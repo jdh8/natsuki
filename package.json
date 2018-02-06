@@ -1,0 +1,13 @@
+{
+    "name": "natsuki",
+    "description": "Discord bot named after Natsuki from Doki Doki Literature Club",
+    "main": "index.js",
+    "repository": "https://github.com/yurigang/natsuki",
+    "contributors": [
+        "Chen-Pang He (https://jdh8.org)",
+        "YourWorstNightmare (https://www.reddit.com/user/YourWrstNightmare)"
+    ],
+    "dependencies": {
+        "discord.io": "github:woor/discord.io#gateway_v6"
+    }
+}

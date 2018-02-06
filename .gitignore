@@ -1,3 +1,6 @@
+# Credentials of the bot
+auth.json
+
 # Logs
 logs
 *.log
