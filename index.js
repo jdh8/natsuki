@@ -6,7 +6,8 @@ const natsuki =
 {
 	ping() { return "Pong!"; },
 	repo() { return "https://github.com/yurigang/natsuki"; },
-	help(message) { return manual[/\S*/.exec(message.content)] || manual[""]; }
+	eval(message) { return eval(message.content); },
+	help(message) { return manual[/\S*/.exec(message.content)] || manual[""]; },
 };
 
 const Discord = require("discord.js");
