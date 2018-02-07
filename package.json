@@ -8,6 +8,6 @@
         "YourWorstNightmare (https://www.reddit.com/user/YourWrstNightmare)"
     ],
     "dependencies": {
-        "discord.io": "github:woor/discord.io#gateway_v6"
+        "discord.js": "^11.3.0"
     }
 }
