@@ -1,0 +1,5 @@
+{
+    "ping": "**`n.ping`** Test if Natsuki responds\n\n**Usage**: n.ping",
+    "repo": "**`n.repo`** Github repository of Natsuki\n\n**Usage**: n.repo",
+    "": "**List of commands**\nSend `n.help [command]` for usage of a specific command.\n\n**Core -** `ping` `repo`"
+}

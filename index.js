@@ -1,8 +1,12 @@
 "use strict";
 
+const manual = require("./manual.json");
+
 const natsuki =
 {
-	ping(message) { message.reply("pong!"); }
+	ping() { return "Pong!"; },
+	repo() { return "https://github.com/yurigang/natsuki"; },
+	help(message) { return manual[/\S*/.exec(message.content)] || manual[""]; }
 };
 
 const Discord = require("discord.js");
@@ -15,8 +19,10 @@ client.on("message", message =>
 	if (match) {
 		const callback = natsuki[match[1]];
 
+		message.content = match[2];
+
 		if (callback)
-			callback(message, match[2]);
+			message.channel.send(callback(message));
 	}
 });
 
