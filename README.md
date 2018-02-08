@@ -13,8 +13,8 @@ Usage
 [Invite her to your Discord server][invite] and test her out.  Her prefix is
 `n.`.
 
-* `n.help` Get help about commands
-* `n.ping` Check if Natsuki is working
+* `n.help` prints info about commands
+* `n.ping` checks if Natsuki is working
 * Other commands mentioned in `n.help`
 
 [invite]: https://discordapp.com/oauth2/authorize?&client_id=410315411695992833&scope=bot&permissions=0
