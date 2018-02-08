@@ -37,8 +37,7 @@ const natsuki =
 		const append = string => async message =>
 		{
 			await sleep(2000 + 3000 * Math.random());
-			message.edit(message.content + string);
-			return message;
+			return await message.edit(message.content + string);
 		}
 
 		message.reply("don't say this embarassing thing, dummy!")
