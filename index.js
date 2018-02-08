@@ -21,6 +21,12 @@ const natsuki =
 		message.reply("pong!");
 	},
 
+// Fun
+	beat(message)
+	{
+		return `**I'll beat the shit out of ${message.content}.**`;
+	},
+
 // Utilities
 	eval(message)
 	{
