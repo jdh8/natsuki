@@ -2,6 +2,11 @@
 
 const manual = require("./manual.json");
 
+function sleep(duration)
+{
+	return new Promise(resolve => setTimeout(resolve, duration));
+}
+
 const natsuki =
 {
 // Core
@@ -25,6 +30,22 @@ const natsuki =
 	beat(message)
 	{
 		return "**I'll beat the shit out of " + (message.content || "my dad") + ".**";
+	},
+
+	cute(message)
+	{
+		const append = string => async message =>
+		{
+			await sleep(2000 + 3000 * Math.random());
+			message.edit(message.content + string);
+			return message;
+		}
+
+		message.reply("don't say this embarassing thing, dummy!")
+			.then(append("\nY-You t-too...."))
+			.then(append("\nI'M NOT CUUUUUUUUUUUTE!"))
+			.then(append("\nDon't think you can make me say this embarassing thing just because we're not at school!"))
+			.then(append("\nI-I have to go to the bathroom."));
 	},
 
 	nut(message)
