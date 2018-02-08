@@ -33,6 +33,13 @@ const natsuki =
 			+ ".\n**You guys are so gross!**";
 	},
 
+	shelf(message)
+	{
+		const user = message.mentions.users.first() || message.author;
+
+		return "Fucking " + user + user.username[0].repeat(5 + 10 * Math.random());
+	},
+
 // Information
 	repo()
 	{

@@ -5,8 +5,9 @@
 
     "beat": "**`n.beat`** Ask Buffski to beat someone\n\n**Usage**: n.beat [user|text]",
     "nut": "**`n.nut`** Nut on someone\n\n**Usage**: n.nut [user|text]",
+    "shelf": "**`n.shelf`** Help Natsuki access the book on the shelf\n\n**Usage**: n.shelf [user]",
 
     "repo": "**`n.repo`** Github repository of Natsuki\n\n**Usage**: n.repo",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping`\n**Fun -** `beat` `nut`\n**Information -** `repo`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping`\n**Fun -** `beat` `nut` `shelf`\n**Information -** `repo`"
 }
