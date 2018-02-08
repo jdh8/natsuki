@@ -13,12 +13,13 @@ const natsuki =
 	help(message)
 	{
 		const command = /\S*/.exec(message.content);
-		return manual[command] || `The command \`${command}\` is not found.`;
+
+		message.channel.send(manual[command] || `The command \`${command}\` is not found.`);
 	},
 
-	invite()
+	invite(message)
 	{
-		return "https://discordapp.com/oauth2/authorize?&client_id=410315411695992833&scope=bot&permissions=0";
+		message.channel.send("https://discordapp.com/oauth2/authorize?&client_id=410315411695992833&scope=bot&permissions=0");
 	},
 
 	ping(message)
@@ -29,7 +30,7 @@ const natsuki =
 // Fun
 	beat(message)
 	{
-		return "**I'll beat the shit out of " + (message.content || "my dad") + ".**";
+		message.channel.send(`**I'll beat the shit out of ${message.content || "my dad"}.**`);
 	},
 
 	cute(message)
@@ -49,21 +50,20 @@ const natsuki =
 
 	nut(message)
 	{
-		return message.author + " nuts on " + (message.content || "the floor")
-			+ ".\n**You guys are so gross!**";
+		message.channel.send(`${message.author} nuts on ${message.content || "the floor"}.\n**You guys are so gross!**`);
 	},
 
 	shelf(message)
 	{
 		const user = message.mentions.users.first() || message.author;
 
-		return "**Fucking " + user + user.username[0].repeat(5 + 10 * Math.random()) + "**";
+		message.channel.send(`**Fucking ${user}${user.username[0].repeat(5 + 10 * Math.random())}**`);
 	},
 
 // Information
-	repo()
+	repo(message)
 	{
-		return "https://github.com/yurigang/natsuki";
+		message.channel.send("https://github.com/yurigang/natsuki");
 	},
 };
 
@@ -75,12 +75,8 @@ client.on("message", message =>
 	const match = /^n\.(\S*)\s*(.*)/.exec(message.content);
 
 	if (match) {
-		const callback = natsuki[match[1]];
-
 		message.content = match[2];
-
-		if (callback)
-			message.channel.send(callback(message));
+		(natsuki[match[1]] || (() => {}))(message);
 	}
 });
 
