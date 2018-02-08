@@ -24,7 +24,7 @@ const natsuki =
 // Fun
 	beat(message)
 	{
-		return `**I'll beat the shit out of ${message.content}.**`;
+		return "**I'll beat the shit out of " + (message.content || "my dad") + ".**";
 	},
 
 // Utilities
