@@ -27,6 +27,12 @@ const natsuki =
 		return "**I'll beat the shit out of " + (message.content || "my dad") + ".**";
 	},
 
+	nut(message)
+	{
+		return message.author + " nuts on " + (message.content || "the floor")
+			+ ".\n**You guys are so gross!**";
+	},
+
 // Utilities
 	eval(message)
 	{
