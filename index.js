@@ -37,7 +37,7 @@ const natsuki =
 	{
 		const user = message.mentions.users.first() || message.author;
 
-		return "Fucking " + user + user.username[0].repeat(5 + 10 * Math.random());
+		return "**Fucking " + user + user.username[0].repeat(5 + 10 * Math.random()) + "**";
 	},
 
 // Information
