@@ -4,14 +4,28 @@ const manual = require("./manual.json");
 
 const natsuki =
 {
-	ping() { return "Pong!"; },
-	repo() { return "https://github.com/yurigang/natsuki"; },
-	eval(message) { return eval(message.content); },
+// Core
+	ping(message)
+	{
+		message.reply("pong!");
+	},
 
 	help(message)
 	{
 		const command = /\S*/.exec(message.content);
 		return manual[command] || `The command \`${command}\` is not found.`;
+	},
+
+// Utilities
+	eval(message)
+	{
+		return eval(message.content);
+	},
+
+// Information
+	repo()
+	{
+		return "https://github.com/yurigang/natsuki";
 	},
 };
 
