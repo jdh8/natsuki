@@ -33,12 +33,6 @@ const natsuki =
 			+ ".\n**You guys are so gross!**";
 	},
 
-// Utilities
-	eval(message)
-	{
-		return eval(message.content);
-	},
-
 // Information
 	repo()
 	{
