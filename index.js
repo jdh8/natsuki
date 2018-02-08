@@ -5,15 +5,20 @@ const manual = require("./manual.json");
 const natsuki =
 {
 // Core
-	ping(message)
-	{
-		message.reply("pong!");
-	},
-
 	help(message)
 	{
 		const command = /\S*/.exec(message.content);
 		return manual[command] || `The command \`${command}\` is not found.`;
+	},
+
+	invite()
+	{
+		return "https://discordapp.com/oauth2/authorize?&client_id=410315411695992833&scope=bot&permissions=0";
+	},
+
+	ping(message)
+	{
+		message.reply("pong!");
 	},
 
 // Utilities
