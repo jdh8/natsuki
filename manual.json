@@ -7,5 +7,5 @@
 
     "repo": "**`n.repo`** Github repository of Natsuki\n\n**Usage**: n.repo",
 
-    "": "**List of commands**\nSend `n.help [command]` for usage of a specific command.\n\n**Core -** `help` `ping`\n**Utilities -** `eval`\n**Information -** `repo`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping`\n**Utilities -** `eval`\n**Information -** `repo`"
 }
