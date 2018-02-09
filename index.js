@@ -26,6 +26,11 @@ const natsuki =
 		message.reply("pong!");
 	},
 
+	support(message)
+	{
+		message.channel.send("Looking for support?  Natsuki is free and open-source software.  Report issues or even contribute to our GitHub repository!\nhttps://github.com/yurigang/natsuki");
+	},
+
 // Fun
 	beat(message)
 	{
@@ -51,12 +56,6 @@ const natsuki =
 		const user = message.mentions.users.first() || message.author;
 
 		message.channel.send(`**Fucking ${user}${user.username[0].repeat(5 + 10 * Math.random())}**`);
-	},
-
-// Information
-	repo(message)
-	{
-		message.channel.send("https://github.com/yurigang/natsuki");
 	},
 };
 

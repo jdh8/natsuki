@@ -2,13 +2,12 @@
     "help": "**`n.help`** List of commands or information about a given command\n\n**Usage**: n.help [command]\n\n**Examples**:\n`n.help`  List of commands\n`n.help ping`  Usage of the `ping` command",
     "invite": "**`n.invite`** Get a link to invite Natsuki to your server\n\n**Usage**: n.invite",
     "ping": "**`n.ping`** Test if Natsuki responds\n\n**Usage**: n.ping",
+    "support": "**`n.support`** GitHub repository of Natsuki\n\n**Usage**: n.support",
 
     "beat": "**`n.beat`** Ask Buffski to beat someone\n\n**Usage**: n.beat [user|text]",
     "cute": "**`n.cute`** Say that Natsuki is cute\n\n**Usage**: n.cute",
     "nut": "**`n.nut`** Nut on someone\n\n**Usage**: n.nut [user|text]",
     "shelf": "**`n.shelf`** Help Natsuki access the book on the shelf\n\n**Usage**: n.shelf [user]",
 
-    "repo": "**`n.repo`** Github repository of Natsuki\n\n**Usage**: n.repo",
-
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping`\n**Fun -** `beat` `cute` `nut` `shelf`\n**Information -** `repo`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping` `support`\n**Fun -** `beat` `cute` `nut` `shelf`"
 }
