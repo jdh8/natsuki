@@ -3,9 +3,11 @@
     "description": "Discord bot named after Natsuki from Doki Doki Literature Club",
     "main": "index.js",
     "repository": "https://github.com/yurigang/natsuki",
+    "license": "MIT",
     "contributors": [
         "Chen-Pang He (https://jdh8.org)",
-        "YourWorstNightmare (https://www.reddit.com/user/YourWrstNightmare)"
+        "u/YourWrstNightmare (https://www.reddit.com/user/YourWrstNightmare)"
+        "u/RoseQuartz6758 (https://www.reddit.com/user/RoseQuartz6758)"
     ],
     "dependencies": {
         "discord.js": "^11.3.0"
