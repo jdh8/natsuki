@@ -34,7 +34,7 @@ const natsuki =
 // Fun
 	beat(message)
 	{
-		message.channel.send(`**I'll beat the shit out of ${message.content || "my dad"}.**`);
+		message.channel.send(`<:buffsuki:403658386723307521> **I'll beat the shit out of ${message.content || "my dad"}.**`);
 	},
 
 	cute(message)
