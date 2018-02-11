@@ -48,7 +48,7 @@ const natsuki =
 
 	nut(message)
 	{
-		message.channel.send(`${message.author} nuts on ${message.content || "the floor"}.\n**You guys are so gross!**`);
+		message.channel.send(`${message.author} nuts on ${message.content || "the floor"}.\n<:pukesuki:405984820674428928> **You guys are so gross!**`);
 	},
 
 	shelf(message)
