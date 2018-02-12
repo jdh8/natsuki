@@ -64,6 +64,8 @@ const natsuki =
 const Discord = require("discord.js");
 const client = new Discord.Client();
 
+client.on("ready", () => client.user.setPresence({ game: { name: "n.help | https://github.com/yurigang/natsuki" }}));
+
 client.on("message", message =>
 {
 	const match = /^n\.(\S*)\s*(.*)/.exec(message.content);
