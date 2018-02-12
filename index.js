@@ -4,7 +4,7 @@ const manual = require("./manual.json");
 
 const append = string => message => message.edit(message.content + string);
 
-const sleep = duration => x => (new Promise(resolve => setTimeout(resolve, duration))).then(() => x);
+const sleep = duration => x => new Promise(resolve => setTimeout(resolve, duration)).then(() => x);
 
 const natsuki =
 {
