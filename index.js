@@ -23,9 +23,9 @@ const natsuki =
 
 	ping(message)
 	{
-		const tick = message.createdTimestamp;
+		const tick = Date.now();
 
-		message.reply("pong!").then(message => message.edit(`${message.content} ${message.createdTimestamp - tick} ms`));
+		message.reply("pong!").then(message => message.edit(`${message.content} ${Date.now() - tick} ms`));
 	},
 
 	support(message)
