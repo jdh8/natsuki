@@ -2,10 +2,6 @@
 
 const manual = require("./manual.json");
 
-const append = string => message => message.edit(message.content + string);
-
-const sleep = duration => x => new Promise(resolve => setTimeout(resolve, duration)).then(() => x);
-
 const natsuki =
 {
 // Core
@@ -41,6 +37,9 @@ const natsuki =
 
 	cute(message)
 	{
+		const append = string => message => message.edit(message.content + string);
+		const sleep = duration => x => new Promise(resolve => setTimeout(resolve, duration)).then(() => x);
+
 		message.reply("don't say this embarassing thing, dummy!")
 			.then(sleep(3000)).then(append("\nY-You t-too...."))
 			.then(sleep(2000)).then(append("\nI'M NOT CUUUUUUUUUUUTE!"))
