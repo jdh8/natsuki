@@ -42,16 +42,16 @@ const natsuki =
 	{
 		Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg").then(image =>
 		{
-			const send = name => (error, buffer) => message.channel.send(new Discord.Attachment(buffer, name));
 			const user = message.mentions.users.first();
 
 			if (user) {
 				Jimp.read(`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`)
 					.then(avatar => image.composite(avatar, 80, 80))
-					.then(image => image.getBuffer("image/png", send("cupcake.png")));
+					.then(image => image.getBuffer("image/png", (error, buffer) =>
+						message.channel.send(new Discord.Attachment(buffer, "cupcake.png"))));
 			}
 			else {
-				image.getBuffer("image/jpeg", send("cupcake.jpg"));
+				message.channel.send("https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Hostess-Cupcake-Whole.jpg/290px-Hostess-Cupcake-Whole.jpg");
 			}
 		});
 	},
