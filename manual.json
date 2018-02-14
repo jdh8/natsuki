@@ -5,9 +5,10 @@
     "support": "**`n.support`** GitHub repository of Natsuki\n\n**Usage**: n.support",
 
     "beat": "**`n.beat`** Ask Buffski to beat someone\n\n**Usage**: n.beat [user|text]",
+    "cupcake": "**`n.cupcake`** Bake cupcake out of someone\n\n**Usage**: n.cupcake [user]",
     "cute": "**`n.cute`** Say that Natsuki is cute\n\n**Usage**: n.cute",
     "nut": "**`n.nut`** Nut on someone\n\n**Usage**: n.nut [user|text]",
     "shelf": "**`n.shelf`** Help Natsuki access the book on the shelf\n\n**Usage**: n.shelf [user]",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping` `support`\n**Fun -** `beat` `cute` `nut` `shelf`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping` `support`\n**Fun -** `beat` `cupcake` `cute` `nut` `shelf`"
 }

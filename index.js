@@ -1,5 +1,8 @@
 "use strict";
 
+const Discord = require("discord.js");
+const Jimp = require("jimp");
+
 const manual = require("./manual.json");
 
 const natsuki =
@@ -35,6 +38,24 @@ const natsuki =
 		message.channel.send(`<:buffsuki:403658386723307521> **I'll beat the shit out of ${message.content || "my dad"}.**`);
 	},
 
+	cupcake(message)
+	{
+		Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg").then(image =>
+		{
+			const send = name => (error, buffer) => message.channel.send(new Discord.Attachment(buffer, name));
+			const user = message.mentions.users.first();
+
+			if (user) {
+				Jimp.read(`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`)
+					.then(avatar => image.composite(avatar, 80, 80))
+					.then(image => image.getBuffer("image/png", send("cupcake.png")));
+			}
+			else {
+				image.getBuffer("image/jpeg", send("cupcake.jpg"));
+			}
+		});
+	},
+
 	cute(message)
 	{
 		const append = string => message => message.edit(message.content + string);
@@ -60,7 +81,6 @@ const natsuki =
 	},
 };
 
-const Discord = require("discord.js");
 const client = new Discord.Client();
 
 client.on("ready", () => client.user.setPresence({ game: { name: "n.help | https://github.com/yurigang/natsuki" }}));
