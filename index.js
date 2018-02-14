@@ -47,7 +47,9 @@ const natsuki =
 			Jimp.read(`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`)
 				.then(avatar => image.composite(avatar, 80, 80))
 				.then(image => image.getBuffer("image/png", (error, buffer) =>
-					message.channel.send(new Discord.Attachment(buffer, "cupcake.png"))));
+					message.channel.send(
+						`${user} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!`,
+						new Discord.Attachment(buffer, "cupcake.png"))));
 		});
 	},
 
