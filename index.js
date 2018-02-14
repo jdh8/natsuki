@@ -40,17 +40,15 @@ const natsuki =
 
 	cupcake(message)
 	{
-		Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg").then(image =>
-		{
-			const user = message.mentions.users.first() || message.author;
+		const user = message.mentions.users.first() || message.author;
 
+		Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg").then(image =>
 			Jimp.read(`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`)
 				.then(avatar => image.composite(avatar, 80, 80))
 				.then(image => image.getBuffer("image/png", (error, buffer) =>
 					message.channel.send(
 						`${user} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!`,
-						new Discord.Attachment(buffer, "cupcake.png"))));
-		});
+						new Discord.Attachment(buffer, "cupcake.png")))));
 	},
 
 	cute(message)
