@@ -5,7 +5,7 @@
     "support": "**`n.support`** GitHub repository of Natsuki\n\n**Usage**: n.support",
 
     "beat": "**`n.beat`** Ask Buffski to beat someone\n\n**Usage**: n.beat [user|text]",
-    "cupcake": "**`n.cupcake`** Bake cupcake out of someone\n\n**Usage**: n.cupcake [user]",
+    "cupcake": "**`n.cupcake`** Bake cupcake out of someone\n\n**Usage**: n.cupcake [user]\n\nThe source of the cupcake is https://commons.wikimedia.org/wiki/File:Hostess-Cupcake-Whole.jpg",
     "cute": "**`n.cute`** Say that Natsuki is cute\n\n**Usage**: n.cute",
     "nut": "**`n.nut`** Nut on someone\n\n**Usage**: n.nut [user|text]",
     "shelf": "**`n.shelf`** Help Natsuki access the book on the shelf\n\n**Usage**: n.shelf [user]",
