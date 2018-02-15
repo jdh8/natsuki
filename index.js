@@ -41,31 +41,39 @@ const natsuki =
 	cupcake(message)
 	{
 		const user = message.mentions.users.first() || message.author;
+		const text = `${user} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!`;
+		const image = Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg");
+		const avatar = Jimp.read(`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`);
 
-		Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg").then(image =>
-			Jimp.read(`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`)
-				.then(avatar => image.composite(avatar, 80, 80))
-				.then(image => image.getBuffer("image/png", (error, buffer) =>
-					message.channel.send(
-						`${user} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!`,
-						new Discord.Attachment(buffer, "cupcake.png")))));
+		image.then(async image => image.composite(await avatar, 80, 80).getBuffer("image/png", (error, buffer) =>
+			message.channel.send(text, new Discord.Attachment(buffer, "cupcake.png"))));
 	},
 
 	cute(message)
 	{
+		const delay = duration => async x =>
+		{
+			await new Promise(resolve => setTimeout(resolve, duration));
+			return x;
+		}
+
 		const append = string => message => message.edit(message.content + string);
-		const sleep = duration => x => new Promise(resolve => setTimeout(resolve, duration)).then(() => x);
 
 		message.reply("don't say this embarassing thing, dummy!")
-			.then(sleep(3000)).then(append("\nY-You t-too...."))
-			.then(sleep(2000)).then(append("\nI'M NOT CUUUUUUUUUUUTE!"))
-			.then(sleep(2000)).then(append("\nDon't think you can make me say this embarassing thing just because we're not at school!"))
-			.then(sleep(4000)).then(append("\nI-I have to go to the bathroom."));
+			.then(delay(3000))
+			.then(append("\nY-You t-too...."))
+			.then(delay(2000))
+			.then(append("\nI'M NOT CUUUUUUUUUUUTE!"))
+			.then(delay(2000))
+			.then(append("\nDon't think you can make me say this embarassing thing just because we're not at school!"))
+			.then(delay(4000))
+			.then(append("\nI-I have to go to the bathroom."));
 	},
 
 	nut(message)
 	{
-		message.channel.send(`${message.author} nuts on ${message.content || "the floor"}.\n<:pukesuki:405984820674428928> **You guys are so gross!**`);
+		message.channel.send(`${message.author} nuts on ${message.content || "the floor"}.
+<:pukesuki:405984820674428928> **You guys are so gross!**`);
 	},
 
 	shelf(message)
