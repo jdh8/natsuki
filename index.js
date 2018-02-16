@@ -51,23 +51,17 @@ const natsuki =
 
 	cute(message)
 	{
-		const delay = duration => async x =>
+		const append = (duration, string) => async message =>
 		{
 			await new Promise(resolve => setTimeout(resolve, duration));
-			return x;
+			return message.edit(message.content + string);
 		}
 
-		const append = string => message => message.edit(message.content + string);
-
 		message.reply("don't say this embarassing thing, dummy!")
-			.then(delay(3000))
-			.then(append("\nY-You t-too...."))
-			.then(delay(2000))
-			.then(append("\nI'M NOT CUUUUUUUUUUUTE!"))
-			.then(delay(2000))
-			.then(append("\nDon't think you can make me say this embarassing thing just because we're not at school!"))
-			.then(delay(4000))
-			.then(append("\nI-I have to go to the bathroom."));
+			.then(append(3000, "\nY-You t-too...."))
+			.then(append(2000, "\nI'M NOT CUUUUUUUUUUUTE!"))
+			.then(append(2000, "\nDon't think you can make me say this embarassing thing just because we're not at school!"))
+			.then(append(4000, "\nI-I have to go to the bathroom."));
 	},
 
 	nut(message)
