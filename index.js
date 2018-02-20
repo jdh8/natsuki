@@ -80,7 +80,7 @@ const natsuki =
 
 const client = new Discord.Client();
 
-client.on("ready", () => client.user.setPresence({ game: { name: "n.help | https://github.com/yurigang/natsuki" }}));
+client.on("ready", () => client.user.setPresence({ game: { name: "n.help | n.invite" }}));
 
 client.on("message", message =>
 {
