@@ -64,6 +64,18 @@ const natsuki =
 			.then(append(4000, "\nI-I have to go to the bathroom."));
 	},
 
+	hug(message)
+	{
+		message.channel.send(`${message.author} hugged ${message.content || "Yuri"}!
+https://cdn.discordapp.com/attachments/403697175948820481/413015715273113601/Nxdr0qO_1.jpg`);
+	},
+
+	kiss(message)
+	{
+		message.channel.send(`${message.author} kissed ${message.content || "Natsuki"}!
+https://cdn.discordapp.com/attachments/403697175948820481/413015768368939009/orIQN4giQx8ijyQ6Qm1vf6Q6uWrLxQ9Fom_Xkht7WOI.jpg`);
+	},
+
 	nut(message)
 	{
 		message.channel.send(`${message.author} nuts on ${message.content || "the floor"}.
