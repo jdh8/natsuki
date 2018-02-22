@@ -92,7 +92,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 // Tools
 	async poll(message)
 	{
-		const choices = message.content.split(/\s*\|\s*/, 26);
+		const choices = message.content.split(/\s*$/m, 1)[0].split(/\s*\|\s*/, 26);
 		const length = choices.length;
 
 		if (length > 1) {
@@ -118,7 +118,7 @@ client.on("ready", () => client.user.setPresence({ game: { name: "n.help | n.inv
 
 client.on("message", message =>
 {
-	const match = /^n\.(\S*)\s*(.*)/.exec(message.content);
+	const match = /^n\.(\S*)\s*([^]*)/.exec(message.content);
 
 	if (match) {
 		message.content = match[2];
