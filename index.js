@@ -73,7 +73,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015715273113601/Nxd
 	kiss(message)
 	{
 		message.channel.send(`${message.author} kissed ${message.content || "Natsuki"}!
-https://cdn.discordapp.com/attachments/403697175948820481/413015768368939009/orIQN4giQx8ijyQ6Qm1vf6Q6uWrLxQ9Fom_Xkht7WOI.jpg`);
+https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tumblr_inline_p2j9lgKnBS1ujm7ol_540.jpg`);
 	},
 
 	nut(message)
