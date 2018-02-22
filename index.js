@@ -97,7 +97,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 			await message.react("👎");
 		}
 		else {
-			message.reply("please ask a yes-no question like `n.poll Is Natsuki loli?`");
+			message.reply("please provide a topic.");
 		}
 	},
 };
