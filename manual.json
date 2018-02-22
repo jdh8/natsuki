@@ -12,7 +12,7 @@
     "nut": "**`n.nut`** Nut on someone\n\n**Usage**: n.nut [user|text]",
     "shelf": "**`n.shelf`** Help Natsuki access the book on the shelf\n\n**Usage**: n.shelf [user]",
 
-    "poll": "**`n.poll`** Ask everyone a yes-no question\n\n**Usage**: n.poll [question]\n\n**Example**:\nn.poll Is Miyuki Sone best waifu",
+    "poll": "**`n.poll`** Poll a yes-no question or multiple choices\n\n**Usage**: n.poll [question|choices]\n\n**Examples**:\nn.poll Is Miyuki Sone best waifu\nn.poll Sayori | Natsuki | Yuri | Monika",
 
     "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping` `support`\n**Fun -** `beat` `cupcake` `cute` `hug` `kiss` `nut` `shelf`\n**Tools -** `poll`"
 }

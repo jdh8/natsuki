@@ -92,7 +92,17 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 // Tools
 	async poll(message)
 	{
-		if (message.content) {
+		const choices = message.content.split(/\s*\|\s*/, 26);
+		const length = choices.length;
+
+		if (length > 1) {
+			const option = (string, index) => String.fromCodePoint(0x1F1E6 + index) + " " + string;
+			const reply = await message.channel.send(choices.map(option).join("\n"));
+
+			for (let code = 0x1F1E6; code < 0x1F1E6 + length; ++code)
+				await reply.react(String.fromCodePoint(code));
+		}
+		else if (message.content) {
 			await message.react("👍");
 			await message.react("👎");
 		}
