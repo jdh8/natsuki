@@ -110,6 +110,11 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 			message.reply("please provide a topic.");
 		}
 	},
+
+	"0chan"(message)
+	{
+		message.channel.send("https://www.zerochan.net/" + message.content.split(/\s+/).map(encodeURIComponent).join("+"));
+	},
 };
 
 const client = new Discord.Client();
