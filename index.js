@@ -125,7 +125,7 @@ client.on("message", message =>
 		(natsuki[match[1]] || (() => {}))(message);
 	}
 	else if (message.mentions.users.get(client.user.id)) {
-		message.channel.send("<:YuriNotification:414264323880386561>");
+		message.channel.send("https://store.teamsalvato.com/product/ddlc-poster-natsuki-11x17/");
 	}
 });
 
