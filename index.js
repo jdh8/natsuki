@@ -124,6 +124,9 @@ client.on("message", message =>
 		message.content = match[2];
 		(natsuki[match[1]] || (() => {}))(message);
 	}
+	else if (message.mentions.users.get(client.user.id)) {
+		message.channel.send("<:YuriNotification:414264323880386561>");
+	}
 });
 
 client.login(process.env.TOKEN);
