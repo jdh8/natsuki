@@ -89,6 +89,11 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 		message.channel.send(`**Fucking ${user}${user.username[0].repeat(5 + 10 * Math.random())}**`);
 	},
 
+	word(message)
+	{
+		message.channel.send("🇳\u200B🇮🅱🅱🅰");
+	},
+
 // Tools
 	async poll(message)
 	{

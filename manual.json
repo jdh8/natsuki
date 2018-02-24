@@ -11,8 +11,9 @@
     "kiss": "**`n.kiss`** Kiss someone\n\n**Usage**: n.kiss [user|text]",
     "nut": "**`n.nut`** Nut on someone\n\n**Usage**: n.nut [user|text]",
     "shelf": "**`n.shelf`** Help Natsuki access the book on the shelf\n\n**Usage**: n.shelf [user]",
+    "word": "**`n.word`** Display the n-word\n\n**Usage**: n.word",
 
     "poll": "**`n.poll`** Poll a yes-no question or multiple choices\n\n**Usage**: n.poll [question|choices]\n\n**Examples**:\nn.poll Is Miyuki Sone best waifu\nn.poll Sayori | Natsuki | Yuri | Monika",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping` `support`\n**Fun -** `beat` `cupcake` `cute` `hug` `kiss` `nut` `shelf`\n**Tools -** `poll`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping` `support`\n**Fun -** `beat` `cupcake` `cute` `hug` `kiss` `nut` `shelf` `word`\n**Tools -** `poll`"
 }
