@@ -13,7 +13,6 @@
     "shelf": "**`n.shelf`** Help Natsuki access the book on the shelf\n\n**Usage**: n.shelf [user]",
 
     "poll": "**`n.poll`** Poll a yes-no question or multiple choices\n\n**Usage**: n.poll [question|choices]\n\n**Examples**:\nn.poll Is Miyuki Sone best waifu\nn.poll Sayori | Natsuki | Yuri | Monika",
-    "0chan": "**`n.0chan`** Get anime image from zerochan\n\n**Usage**: n.0chan [tags]\n\n**Examples**:\nn.0chan Ikezawa Hanako\nn.0chan Sone Miyuki",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping` `support`\n**Fun -** `beat` `cupcake` `cute` `hug` `kiss` `nut` `shelf`\n**Tools -** `poll` `0chan`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping` `support`\n**Fun -** `beat` `cupcake` `cute` `hug` `kiss` `nut` `shelf`\n**Tools -** `poll`"
 }
