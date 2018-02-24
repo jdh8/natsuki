@@ -120,15 +120,15 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 			return result;
 		};
 
-		message.reply(`whose word is **${word}**?  Please answer in 20 seconds.`).then(message =>
+		message.reply(`whose word is **${word}**?  Please answer in 20 seconds.`).then(async message =>
 		{
-			if (act1)
-				message.react(client.emojis.get(sayori));
-
-			message.react(client.emojis.get(natsuki));
-			message.react(client.emojis.get(yuri));
-
 			client.on("messageReactionAdd", listen(message.id));
+
+			if (act1)
+				await message.react(client.emojis.get(sayori));
+
+			await message.react(client.emojis.get(natsuki));
+			await message.react(client.emojis.get(yuri));
 		});
 	},
 
