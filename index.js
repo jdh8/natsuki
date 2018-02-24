@@ -4,6 +4,9 @@ const Discord = require("discord.js");
 const Jimp = require("jimp");
 
 const manual = require("./manual.json");
+const poetry = require("./poetry.json");
+
+const client = new Discord.Client();
 
 const natsuki =
 {
@@ -82,6 +85,53 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 <:pukesuki:405984820674428928> **You guys are so gross!**`);
 	},
 
+	poem(message)
+	{
+		const pick = array => array[~~(array.length * Math.random())];
+		const word = pick(Object.keys(poetry));
+		const act1 = message.content.indexOf("2") < 0;
+
+		const sayori = "413123702788718593";
+		const natsuki = "413125818059849728";
+		const yuri = "405392894787059732";
+		const answer = [ natsuki, sayori, yuri, sayori ][poetry[word] & (2 | act1)];
+
+		const listen = reply =>
+		{
+			const timer = setTimeout(() =>
+			{
+				client.removeListener("messageReactionAdd", result);
+				message.channel.send(message.author + ", you didn't answer.");
+			}, 20000);
+
+			const result = (reaction, user) =>
+			{
+				if (reaction.message.id == reply && user.id == message.author.id) {
+					clearTimeout(timer);
+					client.removeListener("messageReactionAdd", result);
+
+					if (reaction.emoji.id == answer)
+						message.channel.send(`Congrats, ${user}!  That's correct.`);
+					else
+						message.channel.send(user + ", you didn't get it.");
+				}
+			};
+
+			return result;
+		};
+
+		message.reply(`whose word is **${word}**?  Please answer in 20 seconds.`).then(message =>
+		{
+			if (act1)
+				message.react(client.emojis.get(sayori));
+
+			message.react(client.emojis.get(natsuki));
+			message.react(client.emojis.get(yuri));
+
+			client.on("messageReactionAdd", listen(message.id));
+		});
+	},
+
 	shelf(message)
 	{
 		const user = message.mentions.users.first() || message.author;
@@ -116,8 +166,6 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 		}
 	},
 };
-
-const client = new Discord.Client();
 
 client.on("ready", () => client.user.setPresence({ game: { name: "n.help | n.invite" }}));
 
