@@ -94,9 +94,22 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 		const sayori = "413123702788718593";
 		const natsuki = "413125818059849728";
 		const yuri = "405392894787059732";
+		const monika = "414572706370027533";
 		const answer = [ natsuki, sayori, yuri, sayori ][poetry[word] & (2 | act1)];
 
-		const listen = reply =>
+		const reply = emoticon =>
+		{
+			switch (emoticon) {
+				case answer:
+					return `Congrats, ${message.author}!  That's correct.`;
+				case monika:
+					return "Really?";
+				default:
+					return message.author + ", you didn't get it.";
+			}
+		};
+
+		const listen = question =>
 		{
 			const timer = setTimeout(() =>
 			{
@@ -106,14 +119,10 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 			const result = (reaction, user) =>
 			{
-				if (reaction.message.id == reply && user.id == message.author.id) {
+				if (reaction.message.id == question && user.id == message.author.id) {
 					clearTimeout(timer);
 					client.removeListener("messageReactionAdd", result);
-
-					if (reaction.emoji.id == answer)
-						message.channel.send(`Congrats, ${user}!  That's correct.`);
-					else
-						message.channel.send(user + ", you didn't get it.");
+					message.channel.send(reply(reaction.emoji.id));
 				}
 			};
 
@@ -129,6 +138,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 			await message.react(client.emojis.get(natsuki));
 			await message.react(client.emojis.get(yuri));
+			await message.react(client.emojis.get(monika));
 		});
 	},
 
