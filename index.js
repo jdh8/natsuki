@@ -194,7 +194,7 @@ client.on("ready", () => client.user.setPresence({ game: { name: "n.help | n.inv
 
 client.on("message", message =>
 {
-	const match = /^n\.(\S*)\s*([^]*)/.exec(message.content);
+	const match = message.channel instanceof Discord.TextChannel && /^n\.(\S*)\s*([^]*)/.exec(message.content);
 
 	if (match) {
 		message.content = match[2];
