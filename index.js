@@ -88,18 +88,19 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 	poem(message)
 	{
 		const act = !message.content | message.content;
+
+		if (act < 1 || act > 3)
+			return message.reply("you input an invalid act.");
+
 		const pick = array => array[~~(array.length * Math.random())];
 		const word = act == 3 ? "Monika" : pick(Object.keys(poetry));
 
 		const sayori = "413123702788718593";
 		const natsuki = "413125818059849728";
-		const yuri = ["405392894787059732", "405392891490598913", ""][act - 1];
+		const yuri = ["405392894787059732", "405392891490598913"][act - 1];
 
 		const monikas = ["414572706370027533", "405977244952166400"];
 		const monika = monikas[act - 1];
-
-		if (yuri === undefined)
-			return message.reply("you input an invalid act.");
 
 		const answer = [ natsuki, sayori, yuri, sayori ][poetry[word] & (4 - act)];
 
