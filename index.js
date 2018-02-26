@@ -8,6 +8,26 @@ const poetry = require("./poetry.json");
 
 const client = new Discord.Client();
 
+const PoemListener = (f, message, author) =>
+{
+	const timer = setTimeout(() =>
+	{
+		client.removeListener("messageReactionAdd", result);
+		message.channel.send(author + ", you didn't answer.");
+	}, 20000);
+
+	const result = (reaction, user) =>
+	{
+		if (reaction.message.id == message.id && user.id == author.id) {
+			clearTimeout(timer);
+			client.removeListener("messageReactionAdd", result);
+			message.channel.send(f(reaction.emoji.id));
+		}
+	};
+
+	return result;
+};
+
 const natsuki =
 {
 // Core
@@ -87,22 +107,25 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 	poem(message)
 	{
-		const act = !message.content | message.content;
+		const f = [ natsuki.poem1, natsuki.poem2, natsuki.poem3 ][(!message.content | message.content) - 1];
 
-		if (act < 1 || act > 3)
-			return message.reply("you input an invalid act.");
+		if (f)
+			f(message);
+		else
+			message.reply("you input an invalid act.");
+	},
 
+	poem1(message)
+	{
 		const pick = array => array[~~(array.length * Math.random())];
-		const word = act == 3 ? "Monika" : pick(Object.keys(poetry));
+		const word = pick(Object.keys(poetry));
 
 		const sayori = "413123702788718593";
 		const natsuki = "413125818059849728";
-		const yuri = ["405392894787059732", "405392891490598913"][act - 1];
+		const yuri = "405392894787059732";
+		const monika = "414572706370027533";
 
-		const monikas = ["414572706370027533", "405977244952166400"];
-		const monika = monikas[act - 1];
-
-		const answer = [ natsuki, sayori, yuri, sayori ][poetry[word] & (4 - act)];
+		const answer = [ natsuki, sayori, yuri, sayori ][poetry[word]];
 
 		const reply = emoticon =>
 		{
@@ -116,42 +139,58 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 			}
 		};
 
-		const listen = question =>
+		message.reply(`whose word is **${word}**?  Please answer in 20 seconds.`).then(async question =>
 		{
-			const timer = setTimeout(() =>
-			{
-				client.removeListener("messageReactionAdd", result);
-				message.channel.send(message.author + ", you didn't answer.");
-			}, 20000);
+			client.on("messageReactionAdd", PoemListener(reply, question, message.author));
 
-			const result = (reaction, user) =>
-			{
-				if (reaction.message.id == question && user.id == message.author.id) {
-					clearTimeout(timer);
-					client.removeListener("messageReactionAdd", result);
-					message.channel.send(act == 3 ? "Just Monika" : reply(reaction.emoji.id));
-				}
-			};
+			await question.react(client.emojis.get(sayori));
+			await question.react(client.emojis.get(natsuki));
+			await question.react(client.emojis.get(yuri));
+			await question.react(client.emojis.get(monika));
+		});
+	},
 
-			return result;
+	poem2(message)
+	{
+		const pick = array => array[~~(array.length * Math.random())];
+		const word = pick(Object.keys(poetry));
+
+		const natsuki = "413125818059849728";
+		const yuri = "405392891490598913";
+		const monika = "405977244952166400";
+
+		const answer = [ natsuki, yuri ][poetry[word] >> 1];
+
+		const reply = emoticon =>
+		{
+			switch (emoticon) {
+				case answer:
+					return `Congrats, ${message.author}!  That's correct.`;
+				case monika:
+					return "Really?";
+				default:
+					return message.author + ", you didn't get it.";
+			}
 		};
 
-		message.reply(`whose word is **${word}**?  Please answer in 20 seconds.`).then(async message =>
+		message.reply(`whose word is **${word}**?  Please answer in 20 seconds.`).then(async question =>
 		{
-			client.on("messageReactionAdd", listen(message.id));
+			client.on("messageReactionAdd", PoemListener(reply, question, message.author));
 
-			if (act == 1)
-				await message.react(client.emojis.get(sayori));
+			await question.react(client.emojis.get(natsuki));
+			await question.react(client.emojis.get(yuri));
+			await question.react(client.emojis.get(monika));
+		});
+	},
 
-			if (act == 3) {
-				await message.react(client.emojis.get(monikas[0]));
-				await message.react(client.emojis.get(monikas[1]));
-			}
-			else {
-				await message.react(client.emojis.get(natsuki));
-				await message.react(client.emojis.get(yuri));
-				await message.react(client.emojis.get(monika));
-			}
+	poem3(message)
+	{
+		message.reply("whose word is **Monika**?  Please answer in 20 seconds.").then(async question =>
+		{
+			client.on("messageReactionAdd", PoemListener(x => "Just Monika", question, message.author));
+
+			await question.react(client.emojis.get("414572706370027533"));
+			await question.react(client.emojis.get("405977244952166400"));
 		});
 	},
 
