@@ -200,9 +200,6 @@ client.on("message", message =>
 		message.content = match[2];
 		(natsuki[match[1]] || (() => {}))(message);
 	}
-	else if (message.content == client.user) {
-		message.channel.send("https://store.teamsalvato.com/product/ddlc-poster-natsuki-11x17/");
-	}
 });
 
 client.login(process.env.TOKEN);
