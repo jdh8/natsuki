@@ -87,14 +87,16 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 	poem(message)
 	{
-		const pick = array => array[~~(array.length * Math.random())];
-		const word = pick(Object.keys(poetry));
 		const act = !message.content | message.content;
+		const pick = array => array[~~(array.length * Math.random())];
+		const word = act == 3 ? "Monika" : pick(Object.keys(poetry));
 
 		const sayori = "413123702788718593";
 		const natsuki = "413125818059849728";
-		const yuri = ["405392894787059732", "405392891490598913"][act - 1];
-		const monika = "414572706370027533";
+		const yuri = ["405392894787059732", "405392891490598913", ""][act - 1];
+
+		const monikas = ["414572706370027533", "405977244952166400"];
+		const monika = monikas[act - 1];
 
 		if (yuri === undefined)
 			return message.reply("you input an invalid act.");
@@ -126,7 +128,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 				if (reaction.message.id == question && user.id == message.author.id) {
 					clearTimeout(timer);
 					client.removeListener("messageReactionAdd", result);
-					message.channel.send(reply(reaction.emoji.id));
+					message.channel.send(act == 3 ? "Just Monika" : reply(reaction.emoji.id));
 				}
 			};
 
@@ -140,9 +142,15 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 			if (act == 1)
 				await message.react(client.emojis.get(sayori));
 
-			await message.react(client.emojis.get(natsuki));
-			await message.react(client.emojis.get(yuri));
-			await message.react(client.emojis.get(monika));
+			if (act == 3) {
+				await message.react(client.emojis.get(monikas[0]));
+				await message.react(client.emojis.get(monikas[1]));
+			}
+			else {
+				await message.react(client.emojis.get(natsuki));
+				await message.react(client.emojis.get(yuri));
+				await message.react(client.emojis.get(monika));
+			}
 		});
 	},
 
