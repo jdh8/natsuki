@@ -6,29 +6,9 @@ const Jimp = require("jimp");
 const manual = require("./manual.json");
 const poetry = require("./poetry.json");
 
-const client = new Discord.Client();
-
-const PoemListener = (f, message, author) =>
-{
-	const timer = setTimeout(() =>
-	{
-		client.removeListener("messageReactionAdd", result);
-		message.channel.send(author + ", you didn't answer.");
-	}, 20000);
-
-	const result = (reaction, user) =>
-	{
-		if (reaction.message.id == message.id && user.id == author.id) {
-			clearTimeout(timer);
-			client.removeListener("messageReactionAdd", result);
-			message.channel.send(f(reaction.emoji.id));
-		}
-	};
-
-	return result;
-};
-
 const resolve = (collection, x) => collection.get(x) || collection.find("name", x);
+
+const client = new Discord.Client();
 
 const natsuki =
 {
@@ -129,26 +109,28 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 		const answer = [ natsuki, sayori, yuri, sayori ][poetry[word]];
 
-		const reply = icon =>
+		message.reply(`whose word is **${word}**?  Please answer in 15 seconds.`).then(async response =>
 		{
-			switch (icon) {
-				case answer:
-					return `Congrats, ${message.author}!  That's correct.`;
-				case monika:
-					return "Really?";
-				default:
-					return message.author + ", you didn't get it.";
-			}
-		};
+			const filter = (reaction, user) => user.id == message.author.id;
+			const collector = response.createReactionCollector(filter, { time: 15000 });
 
-		message.reply(`whose word is **${word}**?  Please answer in 20 seconds.`).then(async question =>
-		{
-			client.on("messageReactionAdd", PoemListener(reply, question, message.author));
+			collector.on("collect", reaction =>
+			{
+				collector.stop();
 
-			await question.react(client.emojis.get(sayori));
-			await question.react(client.emojis.get(natsuki));
-			await question.react(client.emojis.get(yuri));
-			await question.react(client.emojis.get(monika));
+				switch (reaction.emoji.id) {
+					case answer: return message.reply("that's correct.  Congrats!");
+					case monika: return message.channel.send("Really?");
+					default: return message.reply("you didn't get it.");
+				}
+			});
+
+			collector.on("end", (collection, reason) => reason == "time" && message.reply("you didn't answer."));
+
+			await response.react(client.emojis.get(sayori));
+			await response.react(client.emojis.get(natsuki));
+			await response.react(client.emojis.get(yuri));
+			await response.react(client.emojis.get(monika));
 		});
 	},
 
@@ -163,36 +145,47 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 		const answer = [ natsuki, yuri ][poetry[word] >> 1];
 
-		const reply = icon =>
+		message.reply(`whose word is **${word}**?  Please answer in 15 seconds.`).then(async response =>
 		{
-			switch (icon) {
-				case answer:
-					return `Congrats, ${message.author}!  That's correct.`;
-				case monika:
-					return "Really?";
-				default:
-					return message.author + ", you didn't get it.";
-			}
-		};
+			const filter = (reaction, user) => user.id == message.author.id;
+			const collector = response.createReactionCollector(filter, { time: 15000 });
 
-		message.reply(`whose word is **${word}**?  Please answer in 20 seconds.`).then(async question =>
-		{
-			client.on("messageReactionAdd", PoemListener(reply, question, message.author));
+			collector.on("collect", reaction =>
+			{
+				collector.stop();
 
-			await question.react(client.emojis.get(natsuki));
-			await question.react(client.emojis.get(yuri));
-			await question.react(client.emojis.get(monika));
+				switch (reaction.emoji.id) {
+					case answer: return message.reply("that's correct.  Congrats!");
+					case monika: return message.channel.send("Really?");
+					default: return message.reply("you didn't get it.");
+				}
+			});
+
+			collector.on("end", (collection, reason) => reason == "time" && message.reply("you didn't answer."));
+
+			await response.react(client.emojis.get(natsuki));
+			await response.react(client.emojis.get(yuri));
+			await response.react(client.emojis.get(monika));
 		});
 	},
 
 	poem3(message)
 	{
-		message.reply("whose word is **Monika**?  Please answer in 20 seconds.").then(async question =>
+		message.reply("whose word is **Monika**?  Please answer in 15 seconds.").then(async response =>
 		{
-			client.on("messageReactionAdd", PoemListener(x => "Just Monika", question, message.author));
+			const filter = (reaction, user) => user.id == message.author.id;
+			const collector = response.createReactionCollector(filter, { time: 15000 });
 
-			await question.react(client.emojis.get("414572706370027533"));
-			await question.react(client.emojis.get("405977244952166400"));
+			collector.on("collect", () =>
+			{
+				collector.stop();
+				message.channel.send("Just Monika");
+			});
+
+			collector.on("end", (collection, reason) => reason == "time" && message.reply("you didn't answer."));
+
+			await response.react(client.emojis.get("414572706370027533"));
+			await response.react(client.emojis.get("405977244952166400"));
 		});
 	},
 
