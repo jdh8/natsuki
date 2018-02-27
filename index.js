@@ -217,12 +217,12 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 		if (guild.emojis.size == 0)
 			return message.channel.send("This guild has no custom emojis.");
 
-		message.channel.send(guild.emojis.map(icon => `\`${icon.id}\` ${icon.name} ${icon}`).join("\n"), { split: true });
+		message.channel.send(guild.emojis.map(icon => `\`${icon.id}\` ${icon.name} ${icon}`), { split: true });
 	},
 
 	guilds(message)
 	{
-		message.channel.send(client.guilds.map(guild => `\`${guild.id}\` ${guild.name}`).join("\n"), { split: true });
+		message.channel.send(client.guilds.map(guild => `\`${guild.id}\` ${guild.name}`), { split: true });
 	},
 
 	async poll(message)
@@ -232,7 +232,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 		if (length > 1) {
 			const option = (string, index) => String.fromCodePoint(0x1F1E6 + index) + " " + string;
-			const reply = await message.channel.send(choices.map(option).join("\n"));
+			const reply = await message.channel.send(choices.map(option));
 
 			for (let code = 0x1F1E6; code < 0x1F1E6 + length; ++code)
 				await reply.react(String.fromCodePoint(code));
