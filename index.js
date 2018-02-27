@@ -207,6 +207,11 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 	},
 
 // Tools
+	guilds(message)
+	{
+		message.channel.send(client.guilds.map(guild => `\`${guild.id}\` ${guild.name}`).join("\n"), { split: true });
+	},
+
 	async poll(message)
 	{
 		const choices = message.content.split(/\s*$/m, 1)[0].split(/\s*\|\s*/, 20);
@@ -226,6 +231,11 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 		else {
 			message.reply("please provide a topic.");
 		}
+	},
+
+	servers(message)
+	{
+		natsuki.guilds(message);
 	},
 };
 
