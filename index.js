@@ -129,9 +129,9 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 		const answer = [ natsuki, sayori, yuri, sayori ][poetry[word]];
 
-		const reply = emoticon =>
+		const reply = icon =>
 		{
-			switch (emoticon) {
+			switch (icon) {
 				case answer:
 					return `Congrats, ${message.author}!  That's correct.`;
 				case monika:
@@ -163,9 +163,9 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 		const answer = [ natsuki, yuri ][poetry[word] >> 1];
 
-		const reply = emoticon =>
+		const reply = icon =>
 		{
-			switch (emoticon) {
+			switch (icon) {
 				case answer:
 					return `Congrats, ${message.author}!  That's correct.`;
 				case monika:
@@ -209,6 +209,11 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 	},
 
 // Tools
+	emoji(message)
+	{
+		message.channel.send(resolve(client.emojis, message.content) || `The emoji \`${message.content}\` is not found.`);
+	},
+
 	emojis(message)
 	{
 		const guild = message.content ? resolve(client.guilds, message.content) : client;
@@ -217,7 +222,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 			return message.channel.send(`The guild \`${message.content}\` is not found.`);
 
 		if (guild.emojis.size == 0)
-			return message.channel.send("This guild has no custom emoticons.");
+			return message.channel.send("This guild has no custom emojis.");
 
 		message.channel.send(guild.emojis.map(icon => `\`${icon.id}\` ${icon.name} ${icon}`).join("\n"), { split: true });
 	},
