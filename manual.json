@@ -23,5 +23,5 @@
     "poll": "**`n.poll`** Poll a yes-no question or multiple choices\n\n**Usage**: n.poll [question|choices]\n\n**Examples**:\nn.poll Is Miyuki Sone best waifu\nn.poll Sayori | Natsuki | Yuri | Monika",
     "servers": "**`n.servers`** is an alias of n.guilds.",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping` `support`\n**Fun -** `beat` `cupcake` `cute` `hug` `kiss` `nut` `poem` `shelf` `word`\n**Tools -** `guilds` `poll`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping` `support`\n**Fun -** `beat` `cupcake` `cute` `hug` `kiss` `nut` `poem` `shelf` `word`\n**Tools -** `emoji` `emojis` `guilds` `poll`"
 }
