@@ -28,6 +28,8 @@ const PoemListener = (f, message, author) =>
 	return result;
 };
 
+const resolve = (collection, x) => collection.get(x) || collection.find("name", x);
+
 const natsuki =
 {
 // Core
@@ -207,6 +209,19 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 	},
 
 // Tools
+	emojis(message)
+	{
+		const guild = message.content ? resolve(client.guilds, message.content) : client;
+
+		if (guild == null)
+			return message.channel.send(`The guild \`${message.content}\` is not found.`);
+
+		if (guild.emojis.size == 0)
+			return message.channel.send("This guild has no custom emoticons.");
+
+		message.channel.send(guild.emojis.map(icon => `\`${icon.id}\` ${icon.name} ${icon}`).join("\n"), { split: true });
+	},
+
 	guilds(message)
 	{
 		message.channel.send(client.guilds.map(guild => `\`${guild.id}\` ${guild.name}`).join("\n"), { split: true });
