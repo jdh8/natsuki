@@ -204,8 +204,16 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 // Tools
 	emoji(message)
 	{
-		const emoji = resolve(client.emojis, message.content);
-		message.channel.send(emoji ? `${emoji}` : `The emoji \`${message.content}\` is not found.`);
+		const respond = (id, url) =>
+		{
+			if (!id)
+				return "Please specify id or name of the emoji.";
+
+			const emoji = resolve(client.emojis, id);
+			return emoji ? url ? emoji.url : `${emoji}` : `The emoji \`${id}\` is not found.`;
+		}
+
+		message.channel.send(respond(...message.content.split(/\s+/, 2)));
 	},
 
 	emojis(message)
