@@ -34,7 +34,11 @@ const natsuki =
 
 	support(message)
 	{
-		message.channel.send("Looking for support?  Natsuki is free and open-source software.  Report issues or even contribute to our GitHub repository!\nhttps://github.com/yurigang/natsuki");
+		message.channel.send(`I am developed by <@406911726638989313> from Yuri Gang.  I have no dedicated guild, so join Yuri Gang to discuss me and everything.  They are cool people and accept non-Yurists.  Actually, I am conceived by <@374000350363123712>, the biggest Natsuki fan of Yuri Gang.
+https://discord.gg/ftdYR75
+
+I am free and open-source software.  Here comes my repository.  ~~Use the source, Luke!~~
+https://github.com/yurigang/natsuki`);
 	},
 
 // Fun
