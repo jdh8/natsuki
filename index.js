@@ -259,6 +259,23 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 		}
 	},
 
+	react(message)
+	{
+		const list = message.content.split(/\s+/);
+		const id = list.shift();
+
+		if (!id)
+			return message.channel.send("Please specify id of the message.");
+
+		if (list.length == 0)
+			return message.channel.send("Please specify emojis to react.");
+
+		message.channel.fetchMessage(id).then(message =>
+		{
+			list.map(x => message.react(resolve(client.emojis, x) || x))
+		});
+	},
+
 	servers(message)
 	{
 		natsuki.guilds(message);
