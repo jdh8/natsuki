@@ -21,7 +21,8 @@
     "emojis": "**`n.emojis`** Show available emojis\n\n**Usage**: n.emojis [guild]\n\n**Examples**:\n`n.emojis`  Show all accessible emojis\n`n.emojis 403299885891452936`  Show emojis from Yuri Gang!",
     "guilds": "**`n.guilds`** Show guilds where Natsuki is\n\n**Usage**: n.guilds",
     "poll": "**`n.poll`** Poll a yes-no question or multiple choices\n\n**Usage**: n.poll [question|choices]\n\n**Examples**:\nn.poll Is Miyuki Sone best waifu\nn.poll Sayori | Natsuki | Yuri | Monika",
+    "react": "**`n.react`** Have Natsuki react emojis to a message\n\n**Usage**: n.react [id] [emojis]\nEmojis can be specified as id, name, or themselves.\n\n**Example**:\nn.react [message id] 🍋 :seven: glitchyuri",
     "servers": "**`n.servers`** is an alias of n.guilds.",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping` `support`\n**Fun -** `beat` `cupcake` `cute` `hug` `kiss` `nut` `poem` `shelf` `word`\n**Tools -** `emoji` `emojis` `guilds` `poll`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping` `support`\n**Fun -** `beat` `cupcake` `cute` `hug` `kiss` `nut` `poem` `shelf` `word`\n**Tools -** `emoji` `emojis` `guilds` `poll` `react`"
 }

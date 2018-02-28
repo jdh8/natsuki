@@ -261,7 +261,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 	react(message)
 	{
-		const list = message.content.split(/\s+/);
+		const list = message.content.replace(/<a?:\w*:(\d*)>/g, "$1 ").replace(/::/g, ": :").split(/\s+/);
 		const id = list.shift();
 
 		if (!id)
@@ -270,9 +270,10 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 		if (list.length == 0)
 			return message.channel.send("Please specify emojis to react.");
 
-		message.channel.fetchMessage(id).then(message =>
+		message.channel.fetchMessage(id).then(async message =>
 		{
-			list.map(x => message.react(resolve(client.emojis, x) || x))
+			for (let k = 0; k < list.length; ++k)
+				await message.react(resolve(client.emojis, list[k]) || list[k]);
 		});
 	},
 
