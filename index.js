@@ -8,8 +8,6 @@ const poetry = require("./poetry.json");
 
 const client = new Discord.Client();
 
-const Emoji = x => x[0].toLowerCase() == x[0].toUpperCase() ? x : client.emojis.find("name", x);
-
 const natsuki =
 {
 // Core
@@ -213,7 +211,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 			if (!id)
 				return "Please specify id or name of the emoji.";
 
-			const emoji = Emoji(id);
+			const emoji = client.emojis.get(id) || client.emojis.find("name", id);
 			return emoji ? url ? emoji.url : `${emoji}` : `The emoji \`${id}\` is not found.`;
 		}
 
@@ -276,10 +274,11 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 		target.then(async target =>
 		{
+			const resolve = x => x[0].toLowerCase() == x[0].toUpperCase() ? x : client.emojis.find("name", x);
 			const errors = [];
 
 			for (let k = 0; k < list.length; ++k) {
-				const emoji = Emoji(list[k]);
+				const emoji = resolve(list[k]);
 				emoji ? await target.react(emoji) : errors.push(list[k]);
 			}
 
