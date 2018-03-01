@@ -198,6 +198,16 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 		message.channel.send(`**Fucking ${user}${user.username[0].repeat(5 + 10 * Math.random())}**`);
 	},
 
+	ship(message)
+	{
+		const mentions = message.content.match(/<(?:#|@[!&]?)\d+>|@(?:everyone|here)/g);
+
+		if (mentions.length < 2)
+			message.channel.send(`${message.author} × ${message.content || client.user}`);
+		else
+			message.channel.send(mentions.join(" × "));
+	},
+
 	word(message)
 	{
 		message.channel.send("🇳\u200B🇮🅱🅱🅰");
