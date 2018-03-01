@@ -284,7 +284,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 			switch (errors.length) {
 				case 0:
-					return message.reply("all emojis were successfully reacted.");
+					return message;
 				case 1:
 					return message.channel.send(`Emoji ${errors[0]} was not found.`);
 				case 2:
