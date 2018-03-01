@@ -6,9 +6,9 @@ const Jimp = require("jimp");
 const manual = require("./manual.json");
 const poetry = require("./poetry.json");
 
-const resolve = (collection, x) => collection.get(x) || collection.find("name", x);
-
 const client = new Discord.Client();
+
+const Emoji = x => x[0].toLowerCase() == x[0].toUpperCase() ? x : client.emojis.find("name", x);
 
 const natsuki =
 {
@@ -213,7 +213,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 			if (!id)
 				return "Please specify id or name of the emoji.";
 
-			const emoji = resolve(client.emojis, id);
+			const emoji = Emoji(id);
 			return emoji ? url ? emoji.url : `${emoji}` : `The emoji \`${id}\` is not found.`;
 		}
 
@@ -222,10 +222,11 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 	emojis(message)
 	{
-		const guild = message.content ? resolve(client.guilds, message.content) : client;
+		const id = message.content;
+		const guild = id ? client.guilds.get(id) || client.guilds.find("name", id) : client;
 
 		if (guild == null)
-			return message.channel.send(`The guild \`${message.content}\` is not found.`);
+			return message.channel.send(`The guild \`${id}\` is not found.`);
 
 		if (guild.emojis.size == 0)
 			return message.channel.send("This guild has no custom emojis.");
@@ -272,11 +273,10 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 		message.channel.fetchMessage(id).then(async target =>
 		{
-			const resolve = x => x[0].toLowerCase() == x[0].toUpperCase() ? x : client.emojis.find("name", x);
 			const errors = [];
 
 			for (let k = 0; k < list.length; ++k) {
-				const emoji = resolve(list[k]);
+				const emoji = Emoji(list[k]);
 				emoji ? await target.react(emoji) : errors.push(list[k]);
 			}
 
