@@ -201,11 +201,13 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 	ship(message)
 	{
 		const mentions = message.content.match(/<(?:#|@[!&]?)\d+>|@(?:everyone|here)/g);
+		const shipping = !mentions || mentions.length < 2 ?
+			`${message.author} × ${message.content || client.user}` :
+			mentions.join(" × ");
 
-		if (mentions.length < 2)
-			message.channel.send(`${message.author} × ${message.content || client.user}`);
-		else
-			message.channel.send(mentions.join(" × "));
+		message.channel.send(`Look at them, a lovey dovey couple!  I ship it!
+${shipping}
+N-not that I c-care...`)
 	},
 
 	word(message)
