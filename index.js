@@ -261,7 +261,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 	react(message)
 	{
-		const list = message.content.replace(/<a?:\w*:(\d*)>/g, "$1 ").replace(/::/g, ": :").split(/\s+/);
+		const list = message.content.replace(/<a?:\w*:(\d*)>/g, "$1 ").split(/\s+/);
 		const id = list.shift();
 
 		if (!id)
@@ -270,11 +270,28 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 		if (list.length == 0)
 			return message.channel.send("Please specify emojis to react.");
 
-		message.channel.fetchMessage(id).then(async message =>
+		message.channel.fetchMessage(id).then(async target =>
 		{
-			for (let k = 0; k < list.length; ++k)
-				await message.react(resolve(client.emojis, list[k]) || list[k]);
-		});
+			const resolve = x => x[0].toLowerCase() == x[0].toUpperCase() ? x : client.emojis.find("name", x);
+			const errors = [];
+
+			for (let k = 0; k < list.length; ++k) {
+				const emoji = resolve(list[k]);
+				emoji ? await target.react(emoji) : errors.push(list[k]);
+			}
+
+			switch (errors.length) {
+				case 0:
+					return message.reply("all emojis were successfully reacted.");
+				case 1:
+					return message.channel.send(`Emoji ${errors[0]} was not found.`);
+				case 2:
+					return message.channel.send(`Emojis ${errors[0]} and ${errors[1]} were not found.`);
+				default:
+					const last = errors.pop();
+					return message.channel.send(`Emojis ${errors.join(", ")}, and ${last} were not found.`);
+			}
+		}).catch(() => message.channel.send(`The message ${id} was not found.`));
 	},
 
 	servers(message)
