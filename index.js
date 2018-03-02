@@ -287,6 +287,9 @@ N-not that I c-care...`)
 			const resolve = x => x[0].toLowerCase() == x[0].toUpperCase() ? x : client.emojis.find("name", x);
 			const errors = [];
 
+			if (list.length == 0)
+				return message.channel.send("Please specify emojis to react.");
+
 			for (let k = 0; k < list.length; ++k) {
 				const emoji = resolve(list[k]);
 				emoji ? await target.react(emoji) : errors.push(list[k]);
