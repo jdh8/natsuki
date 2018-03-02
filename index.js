@@ -8,7 +8,7 @@ const poetry = require("./poetry.json");
 
 const client = new Discord.Client();
 
-const natsuki =
+const natsuki = Object.create(null,
 {
 // Core
 	help(message, content)
@@ -337,7 +337,7 @@ message_id: Value "${id}" is not snowflake.`]: `${id} is not a message id, which
 	{
 		return natsuki.guilds(message);
 	},
-};
+});
 
 client.on("ready", () => client.user.setPresence({ game: { name: "n.help | n.invite" }}));
 
