@@ -18,12 +18,14 @@
     "ship": "**`n.ship`** Ship specified users\n\n**Usage**: n.ship [users|text]\n\n**Examples**:\n`n.ship`  Shipping you and Natsuki\n`n.ship [text with < 2 mentions]`  Shipping you and the text\n`n.ship [2+ mentions]`  Shipping mentioned users, groups, and channels",
     "word": "**`n.word`** Display the n-word\n\n**Usage**: n.word",
 
+    "echo": "**`n.echo`** Print what you type\n\n**Usage**: n.echo [text]\nThis function looks useless, but it can resolve animated emojis or ones from another server.",
     "emoji": "**`n.emoji`** Display specified emoji\n\n**Usage**: n.emoji [id|name] [url]\nIf the second argument is given, its URL is shown instead.\n\n**Examples**:\n`n.emoji glitchyuri`  Display glitched Yuri\n`n.emoji glitchyuri whatever`  Display URL of the aforementioned emoji",
     "emojis": "**`n.emojis`** Show available emojis\n\n**Usage**: n.emojis [guild]\n\n**Examples**:\n`n.emojis`  Show all accessible emojis\n`n.emojis 403299885891452936`  Show emojis from Yuri Gang!",
     "guilds": "**`n.guilds`** Show guilds where Natsuki is\n\n**Usage**: n.guilds",
     "poll": "**`n.poll`** Poll a yes-no question or multiple choices\n\n**Usage**: n.poll [question|choices]\n\n**Examples**:\nn.poll Is Miyuki Sone best waifu\nn.poll Sayori | Natsuki | Yuri | Monika",
     "react": "**`n.react`** Have Natsuki react emojis to a message\n\n**Usage**: n.react [id|-before] [emojis]\nZero or negative message id points to the *n*th message before.  Emojis can be specified as id, name, or themselves.  Please separate emojis with whitespaces.\n\n**Example**:\nn.react -1 🍋 :seven: glitchyuri",
+    "say": "**`n.say`** is an alias of n.echo.",
     "servers": "**`n.servers`** is an alias of n.guilds.",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping` `support`\n**Fun -** `beat` `cupcake` `cute` `hug` `kiss` `nut` `poem` `shelf` `ship` `word`\n**Tools -** `emoji` `emojis` `guilds` `poll` `react`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping` `support`\n**Fun -** `beat` `cupcake` `cute` `hug` `kiss` `nut` `poem` `shelf` `ship` `word`\n**Tools -** `echo` `emoji` `emojis` `guilds` `poll` `react`"
 }

@@ -213,6 +213,12 @@ N-not that I c-care...`)
 	},
 
 // Tools
+	echo(message, content)
+	{
+		const f = (match, name) => name && client.emojis.find("name", name) || match;
+		return message.channel.send(content.replace(/<a?:\w*:\d*>|:(\w*):/g, f));
+	},
+
 	emoji(message, content)
 	{
 		const respond = (match, id, url) =>
@@ -320,6 +326,11 @@ message_id: Value "${id}" is not snowflake.`]: `${id} is not a message id, which
 
 			return message.channel.send(content);
 		});
+	},
+
+	say(message, content)
+	{
+		return natsuki.echo(message, content);
 	},
 
 	servers(message)
