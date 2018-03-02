@@ -333,19 +333,11 @@ client.on("ready", () => client.user.setPresence({ game: { name: "n.help | n.inv
 client.on("message", message =>
 {
 	const match = message.channel instanceof Discord.TextChannel && /^n\.(\S*)\s*([^]*)/.exec(message.content);
+	const f = match && natsuki[match[1]];
+	const promise = f && f(message, match[2]);
 
-	if (match) {
-		(natsuki[match[1]] || (() => {}))(message, match[2]).catch(error =>
-		{
-			message.channel.send(`An error occurred: \`${error}\`
-You should not have received a message like this because this is a bug.  This issue is automatically reported to my developers.  If you want to help fix me, please invoke n.support for more details.`);
-
-			process.env.LOG && client.channels.get(process.env.LOG).send(`${error}
-\`${message.channel.id}\`: ${message.guild.name}#${message.channel.name}
-\`${message.author.id}\`: ${message.author.username}#${message.author.discriminator}
-\`${message.id}\`: ${message.content}`);
-		});
-	}
+	process.env.LOGGER && promise &&
+		promise.catch(error => client.channels.get(process.env.LOGGER).send(error + "\nCause: " + message.content));
 });
 
 client.login(process.env.TOKEN);
