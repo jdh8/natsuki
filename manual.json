@@ -19,7 +19,7 @@
     "word": "**`n.word`** Display the n-word\n\n**Usage**: n.word",
 
     "echo": "**`n.echo`** Print what you type\n\n**Usage**: n.echo [text]\nThis function looks useless, but it can resolve animated emojis or ones from another server.",
-    "emoji": "**`n.emoji`** Display specified emoji\n\n**Usage**: n.emoji [id|name] [url]\nIf the second argument is given, its URL is shown instead.\n\n**Examples**:\n`n.emoji glitchyuri`  Display glitched Yuri\n`n.emoji glitchyuri whatever`  Display URL of the aforementioned emoji",
+    "emoji": "**`n.emoji`** Display URL of the first custom emoji\n\n**Usage**: n.emoji [emoji|name]\n\n**Example**:\n`n.emoji glitchyuri`  Display glitched Yuri",
     "emojis": "**`n.emojis`** Show available emojis\n\n**Usage**: n.emojis [guild]\n\n**Examples**:\n`n.emojis`  Show all accessible emojis\n`n.emojis 403299885891452936`  Show emojis from Yuri Gang!",
     "guilds": "**`n.guilds`** Show guilds where Natsuki is\n\n**Usage**: n.guilds",
     "poll": "**`n.poll`** Poll a yes-no question or multiple choices\n\n**Usage**: n.poll [question|choices]\n\n**Examples**:\nn.poll Is Miyuki Sone best waifu\nn.poll Sayori | Natsuki | Yuri | Monika",

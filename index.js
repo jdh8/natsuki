@@ -224,16 +224,13 @@ N-not that I c-care...`)
 
 	emoji(message, content)
 	{
-		const respond = (match, id, url) =>
+		const respond = (match, id) =>
 		{
-			if (!id)
-				return "Please specify id or name of the emoji.";
-
-			const emoji = client.emojis.get(id) || client.emojis.find("name", id);
-			return emoji ? url ? emoji.url : `${emoji}` : `The emoji \`${id}\` is not found.`;
+			const emoji = id ? client.emojis.get(id) : client.emojis.find("name", match);
+			return emoji ? emoji.url : match ? `The custom emoji ${match} is not found.` : "Please specify a custom emoji.";
 		}
 
-		return message.channel.send(respond(.../(\S*)\s*(\S?)/.exec(content)));
+		return message.channel.send(respond(.../<a?:\w*:(\d*)>|\S*/.exec(content)));
 	},
 
 	emojis(message, content)
