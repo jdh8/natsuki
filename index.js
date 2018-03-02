@@ -215,7 +215,7 @@ N-not that I c-care...`)
 // Tools
 	emoji(message, content)
 	{
-		const respond = (id, url) =>
+		const respond = (match, id, url) =>
 		{
 			if (!id)
 				return "Please specify id or name of the emoji.";
@@ -224,7 +224,7 @@ N-not that I c-care...`)
 			return emoji ? url ? emoji.url : `${emoji}` : `The emoji \`${id}\` is not found.`;
 		}
 
-		return message.channel.send(respond(...content.split(/\s+/, 2)));
+		return message.channel.send(respond(.../(\S*)\s*(\S?)/.exec(content)));
 	},
 
 	emojis(message, content)
