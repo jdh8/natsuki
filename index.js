@@ -306,9 +306,15 @@ N-not that I c-care...`)
 			}
 		}).catch(error =>
 		{
-			if (error.message == "Unknown Message")
-				message.channel.send(`The message with id ${id} was not found.`);
-			else throw error;
+			const content =
+			{
+				"Unknown Message": `The message with id ${id} was not found.`,
+				"Invalid Form Body\nlimit: int value should be less than or equal to 100.": "I can only trace back 100 messages, oof!",
+			}[error.message];
+
+			if (!content) throw error;
+
+			return message.channel.send(content);
 		});
 	},
 
