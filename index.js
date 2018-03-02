@@ -11,28 +11,28 @@ const client = new Discord.Client();
 const natsuki =
 {
 // Core
-	help(message)
+	help(message, content)
 	{
-		const command = /\S*/.exec(message.content);
+		const command = /\S*/.exec(content);
 
-		message.channel.send(manual[command] || `The command \`${command}\` is not found.`);
+		return message.channel.send(manual[command] || `The command \`${command}\` is not found.`);
 	},
 
 	invite(message)
 	{
-		message.channel.send("https://discordapp.com/oauth2/authorize?&client_id=410315411695992833&scope=bot&permissions=0");
+		return message.channel.send("https://discordapp.com/oauth2/authorize?&client_id=410315411695992833&scope=bot&permissions=0");
 	},
 
-	ping(message)
+	ping(message, content)
 	{
 		const tick = Date.now();
 
-		message.reply("pong!").then(message => message.edit(`${message.content} ${Date.now() - tick} ms`));
+		return message.reply("pong!").then(message => message.edit(`${message.content} ${Date.now() - tick} ms`));
 	},
 
 	support(message)
 	{
-		message.channel.send(`I am developed by <@406911726638989313> from Yuri Gang.  I have no dedicated guild, so join Yuri Gang to discuss me and everything.  They are cool people and accept non-Yurists.  Actually, I am conceived by <@374000350363123712>, the biggest Natsuki fan of Yuri Gang.
+		return message.channel.send(`I am developed by <@406911726638989313> from Yuri Gang.  I have no dedicated guild, so join Yuri Gang to discuss me and everything.  They are cool people and accept non-Yurists.  Actually, I am conceived by <@374000350363123712>, the biggest Natsuki fan of Yuri Gang.
 https://discord.gg/ftdYR75
 
 I am free and open-source software.  Here comes my repository.  ~~Use the source, Luke!~~
@@ -40,9 +40,9 @@ https://github.com/yurigang/natsuki`);
 	},
 
 // Fun
-	beat(message)
+	beat(message, content)
 	{
-		message.channel.send(`<:buffsuki:403658386723307521> **I'll beat the shit out of ${message.content || "my dad"}.**`);
+		return message.channel.send(`<:buffsuki:403658386723307521> **I'll beat the shit out of ${content || "my dad"}.**`);
 	},
 
 	cupcake(message)
@@ -52,11 +52,11 @@ https://github.com/yurigang/natsuki`);
 		const image = Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg");
 		const avatar = Jimp.read(`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`);
 
-		image.then(async image => image.composite(await avatar, 80, 80).getBuffer("image/png", (error, buffer) =>
-			message.channel.send(text, new Discord.Attachment(buffer, "cupcake.png"))));
+		return image.then(async image => image.composite(await avatar, 80, 80).getBuffer("image/png",
+			(error, buffer) => message.channel.send(text, new Discord.Attachment(buffer, "cupcake.png"))));
 	},
 
-	cute(message)
+	cute(message, content)
 	{
 		const append = (duration, string) => async message =>
 		{
@@ -64,39 +64,36 @@ https://github.com/yurigang/natsuki`);
 			return message.edit(message.content + string);
 		}
 
-		message.reply("don't say this embarassing thing, dummy!")
+		return message.reply("don't say this embarassing thing, dummy!")
 			.then(append(3000, "\nY-You t-too...."))
 			.then(append(2000, "\nI'M NOT CUUUUUUUUUUUTE!"))
 			.then(append(2000, "\nDon't think you can make me say this embarassing thing just because we're not at school!"))
 			.then(append(4000, "\nI-I have to go to the bathroom."));
 	},
 
-	hug(message)
+	hug(message, content)
 	{
-		message.channel.send(`${message.author} hugged ${message.content || "Yuri"}!
+		return message.channel.send(`${message.author} hugged ${content || "Yuri"}!
 https://cdn.discordapp.com/attachments/403697175948820481/413015715273113601/Nxdr0qO_1.jpg`);
 	},
 
-	kiss(message)
+	kiss(message, content)
 	{
-		message.channel.send(`${message.author} kissed ${message.content || "Natsuki"}!
+		return message.channel.send(`${message.author} kissed ${content || "Natsuki"}!
 https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tumblr_inline_p2j9lgKnBS1ujm7ol_540.jpg`);
 	},
 
-	nut(message)
+	nut(message, content)
 	{
-		message.channel.send(`${message.author} nuts on ${message.content || "the floor"}.
+		return message.channel.send(`${message.author} nuts on ${content || "the floor"}.
 <:pukesuki:405984820674428928> **You guys are so gross!**`);
 	},
 
-	poem(message)
+	poem(message, content)
 	{
-		const f = [ natsuki.poem1, natsuki.poem2, natsuki.poem3 ][(!message.content | message.content) - 1];
+		const f = [ natsuki.poem1, natsuki.poem2, natsuki.poem3 ][(!content | content) - 1];
 
-		if (f)
-			f(message);
-		else
-			message.reply("you input an invalid act.");
+		return f ? f(message) : message.reply("you input an invalid act.");
 	},
 
 	poem1(message)
@@ -111,7 +108,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 		const answer = [ natsuki, sayori, yuri, sayori ][poetry[word]];
 
-		message.reply(`whose word is **${word}**?  Please answer in 15 seconds.`).then(async response =>
+		return message.reply(`whose word is **${word}**?  Please answer in 15 seconds.`).then(async response =>
 		{
 			const filter = (reaction, user) => user.id == message.author.id;
 			const collector = response.createReactionCollector(filter, { time: 15000 });
@@ -147,7 +144,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 		const answer = [ natsuki, yuri ][poetry[word] >> 1];
 
-		message.reply(`whose word is **${word}**?  Please answer in 15 seconds.`).then(async response =>
+		return message.reply(`whose word is **${word}**?  Please answer in 15 seconds.`).then(async response =>
 		{
 			const filter = (reaction, user) => user.id == message.author.id;
 			const collector = response.createReactionCollector(filter, { time: 15000 });
@@ -173,7 +170,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 	poem3(message)
 	{
-		message.reply("whose word is **Monika**?  Please answer in 15 seconds.").then(async response =>
+		return message.reply("whose word is **Monika**?  Please answer in 15 seconds.").then(async response =>
 		{
 			const filter = (reaction, user) => user.id == message.author.id;
 			const collector = response.createReactionCollector(filter, { time: 15000 });
@@ -195,28 +192,28 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 	{
 		const user = message.mentions.users.first() || message.author;
 
-		message.channel.send(`**Fucking ${user}${user.username[0].repeat(5 + 10 * Math.random())}**`);
+		return message.channel.send(`**Fucking ${user}${user.username[0].repeat(5 + 10 * Math.random())}**`);
 	},
 
-	ship(message)
+	ship(message, content)
 	{
-		const mentions = message.content.match(/<(?:#|@[!&]?)\d+>|@(?:everyone|here)/g);
+		const mentions = content.match(/<(?:#|@[!&]?)\d+>|@(?:everyone|here)/g);
 		const shipping = !mentions || mentions.length < 2 ?
-			`${message.author} × ${message.content || client.user}` :
+			`${message.author} × ${content || client.user}` :
 			mentions.join(" × ");
 
-		message.channel.send(`Look at them, a lovey dovey couple!  I ship it!
+		return message.channel.send(`Look at them, a lovey dovey couple!  I ship it!
 ${shipping}
 N-not that I c-care...`)
 	},
 
 	word(message)
 	{
-		message.channel.send("🇳\u200B🇮🅱🅱🅰");
+		return message.channel.send("🇳\u200B🇮🅱🅱🅰");
 	},
 
 // Tools
-	emoji(message)
+	emoji(message, content)
 	{
 		const respond = (id, url) =>
 		{
@@ -227,31 +224,30 @@ N-not that I c-care...`)
 			return emoji ? url ? emoji.url : `${emoji}` : `The emoji \`${id}\` is not found.`;
 		}
 
-		message.channel.send(respond(...message.content.split(/\s+/, 2)));
+		return message.channel.send(respond(...content.split(/\s+/, 2)));
 	},
 
-	emojis(message)
+	emojis(message, content)
 	{
-		const id = message.content;
-		const guild = id ? client.guilds.get(id) || client.guilds.find("name", id) : client;
+		const guild = content ? client.guilds.get(content) || client.guilds.find("name", content) : client;
 
 		if (guild == null)
-			return message.channel.send(`The guild \`${id}\` is not found.`);
+			return message.channel.send(`The guild \`${content}\` is not found.`);
 
 		if (guild.emojis.size == 0)
 			return message.channel.send("This guild has no custom emojis.");
 
-		message.channel.send(guild.emojis.map(icon => `\`${icon.id}\` ${icon.name} ${icon}`), { split: true });
+		return message.channel.send(guild.emojis.map(icon => `\`${icon.id}\` ${icon.name} ${icon}`), { split: true });
 	},
 
 	guilds(message)
 	{
-		message.channel.send(client.guilds.map(guild => `\`${guild.id}\` ${guild.name}`), { split: true });
+		return message.channel.send(client.guilds.map(guild => `\`${guild.id}\` ${guild.name}`), { split: true });
 	},
 
-	async poll(message)
+	async poll(message, content)
 	{
-		const choices = message.content.split(/\s*$/m, 1)[0].split(/\s*\|\s*/, 20);
+		const choices = content.split(/\s*$/m, 1)[0].split(/\s*\|\s*/, 20);
 		const length = choices.length;
 
 		if (length > 1) {
@@ -260,19 +256,22 @@ N-not that I c-care...`)
 
 			for (let code = 0x1F1E6; code < 0x1F1E6 + length; ++code)
 				await reply.react(String.fromCodePoint(code));
+
+			return reply;
 		}
-		else if (message.content) {
+		else if (content) {
 			await message.react("👍");
 			await message.react("👎");
+			return message;
 		}
 		else {
-			message.reply("please provide a topic.");
+			return message.reply("please provide a topic.");
 		}
 	},
 
-	react(message)
+	react(message, content)
 	{
-		const list = message.content.replace(/<a?:\w*:(\d*)>/g, "$1 ").match(/\S+/g);
+		const list = content.replace(/<a?:\w*:(\d*)>/g, "$1 ").match(/\S+/g);
 		const id = list.shift();
 
 		if (!id)
@@ -284,7 +283,7 @@ N-not that I c-care...`)
 		const target = id > 0 ? message.channel.fetchMessage(id):
 			message.channel.fetchMessages({ limit: 1 - id }).then(collection => collection.last());
 
-		target.then(async target =>
+		return target.then(async target =>
 		{
 			const resolve = x => x[0].toLowerCase() == x[0].toUpperCase() ? x : client.emojis.find("name", x);
 			const errors = [];
@@ -305,12 +304,17 @@ N-not that I c-care...`)
 					const last = errors.pop();
 					return message.channel.send(`Emojis ${errors.join(", ")}, and ${last} were not found.`);
 			}
-		}).catch(() => message.channel.send(`The message ${id} was not found.`));
+		}).catch(error =>
+		{
+			if (error.message == "Unknown Message")
+				message.channel.send(`The message with id ${id} was not found.`);
+			else throw error;
+		});
 	},
 
 	servers(message)
 	{
-		natsuki.guilds(message);
+		return natsuki.guilds(message);
 	},
 };
 
@@ -321,8 +325,16 @@ client.on("message", message =>
 	const match = message.channel instanceof Discord.TextChannel && /^n\.(\S*)\s*([^]*)/.exec(message.content);
 
 	if (match) {
-		message.content = match[2];
-		(natsuki[match[1]] || (() => {}))(message);
+		(natsuki[match[1]] || (() => {}))(message, match[2]).catch(error =>
+		{
+			message.channel.send(`An error occurred: \`${error}\`
+You should not have received a message like this because this is a bug.  This issue is automatically reported to my developers.  If you want to help fix me, please invoke n.support for more details.`);
+
+			process.env.LOG && client.channels.get(process.env.LOG).send(`${error}
+\`${message.channel.id}\`: ${message.guild.name}#${message.channel.name}
+\`${message.author.id}\`: ${message.author.username}#${message.author.discriminator}
+\`${message.id}\`: ${message.content}`);
+		});
 	}
 });
 
