@@ -272,16 +272,15 @@ N-not that I c-care...`)
 	react(message, content)
 	{
 		const list = content.replace(/<a?:\w*:(\d*)>/g, "$1 ").match(/\S+/g);
-		const id = list.shift();
 
-		if (!id)
+		if (list == null)
 			return message.channel.send("Please specify id of the message.");
 
-		if (list.length == 0)
-			return message.channel.send("Please specify emojis to react.");
+		const id = list.shift();
 
-		const target = id > 0 ? message.channel.fetchMessage(id):
-			message.channel.fetchMessages({ limit: 1 - id }).then(collection => collection.last());
+		const target = id <= 0 ?
+			message.channel.fetchMessages({ limit: 1 - id }).then(collection => collection.last()) :
+			message.channel.fetchMessage(id);
 
 		return target.then(async target =>
 		{
