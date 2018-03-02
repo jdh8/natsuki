@@ -309,6 +309,8 @@ N-not that I c-care...`)
 			{
 				"Unknown Message": `The message with id ${id} was not found.`,
 				"Invalid Form Body\nlimit: int value should be less than or equal to 100.": "I can only trace back 100 messages, oof!",
+				[`Invalid Form Body
+message_id: Value "${id}" is not snowflake.`]: `${id} is not a message id, which is a positive integer`,
 			}[error.message];
 
 			if (!content) throw error;
