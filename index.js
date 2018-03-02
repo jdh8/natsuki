@@ -8,7 +8,7 @@ const poetry = require("./poetry.json");
 
 const client = new Discord.Client();
 
-const natsuki = Object.create(null,
+const natsuki =
 {
 // Core
 	help(message, content)
@@ -340,14 +340,14 @@ message_id: Value "${id}" is not snowflake.`]: `${id} is not a message id, which
 	{
 		return natsuki.guilds(message);
 	},
-});
+};
 
 client.on("ready", () => client.user.setPresence({ game: { name: "n.help | n.invite" }}));
 
 client.on("message", message =>
 {
 	const match = message.channel instanceof Discord.TextChannel && /^n\.(\S*)\s*([^]*)/.exec(message.content);
-	const f = match && natsuki[match[1]];
+	const f = match && !Object.prototype[match[1]] && natsuki[match[1]];
 	const promise = f && f(message, match[2]);
 
 	process.env.LOGGER && promise &&
