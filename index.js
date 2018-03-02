@@ -216,7 +216,10 @@ N-not that I c-care...`)
 	echo(message, content)
 	{
 		const f = (match, name) => name && client.emojis.find("name", name) || match;
-		return message.channel.send(content.replace(/<a?:\w*:\d*>|:(\w*):/g, f));
+		const text = content.replace(/<a?:\w*:\d*>|:(\w*):/g, f);
+
+		return text ? message.channel.send(text) :
+			message.reply("I cannot send an empty message.  Please give me something to say.");
 	},
 
 	emoji(message, content)
