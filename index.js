@@ -277,29 +277,33 @@ N-not that I c-care...`)
 
 	react(message, content)
 	{
-		const list = content.replace(/<a?:\w*:(\d*)>/g, "$1 ").match(/\S+/g);
+		const pattern = /\S+/g;
+		const id = pattern.exec(content)[0];
 
-		if (list == null)
+		if (!id)
 			return message.channel.send("Please specify id of the message.");
 
-		const id = list.shift();
+		const remainder = content.substr(pattern.lastIndex);
+		let target;
 
-		const target = id <= 0 ?
-			message.channel.fetchMessages({ limit: 1 - id }).then(collection => collection.last()) :
-			message.channel.fetchMessage(id);
+		if (id <= -100)
+			return message.reply("I can only trace back 100 messages, oof!");
+		else if (id <= 0)
+			target = message.channel.fetchMessages({ limit: 1 - id }).then(collection => collection.last());
+		else if (/\D/.exec(id))
+			return message.reply(`${id} is not a message id, which is a positive integer`);
+		else
+			target = message.channel.fetchMessage(id);
 
 		return target.then(async target =>
 		{
-			const resolve = x => x[0].toLowerCase() == x[0].toUpperCase() ? x : client.emojis.find("name", x);
+			const pattern = /<a?:\w*:(\d*)>|:(\w*):|\S+/g;
+			const resolve = (match, id, name) => id || name && client.emojis.find("name", name) || match;
 			const errors = [];
+			let match;
 
-			if (list.length == 0)
-				return message.channel.send("Please specify emojis to react.");
-
-			for (let k = 0; k < list.length; ++k) {
-				const emoji = resolve(list[k]);
-				emoji ? await target.react(emoji) : errors.push(list[k]);
-			}
+			while (match = pattern.exec(remainder))
+				await target.react(resolve(...match)).catch(() => errors.push(match[0]));
 
 			switch (errors.length) {
 				case 0:
@@ -312,20 +316,7 @@ N-not that I c-care...`)
 					const last = errors.pop();
 					return message.channel.send(`Emojis ${errors.join(", ")}, and ${last} were not found.`);
 			}
-		}).catch(error =>
-		{
-			const content =
-			{
-				"Unknown Message": `The message with id ${id} was not found.`,
-				"Invalid Form Body\nlimit: int value should be less than or equal to 100.": "I can only trace back 100 messages, oof!",
-				[`Invalid Form Body
-message_id: Value "${id}" is not snowflake.`]: `${id} is not a message id, which is a positive integer`,
-			}[error.message];
-
-			if (!content) throw error;
-
-			return message.channel.send(content);
-		});
+		}).catch(() => message.channel.send(`The message with id ${id} was not found.`));
 	},
 
 	say(message, content)
