@@ -25,9 +25,10 @@ const natsuki =
 
 	ping(message, content)
 	{
-		const tick = Date.now();
+		const format = (seconds, nano) => seconds ? (seconds + 1e-9 * nano).toFixed(3) + " s" : (1e-6 * nano).toFixed() + " ms";
+		const tick = process.hrtime();
 
-		return message.reply("pong!").then(message => message.edit(`${message.content} ${Date.now() - tick} ms`));
+		return message.reply("pong!").then(message => message.edit(`${message.content} ${format(...process.hrtime(tick))}`));
 	},
 
 	support(message)
