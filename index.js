@@ -298,7 +298,7 @@ N-not that I c-care...`)
 		return target.then(async target =>
 		{
 			const pattern = /<a?:\w*:(\d*)>|:(\w*):|\S+/g;
-			const resolve = (match, id, name) => id || name && client.emojis.find("name", name) || match;
+			const resolve = (match, id, name) => id || client.emojis.find("name", name || match) || match;
 			const errors = [];
 			let match;
 
