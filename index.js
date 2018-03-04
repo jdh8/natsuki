@@ -210,7 +210,7 @@ N-not that I c-care...`)
 
 	word(message)
 	{
-		return message.channel.send("🇳\u200B🇮🅱🅱🅰");
+		return message.channel.send("🇳\xAD🇮🅱🅱🅰");
 	},
 
 // Tools
