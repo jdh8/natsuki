@@ -243,7 +243,7 @@ N-not that I c-care...`)
 		if (guild.emojis.size == 0)
 			return message.channel.send("This guild has no custom emojis.");
 
-		return message.channel.send(guild.emojis.map(icon => `\`${icon.id}\` ${icon.name} ${icon}`), { split: true });
+		return message.channel.send(guild.emojis.map(icon => `:${icon.name}: ${icon}`), { split: true });
 	},
 
 	guilds(message)
