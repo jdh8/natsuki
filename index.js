@@ -198,10 +198,10 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 	ship(message, content)
 	{
-		const mentions = content.split(/\s*\|\s*/);
-		const shipping = !mentions || mentions.length < 2 ?
+		const things = content.match(/(?:\\.|[^|])+/g);
+		const shipping = !things || things.length < 2 ?
 			`${message.author} × ${content || client.user}` :
-			mentions.join(" × ");
+			things.map(s => s.trim()).join(" × ");
 
 		return message.channel.send(`Look at them, a lovey dovey couple!  I ship it!
 ${shipping}
