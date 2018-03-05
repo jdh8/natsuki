@@ -258,34 +258,36 @@ N-not that I c-care...`)
 		return message.channel.send(client.guilds.map(guild => `\`${guild.id}\` ${guild.name}`), { split: true });
 	},
 
-	async poll(message, content)
+	poll(message, content)
 	{
-		const source = content.split("\n", 1)[0];
-
-		if (source.indexOf("|") >= 0) {
-			const option = /((?:\\.|[^|])*)\|/g;
-			let code, match, list = "";
-
-			for (code = 0x1F1E6; code < 0x1F1FA; ++code)
-				if (match = option.exec(source + "|"))
-					list += String.fromCodePoint(code) + " " + match[1].trim() + "\n";
-				else break;
-
-			const reply = await message.channel.send(list);
-
-			for (let it = 0x1F1E6; it < code; ++it)
-				await reply.react(String.fromCodePoint(it));
-
-			return reply;
+		const react = code => async message =>
+		{
+			for (let c = 0x1F1E6; c < code; ++c)
+				await message.react(String.fromCodePoint(c));
+			return message;
 		}
-		else if (content) {
+
+		const prepend = (string, index) => String.fromCodePoint(0x1F1E6 + index) + " " + string;
+		const lines = content.split("\n", 21);
+
+		if (lines.length > 1) {
+			const topic = lines.shift();
+			return message.channel.send([topic,...lines.map(prepend)]).then(react(0x1F1E6 + lines.length));
+		}
+
+		const options = content.split(/\s*\|\s*/, 20);
+
+		if (options.length > 1)
+			return message.channel.send(options.map(prepend)).then(react(0x1F1E6 + options.length));
+
+		const yesno = async () =>
+		{
 			await message.react("👍");
 			await message.react("👎");
 			return message;
-		}
-		else {
-			return message.reply("please provide a topic.");
-		}
+		};
+
+		return content ? yesno() : message.reply("please provide a topic.");
 	},
 
 	react(message, content)
