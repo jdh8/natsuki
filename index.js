@@ -198,13 +198,23 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 	ship(message, content)
 	{
-		const things = content.match(/(?:\\.|[^|])+/g);
-		const shipping = !things || things.length < 2 ?
-			`${message.author} × ${content || client.user}` :
-			things.map(s => s.trim()).join(" × ");
+		let couple;
+
+		if (content.indexOf("|") < 0) {
+			couple = `${message.author} × ${content || client.user}`;
+		}
+		else {
+			const pattern = /((?:\\.|[^|])*)\|/g;
+			const pool = content + "|";
+			let match;
+			couple = pattern.exec(pool)[1].trim();
+
+			while (match = pattern.exec(pool))
+				couple += " × " + match[1].trim();
+		}
 
 		return message.channel.send(`Look at them, a lovey dovey couple!  I ship it!
-${shipping}
+${couple}
 N-not that I c-care...`)
 	},
 
@@ -254,15 +264,21 @@ N-not that I c-care...`)
 
 	async poll(message, content)
 	{
-		const choices = content.split(/\s*$/m, 1)[0].split(/\s*\|\s*/, 20);
-		const length = choices.length;
+		const source = content.split("\n", 1)[0];
 
-		if (length > 1) {
-			const option = (string, index) => String.fromCodePoint(0x1F1E6 + index) + " " + string;
-			const reply = await message.channel.send(choices.map(option));
+		if (source.indexOf("|") >= 0) {
+			const option = /((?:\\.|[^|])*)\|/g;
+			let code, match, list = "";
 
-			for (let code = 0x1F1E6; code < 0x1F1E6 + length; ++code)
-				await reply.react(String.fromCodePoint(code));
+			for (code = 0x1F1E6; code < 0x1F1FA; ++code)
+				if (match = option.exec(source + "|"))
+					list += String.fromCodePoint(code) + " " + match[1].trim() + "\n";
+				else break;
+
+			const reply = await message.channel.send(list);
+
+			for (let it = 0x1F1E6; it < code; ++it)
+				await reply.react(String.fromCodePoint(it));
 
 			return reply;
 		}
