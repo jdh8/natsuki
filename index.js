@@ -84,6 +84,11 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015715273113601/Nxd
 https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tumblr_inline_p2j9lgKnBS1ujm7ol_540.jpg`);
 	},
 
+	lewd(message)
+	{
+		return message.channel.send("https://youtu.be/qr89xoZyE1g");
+	},
+
 	nut(message, content)
 	{
 		return message.channel.send(`${message.author} nuts on ${content || "the floor"}.
