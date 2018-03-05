@@ -198,20 +198,11 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 	ship(message, content)
 	{
-		let couple;
-
-		if (content.indexOf("|") < 0) {
-			couple = `${message.author} × ${content || client.user}`;
-		}
-		else {
-			const pattern = /((?:\\.|[^|])*)\|/g;
-			const pool = content + "|";
-			let match;
-			couple = pattern.exec(pool)[1].trim();
-
-			while (match = pattern.exec(pool))
-				couple += " × " + match[1].trim();
-		}
+		const couple = content.indexOf("\n") < 0 ?
+			content.indexOf("|") < 0 ?
+			`${message.author} × ${content || client.user}` :
+			content.replace(/\s*\|\s*/g, " × ") :
+			content.replace(/\s*\n\s*/g, " × ");
 
 		return message.channel.send(`Look at them, a lovey dovey couple!  I ship it!
 ${couple}
