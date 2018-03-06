@@ -224,8 +224,7 @@ N-not that I c-care...`)
 		const f = (match, name) => name && client.emojis.find("name", name) || match;
 		const text = content.replace(/<a?:\w*:\d*>|:(\w*):/g, f);
 
-		return text ? message.channel.send(text) :
-			message.reply("I cannot send an empty message.  Please give me something to say.");
+		return message.channel.send(`${message.author}: ${text}`);
 	},
 
 	emoji(message, content)
