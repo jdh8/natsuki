@@ -28,5 +28,5 @@
     "say": "**`n.say`** is an alias of n.echo.",
     "servers": "**`n.servers`** is an alias of n.guilds.",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping` `support`\n**Fun -** `beat` `cupcake` `cute` `hug` `kiss` `nut` `poem` `shelf` `ship` `word`\n**Tools -** `echo` `emoji` `emojis` `guilds` `poll` `react`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `ping` `support`\n**Fun -** `beat` `cupcake` `cute` `hug` `kiss` `lewd` `nut` `poem` `shelf` `ship` `word`\n**Tools -** `echo` `emoji` `emojis` `guilds` `poll` `react`"
 }
