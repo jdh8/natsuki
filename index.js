@@ -203,14 +203,13 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 	ship(message, content)
 	{
-		const couple = content.indexOf("\n") < 0 ?
-			content.indexOf("|") < 0 ?
-			`${message.author} × ${content || client.user}` :
-			content.replace(/\s*\|\s*/g, " × ") :
-			content.replace(/\s*\n\s*/g, " × ");
+		content = content.replace(/(\\.)|&/g, (match, escaped) => escaped || "×");
+
+		if (content.indexOf("×") < 0)
+			content = `${message.author} × ${content || client.user}`;
 
 		return message.channel.send(`Look at them, a lovey dovey couple!  I ship it!
-${couple}
+${content}
 N-not that I c-care...`)
 	},
 
