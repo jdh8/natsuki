@@ -25,7 +25,7 @@ const natsuki =
 
 	ping(message, content)
 	{
-		const format = (seconds, nano) => seconds ? (seconds + 1e-9 * nano).toFixed(3) + " s" : (1e-6 * nano).toFixed() + " ms";
+		const format = (seconds, nano) => seconds ? `${(seconds + 1e-9 * nano).toFixed(3)} s` : `${(1e-6 * nano).toFixed()} ms`;
 		const tick = process.hrtime();
 
 		return message.reply("pong!").then(message => message.edit(`${message.content} ${format(...process.hrtime(tick))}`));
@@ -62,7 +62,7 @@ https://github.com/yurigang/natsuki`);
 		const append = (duration, string) => async message =>
 		{
 			await new Promise(resolve => setTimeout(resolve, duration));
-			return message.edit(message.content + string);
+			return message.edit(`${message.content}${string}`);
 		}
 
 		return message.reply("don't say this embarassing thing, dummy!")
@@ -265,7 +265,7 @@ N-not that I c-care...`)
 			return message;
 		}
 
-		const prepend = (string, index) => String.fromCodePoint(0x1F1E6 + index) + " " + string;
+		const prepend = (string, index) => `${String.fromCodePoint(0x1F1E6 + index)} ${string}`;
 		const lines = content.split("\n", 21);
 
 		if (lines.length > 1) {
@@ -352,7 +352,7 @@ client.on("message", message =>
 	const promise = f && f(message, match[2]);
 
 	process.env.LOGGER && promise &&
-		promise.catch(error => client.channels.get(process.env.LOGGER).send(error + "\nCause: " + message.content));
+		promise.catch(error => client.channels.get(process.env.LOGGER).send(`${error}\nCause: ${message.content}`));
 });
 
 client.login(process.env.TOKEN);
