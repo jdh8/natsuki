@@ -349,7 +349,7 @@ client.on("ready", () => client.user.setPresence({ game: { name: "n.help | n.inv
 client.on("message", message =>
 {
 	const match = message.channel instanceof Discord.TextChannel && /^n\.(\S*)\s*([^]*)/.exec(message.content);
-	const f = match && !Object.prototype[match[1]] && natsuki[match[1]];
+	const f = match && natsuki.hasOwnProperty(match[1]) && natsuki[match[1]];
 	const promise = f && f(message, match[2]);
 
 	process.env.LOGGER && promise &&
