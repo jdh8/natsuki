@@ -275,7 +275,7 @@ N-not that I c-care...`)
 			return message.channel.send([topic,...lines.map(prepend)]).then(react(0x1F1E6 + lines.length));
 		}
 
-		const options = content.split(/\s*\|\s*/, 20);
+		const options = content.match(/(?:(?:\\.|[^|])+)(?=\||$)|(?=\|(?:\||$))/g).slice(0, 20);
 
 		if (options.length > 1)
 			return message.channel.send(options.map(prepend)).then(react(0x1F1E6 + options.length));
