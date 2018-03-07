@@ -33,8 +33,8 @@ const natsuki =
 
 	support(message)
 	{
-		return message.channel.send(`I am developed by <@406911726638989313> from Yuri Gang.  I have no dedicated guild, so join Yuri Gang to discuss me and everything.  They are cool people and accept non-Yurists.  Actually, I am conceived by <@374000350363123712>, the biggest Natsuki fan of Yuri Gang.
-https://discord.gg/ftdYR75
+		return message.channel.send(`Stuck in a trouble?  Find you way to Natsuki's shelf, my support guild.
+https://discord.gg/VdHYvMC
 
 I am free and open-source software.  Here comes my repository.  ~~Use the source, Luke!~~
 https://github.com/yurigang/natsuki`);
