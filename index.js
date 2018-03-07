@@ -43,7 +43,7 @@ https://github.com/yurigang/natsuki`);
 // Fun
 	beat(message, content)
 	{
-		return message.channel.send(`<:buffsuki:403658386723307521> **I'll beat the shit out of ${content || "my dad"}.**`);
+		return message.channel.send(`<:Buffsuki:419995508443054080> **I'll beat the shit out of ${content || "my dad"}.**`);
 	},
 
 	cupcake(message)
