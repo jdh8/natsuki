@@ -239,17 +239,10 @@ N-not that I c-care...`)
 		return message.channel.send(respond(.../<a?:\w+:(\d+)>|:(\w+):|\S*/.exec(content)));
 	},
 
-	emojis(message, content)
+	emojis(message)
 	{
-		const guild = content ? client.guilds.get(content) || client.guilds.find("name", content) : client;
-
-		if (guild == null)
-			return message.channel.send(`The guild \`${content}\` is not found.`);
-
-		if (guild.emojis.size == 0)
-			return message.channel.send("This guild has no custom emojis.");
-
-		return message.channel.send(guild.emojis.map(icon => `:${icon.name}: ${icon}`), { split: true });
+		return message.channel.send(`The list of emojis is on <#420885744077504532> on Natsuki's shelf, my support server.  Please check them out there.
+https://discord.gg/VdHYvMC`);
 	},
 
 	guilds(message)
@@ -345,6 +338,20 @@ N-not that I c-care...`)
 };
 
 client.on("ready", () => client.user.setPresence({ game: { name: "n.help | n.invite" }}));
+
+client.on("ready", () =>
+{
+	const channel = client.channels.get("420885744077504532");
+
+	channel.fetchMessages().then(collection =>
+	{
+		for (let message of collection.values())
+			if (message.author.id == client.user.id)
+				message.delete();
+	}).catch(() => {});
+
+	channel.send(client.emojis.map(icon => `:${icon.name}: ${icon}`), { split: true });
+});
 
 client.on("message", message =>
 {
