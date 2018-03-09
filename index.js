@@ -245,11 +245,6 @@ N-not that I c-care...`)
 https://discord.gg/VdHYvMC`);
 	},
 
-	guilds(message)
-	{
-		return message.channel.send(client.guilds.map(guild => `\`${guild.id}\` ${guild.name}`), { split: true });
-	},
-
 	poll(message, content)
 	{
 		const react = code => async message =>
@@ -329,11 +324,6 @@ https://discord.gg/VdHYvMC`);
 	say(message, content)
 	{
 		return natsuki.echo(message, content);
-	},
-
-	servers(message)
-	{
-		return natsuki.guilds(message);
 	},
 };
 
