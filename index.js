@@ -2,6 +2,8 @@
 
 const Discord = require("discord.js");
 const Jimp = require("jimp");
+const util = require("util");
+const vm = require("vm");
 
 const manual = require("./manual.json");
 const poetry = require("./poetry.json");
@@ -226,6 +228,28 @@ N-not that I c-care...`)
 		const big = /^(?:<a?:\w+:\d+>\s*)+$/.test(text);
 
 		return message.channel.send(big ? text : `${message.author}: ${text}`);
+	},
+
+	eval(message, content)
+	{
+		const block = code => "```javascript\n" + code + "\n```";
+		const run = code =>
+		{
+			try {
+				const script = new vm.Script(code);
+				const context = vm.createContext();
+				const tick = process.hrtime();
+				const result = script.runInContext(context, { timeout: 500 });
+				const duration = process.hrtime(tick)[1] * 1e-6;
+
+				return `executed in ${duration.toFixed(6)} ms. ${block(util.inspect(result))}`;
+			}
+			catch (error) {
+				return `an error occurred. ${block(util.inspect(error))}`;
+			}
+		}
+
+		return message.reply(run(content));
 	},
 
 	emoji(message, content)
