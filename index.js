@@ -232,7 +232,7 @@ N-not that I c-care...`)
 
 	eval(message, content)
 	{
-		const block = code => "```javascript\n" + code + "\n```";
+		const block = result => "```javascript\n" + util.inspect(result, false, null) + "\n```";
 		const run = code =>
 		{
 			try {
@@ -242,10 +242,10 @@ N-not that I c-care...`)
 				const result = script.runInContext(context, { timeout: 500 });
 				const duration = process.hrtime(tick)[1] * 1e-6;
 
-				return `executed in ${duration.toFixed(6)} ms. ${block(util.inspect(result))}`;
+				return `executed in ${duration.toFixed(6)} ms. ${block(result)}`;
 			}
 			catch (error) {
-				return `an error occurred. ${block(util.inspect(error))}`;
+				return `an error occurred. ${block(error)}`;
 			}
 		}
 
