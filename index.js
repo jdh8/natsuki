@@ -273,8 +273,8 @@ https://discord.gg/VdHYvMC`);
 	{
 		return message.channel.send(content.toUpperCase()
 			.replace(/ /g, "\u2002")
-			.replace(/[0-9*#]/g, "$&\u20E3\u200A")
-			.replace(/[A-Z]/g, match => `${String.fromCodePoint(match.charCodeAt() + 0x1F1A5)}\u200A`));
+			.replace(/[0-9*#]/g, "$&\u20E3")
+			.replace(/[A-Z]/g, match => `${String.fromCodePoint(match.charCodeAt() + 0x1F1A5)}\xAD`));
 	},
 
 	poll(message, content)
