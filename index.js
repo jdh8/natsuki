@@ -2,6 +2,8 @@
 
 const Discord = require("discord.js");
 const Jimp = require("jimp");
+
+const crypto = require("crypto");
 const util = require("util");
 const vm = require("vm");
 
@@ -194,6 +196,14 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 			await response.react(client.emojis.get("414572706370027533"));
 			await response.react(client.emojis.get("405977244952166400"));
 		});
+	},
+
+	rate(message, content)
+	{
+		const hash = new Uint32Array(crypto.createHash("md5").update(content.toLowerCase()).digest().buffer);
+		const percentage = (hash[0] + 24) % 101;
+
+		return message.reply(`I'd give ${content} ${percentage}%.`);
 	},
 
 	shelf(message)
