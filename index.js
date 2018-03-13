@@ -217,7 +217,7 @@ N-not that I c-care...`)
 
 	word(message)
 	{
-		return message.channel.send("🇳\xAD🇮🅱🅱🅰");
+		return message.channel.send("🇳:regional_indicator_i:🅱🅱🅰");
 	},
 
 // Tools
@@ -272,8 +272,9 @@ https://discord.gg/VdHYvMC`);
 	keycaps(message, content)
 	{
 		return message.channel.send(content.toUpperCase()
-			.replace(/[0-9*#]/g, "$&\u20E3")
-			.replace(/[A-Z]/g, match => `${String.fromCodePoint(match.charCodeAt() + 0x1F1A5)}\xAD`));
+			.replace(/ /g, "\u2002")
+			.replace(/[0-9*#]/g, "$&\u20E3\u200A")
+			.replace(/[A-Z]/g, match => `${String.fromCodePoint(match.charCodeAt() + 0x1F1A5)}\u200A`));
 	},
 
 	poll(message, content)
