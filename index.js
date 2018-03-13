@@ -269,6 +269,13 @@ N-not that I c-care...`)
 https://discord.gg/VdHYvMC`);
 	},
 
+	keycaps(message, content)
+	{
+		return message.channel.send(content.toUpperCase()
+			.replace(/[0-9*#]/g, "$&\u20E3")
+			.replace(/[A-Z]/g, match => `${String.fromCodePoint(match.charCodeAt() + 0x1F1A5)}\xAD`));
+	},
+
 	poll(message, content)
 	{
 		const react = code => async message =>
