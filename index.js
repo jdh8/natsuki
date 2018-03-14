@@ -399,8 +399,11 @@ client.on("message", message =>
 	const f = match && natsuki.hasOwnProperty(match[1]) && natsuki[match[1]];
 	const promise = f && f(message, match[2]);
 
-	process.env.LOGGER && promise &&
-		promise.catch(error => client.channels.get(process.env.LOGGER).send(`${error}\nCause: ${message.content}`));
+	promise && promise.catch(error => message.channel.send(`An error occurred.  Please leave a note on my shelf if it lingers.
+https://discord.gg/VdHYvMC
+\`\`\`
+${error}
+\`\`\``));
 });
 
 client.login(process.env.TOKEN);
