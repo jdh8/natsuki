@@ -112,7 +112,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 		const word = pick(Object.keys(poetry));
 
 		const sayori = "413123702788718593";
-		const natsuki = "413125818059849728";
+		const natsuki = "423196976398729216";
 		const yuri = "405392894787059732";
 		const monika = "414572706370027533";
 
@@ -148,7 +148,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 		const pick = array => array[~~(array.length * Math.random())];
 		const word = pick(Object.keys(poetry));
 
-		const natsuki = "413125818059849728";
+		const natsuki = "423196976398729216";
 		const yuri = "405392891490598913";
 		const monika = "405977244952166400";
 
