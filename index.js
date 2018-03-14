@@ -231,6 +231,14 @@ N-not that I c-care...`)
 	},
 
 // Tools
+	avatar(message)
+	{
+		const user = message.mentions.users.first() || message.author;
+		const basename = user.avatar.startsWith("a_") ? `${user.avatar}.gif` : user.avatar;
+
+		return message.channel.send(`https://cdn.discordapp.com/avatars/${user.id}/${basename}?size=2048`);
+	},
+
 	echo(message, content)
 	{
 		const f = (match, name) => name && client.emojis.find("name", name) || match;
