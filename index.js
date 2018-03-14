@@ -403,7 +403,7 @@ client.on("message", message =>
 https://discord.gg/VdHYvMC
 \`\`\`
 ${error}
-\`\`\``));
+\`\`\``).catch(() => message.author.send("I don't have permission to send messages to this channel.")));
 });
 
 client.login(process.env.TOKEN);
