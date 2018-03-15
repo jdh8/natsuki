@@ -200,10 +200,11 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 	rate(message, content)
 	{
-		const hash = new Uint32Array(crypto.createHash("md5").update(content.toLowerCase()).digest().buffer);
-		const percentage = (hash[0] + 24) % 101;
+		const data = content || `${message.author}`;
+		const hash = new Uint32Array(crypto.createHash("md5").update(data.toLowerCase()).digest().buffer);
+		const percentage = ((hash[0] + 24) >>> 0) % 101;
 
-		return message.reply(`I'd give ${content} ${percentage}%.`);
+		return message.channel.send(`<a:thonkk:418870387955335178> I'd give ${data} ${percentage}%.`);
 	},
 
 	shelf(message)
