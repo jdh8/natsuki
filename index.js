@@ -256,7 +256,7 @@ N-not that I c-care...`)
 		{
 			try {
 				const script = new vm.Script(code);
-				const context = vm.createContext();
+				const context = vm.createContext(Object.create(null));
 				const tick = process.hrtime();
 				const result = script.runInContext(context, { timeout: 500 });
 				const duration = process.hrtime(tick)[1] * 1e-6;
