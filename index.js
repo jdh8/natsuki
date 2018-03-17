@@ -114,7 +114,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 		const sayori = "413123702788718593";
 		const natsuki = "423196976398729216";
 		const yuri = "405392894787059732";
-		const monika = "414572706370027533";
+		const monika = "413686794450894850";
 
 		const answer = [ natsuki, sayori, yuri, sayori ][poetry[word]];
 
@@ -180,7 +180,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 	poem3(message)
 	{
-		return message.reply("whose word is **Monika**?  Please answer in 15 seconds.").then(async response =>
+		return message.reply("whose word is **Monika**?  Please answer in 15 seconds.").then(response =>
 		{
 			const filter = (reaction, user) => user.id == message.author.id;
 			const collector = response.createReactionCollector(filter, { time: 15000 });
@@ -193,8 +193,7 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 
 			collector.on("end", (collection, reason) => reason == "time" && message.reply("you didn't answer."));
 
-			await response.react(client.emojis.get("414572706370027533"));
-			await response.react(client.emojis.get("405977244952166400"));
+			response.react(client.emojis.get("416428171705974785"));
 		});
 	},
 
