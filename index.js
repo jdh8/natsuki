@@ -93,6 +93,12 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tum
 		return message.channel.send("https://youtu.be/qr89xoZyE1g");
 	},
 
+	lick(message, content)
+	{
+		return message.channel.send(`${message.author} licked ${content || "the air"}!
+https://cdn.discordapp.com/attachments/421196261132075009/421920949277818891/LickTemplate.gif`)
+	},
+
 	nut(message, content)
 	{
 		return message.channel.send(`${message.author} nuts on ${content || "the floor"}.
