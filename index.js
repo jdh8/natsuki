@@ -117,10 +117,10 @@ https://cdn.discordapp.com/attachments/421196261132075009/421920949277818891/Lic
 		const pick = array => array[~~(array.length * Math.random())];
 		const word = pick(Object.keys(poetry));
 
-		const sayori = "413123702788718593";
-		const natsuki = "423196976398729216";
+		const sayori = "424991418386350081";
+		const natsuki = "424991419329937428";
 		const yuri = "424987242986078218";
-		const monika = "413686794450894850";
+		const monika = "424991419233730560";
 
 		const answer = [ natsuki, sayori, yuri, sayori ][poetry[word]];
 
