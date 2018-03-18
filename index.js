@@ -119,7 +119,7 @@ https://cdn.discordapp.com/attachments/421196261132075009/421920949277818891/Lic
 
 		const sayori = "413123702788718593";
 		const natsuki = "423196976398729216";
-		const yuri = "405392894787059732";
+		const yuri = "424987242986078218";
 		const monika = "413686794450894850";
 
 		const answer = [ natsuki, sayori, yuri, sayori ][poetry[word]];
