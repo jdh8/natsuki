@@ -12,6 +12,8 @@ const poetry = require("./poetry.json");
 
 const client = new Discord.Client();
 
+const Finally = async (promise, cleanup) => { try { return await promise } finally { cleanup() } }
+
 const natsuki =
 {
 // Core
@@ -57,8 +59,12 @@ https://github.com/yurigang/natsuki`);
 		const image = Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg");
 		const avatar = Jimp.read(`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`);
 
-		return image.then(async image => image.composite(await avatar, 80, 80).getBuffer("image/png",
-			(error, buffer) => message.channel.send(text, new Discord.Attachment(buffer, "cupcake.png"))));
+		message.channel.startTyping();
+
+		const promise = image.then(async image => image.composite(await avatar, 80, 80).getBuffer("image/png", (error, buffer) =>
+			error == null ? message.channel.send(text, new Discord.Attachment(buffer, "cupcake.png")) : Promise.reject(error)));
+
+		return Finally(promise, () => message.channel.stopTyping());
 	},
 
 	cute(message, content)
@@ -68,6 +74,8 @@ https://github.com/yurigang/natsuki`);
 			await new Promise(resolve => setTimeout(resolve, duration));
 			return message.edit(`${message.content}${string}`);
 		}
+
+		message.channel.startTyping();
 
 		return message.reply("don't say this embarassing thing, dummy!")
 			.then(append(3000, "\nY-You t-too...."))
