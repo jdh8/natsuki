@@ -2,6 +2,7 @@
 
 const Discord = require("discord.js");
 const Jimp = require("jimp");
+const { PNG } = require("pngjs");
 
 const crypto = require("crypto");
 const util = require("util");
@@ -11,8 +12,6 @@ const manual = require("./manual.json");
 const poetry = require("./poetry.json");
 
 const client = new Discord.Client();
-
-const Finally = async (promise, cleanup) => { try { return await promise } finally { cleanup() } }
 
 const natsuki =
 {
@@ -52,8 +51,16 @@ https://github.com/yurigang/natsuki`);
 		return message.channel.send(`<:Buffsuki:419995508443054080> **I'll beat the shit out of ${content || "my dad"}.**`);
 	},
 
-	cupcake(message)
+	async cupcake(message)
 	{
+		const buffer = stream => new Promise((resolve, reject) =>
+		{
+			const buffers = [];
+			stream.on("error", reject);
+			stream.on("data", data => buffers.push(data));
+			stream.on("end", () => resolve(Buffer.concat(buffers)));
+		});
+
 		const user = message.mentions.users.first() || message.author;
 		const text = `${user} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!`;
 		const image = Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg");
@@ -61,10 +68,17 @@ https://github.com/yurigang/natsuki`);
 
 		message.channel.startTyping();
 
-		const promise = image.then(async image => image.composite(await avatar, 80, 80).getBuffer("image/png", (error, buffer) =>
-			error == null ? message.channel.send(text, new Discord.Attachment(buffer, "cupcake.png")) : Promise.reject(error)));
+		try {
+			const bitmap = (await image).composite(await avatar, 80, 80).bitmap;
+			const png = new PNG({ width: bitmap.width, height: bitmap.height });
 
-		return Finally(promise, () => message.channel.stopTyping());
+			png.data = new Buffer(bitmap.data);
+
+			return await message.channel.send(text, new Discord.Attachment(await buffer(png.pack()), "cupcake.png"));
+		}
+		finally {
+			message.channel.stopTyping();
+		}
 	},
 
 	cute(message, content)
