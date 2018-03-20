@@ -81,7 +81,7 @@ https://github.com/yurigang/natsuki`);
 		}
 	},
 
-	cute(message, content)
+	async cute(message, content)
 	{
 		const append = (duration, string) => async message =>
 		{
@@ -91,11 +91,16 @@ https://github.com/yurigang/natsuki`);
 
 		message.channel.startTyping();
 
-		return message.reply("don't say this embarassing thing, dummy!")
-			.then(append(3000, "\nY-You t-too...."))
-			.then(append(2000, "\nI'M NOT CUUUUUUUUUUUTE!"))
-			.then(append(2000, "\nDon't think you can make me say this embarassing thing just because we're not at school!"))
-			.then(append(4000, "\nI-I have to go to the bathroom."));
+		try {
+			return await message.reply("don't say this embarassing thing, dummy!")
+				.then(append(3000, "\nY-You t-too...."))
+				.then(append(2000, "\nI'M NOT CUUUUUUUUUUUTE!"))
+				.then(append(2000, "\nDon't think you can make me say this embarassing thing just because we're not at school!"))
+				.then(append(4000, "\nI-I have to go to the bathroom."));
+		}
+		finally {
+			message.channel.stopTyping();
+		}
 	},
 
 	hug(message, content)
@@ -328,7 +333,7 @@ https://discord.gg/VdHYvMC`);
 		const react = code => async message =>
 		{
 			for (let c = 0x1F1E6; c < code; ++c)
-				await message.react(String.fromCodePoint(c));
+				await message.react(String.fromCodePoint(c)).catch(() => {});
 			return message;
 		}
 
@@ -347,8 +352,8 @@ https://discord.gg/VdHYvMC`);
 
 		const yesno = async () =>
 		{
-			await message.react("👍");
-			await message.react("👎");
+			await message.react("👍").catch(() => {});
+			await message.react("👎").catch(() => {});
 			return message;
 		};
 
