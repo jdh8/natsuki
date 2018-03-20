@@ -13,6 +13,12 @@ const poetry = require("./poetry.json");
 
 const client = new Discord.Client();
 
+Promise.prototype.finally = Promise.prototype.finally || async function(callback)
+{
+	try { return await this }
+	finally { callback() }
+}
+
 const natsuki =
 {
 // Core
@@ -81,26 +87,21 @@ https://github.com/yurigang/natsuki`);
 		}
 	},
 
-	async cute(message, content)
+	cute(message, content)
 	{
 		const append = (duration, string) => async message =>
 		{
 			await new Promise(resolve => setTimeout(resolve, duration));
-			return message.edit(`${message.content}${string}`);
+			return await message.edit(`${message.content}${string}`);
 		}
 
-		message.channel.startTyping();
-
-		try {
-			return await message.reply("don't say this embarassing thing, dummy!")
-				.then(append(3000, "\nY-You t-too...."))
-				.then(append(2000, "\nI'M NOT CUUUUUUUUUUUTE!"))
-				.then(append(2000, "\nDon't think you can make me say this embarassing thing just because we're not at school!"))
-				.then(append(4000, "\nI-I have to go to the bathroom."));
-		}
-		finally {
-			message.channel.stopTyping();
-		}
+		return message.reply("don't say this embarassing thing, dummy!")
+			.finally(() => message.channel.startTyping())
+			.then(append(3000, "\nY-You t-too...."))
+			.then(append(2000, "\nI'M NOT CUUUUUUUUUUUTE!"))
+			.then(append(2000, "\nDon't think you can make me say this embarassing thing just because we're not at school!"))
+			.then(append(4000, "\nI-I have to go to the bathroom."))
+			.finally(() => message.channel.stopTyping());
 	},
 
 	hug(message, content)
