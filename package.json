@@ -1,7 +1,7 @@
 {
     "name": "natsuki",
     "description": "Discord bot named after Natsuki from Doki Doki Literature Club",
-    "main": "index.js",
+    "main": "index.mjs",
     "repository": "https://github.com/yurigang/natsuki",
     "license": "MIT",
     "contributors": [

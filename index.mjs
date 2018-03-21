@@ -1,15 +1,15 @@
 "use strict";
 
-const Discord = require("discord.js");
-const Jimp = require("jimp");
-const { PNG } = require("pngjs");
+import Discord from "discord.js";
+import Jimp from "jimp";
+import pngjs from "pngjs";
 
-const crypto = require("crypto");
-const util = require("util");
-const vm = require("vm");
+import crypto from "crypto";
+import util from "util";
+import vm from "vm";
 
-const manual = require("./manual.json");
-const poetry = require("./poetry.json");
+import manual from "./manual.json";
+import poetry from "./poetry.json";
 
 const client = new Discord.Client();
 
@@ -79,7 +79,7 @@ https://github.com/yurigang/natsuki`);
 
 		try {
 			const bitmap = (await image).composite(await avatar(user), 80, 80).bitmap;
-			const png = new PNG({ width: bitmap.width, height: bitmap.height });
+			const png = new pngjs.PNG({ width: bitmap.width, height: bitmap.height });
 
 			png.data = new Buffer(bitmap.data);
 
@@ -444,3 +444,5 @@ ${error}
 });
 
 client.login(process.env.TOKEN);
+
+export default natsuki;
