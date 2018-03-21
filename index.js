@@ -240,7 +240,7 @@ https://cdn.discordapp.com/attachments/421196261132075009/421920949277818891/Lic
 		const hash = new Uint32Array(crypto.createHash("md5").update(data.toLowerCase()).digest().buffer);
 		const percentage = ((hash[0] + 24) >>> 0) % 101;
 
-		return message.channel.send(`<a:thonkk:418870387955335178> I'd give ${data} ${percentage}%.`);
+		return message.channel.send(`<:natsuki:424991419329937428> I'd give ${data} ${percentage}%.`);
 	},
 
 	shelf(message)
