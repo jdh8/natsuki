@@ -407,12 +407,9 @@ https://discord.gg/VdHYvMC`);
 			}
 		}).catch(() => message.channel.send(`The message with id ${id} was not found.`));
 	},
-
-	say(message, content)
-	{
-		return natsuki.echo(message, content);
-	},
 };
+
+natsuki.say = natsuki.echo;
 
 client.on("ready", () => client.user.setPresence({ game: { name: "n.help | n.invite" }}));
 
