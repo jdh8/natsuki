@@ -19,6 +19,9 @@ Promise.prototype.finally = Promise.prototype.finally || async function(callback
 	finally { callback() }
 }
 
+const pfp = user => `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`;
+const robot = user => `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`;
+
 const natsuki =
 {
 // Core
@@ -67,15 +70,15 @@ https://github.com/yurigang/natsuki`);
 			stream.on("end", () => resolve(Buffer.concat(buffers)));
 		});
 
+		const avatar = async user => user.avatar ? await Jimp.read(pfp(user)) : (await Jimp.read(robot(user))).scale(0.5);
 		const user = message.mentions.users.first() || message.author;
 		const text = `${user} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!`;
 		const image = Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg");
-		const avatar = Jimp.read(`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`);
 
 		message.channel.startTyping();
 
 		try {
-			const bitmap = (await image).composite(await avatar, 80, 80).bitmap;
+			const bitmap = (await image).composite(await avatar(user), 80, 80).bitmap;
 			const png = new PNG({ width: bitmap.width, height: bitmap.height });
 
 			png.data = new Buffer(bitmap.data);
@@ -268,9 +271,9 @@ N-not that I c-care...`)
 	avatar(message)
 	{
 		const user = message.mentions.users.first() || message.author;
-		const basename = user.avatar.startsWith("a_") ? `${user.avatar}.gif` : user.avatar;
+		const url = user.avatar ? `${pfp(user)}${user.avatar.startsWith("a_") ? ".gif" : ""}?size=2048` : robot(user);
 
-		return message.channel.send(`https://cdn.discordapp.com/avatars/${user.id}/${basename}?size=2048`);
+		return message.channel.send(url);
 	},
 
 	echo(message, content)
