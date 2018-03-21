@@ -396,7 +396,7 @@ https://discord.gg/VdHYvMC`);
 
 			switch (errors.length) {
 				case 0:
-					return message;
+					return (await message.channel.send("... ..- -.-. -.-. . ... ...")).delete(5000);
 				case 1:
 					return message.channel.send(`Emoji ${errors[0]} was not found.`);
 				case 2:
