@@ -9,6 +9,10 @@
         "u/YourWrstNightmare (https://www.reddit.com/user/YourWrstNightmare)",
         "u/RoseQuartz6758 (https://www.reddit.com/user/RoseQuartz6758)"
     ],
+    "scripts": {
+        "start": "node --experimental-modules .",
+        "test": "node --experimental-modules test.mjs"
+    },
     "dependencies": {
         "discord.js": "^11.3.0",
         "jimp": "^0.2.28"

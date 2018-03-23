@@ -1,1 +1,1 @@
-worker: node --experimental-modules .
+worker: npm start
