@@ -34,7 +34,7 @@ export const natsuki =
 
 	invite(message)
 	{
-		return message.channel.send("https://discordapp.com/oauth2/authorize?&client_id=410315411695992833&scope=bot&permissions=0");
+		return message.channel.send("https://discordapp.com/oauth2/authorize?&client_id=410315411695992833&scope=bot");
 	},
 
 	ping(message, content)
