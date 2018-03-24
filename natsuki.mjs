@@ -287,7 +287,8 @@ N-not that I c-care...`)
 
 	eval(message, content)
 	{
-		const block = result => "```javascript\n" + util.inspect(result, false, null) + "\n```";
+		const block = result => "```javascript\n" + util.inspect(result, { depth: 5, customInspect: false }) + "\n```";
+
 		const run = code =>
 		{
 			try {
