@@ -428,7 +428,7 @@ client.on("ready", () =>
 
 client.on("message", message =>
 {
-	const match = /^n\.(\S*)\s*([^]*)/.exec(message.content);
+	const match = !message.author.bot && /^n\.(\S*)\s*([^]*)/.exec(message.content);
 	const f = match && natsuki.hasOwnProperty(match[1]) && natsuki[match[1]];
 	const promise = f && f(message, match[2]);
 
