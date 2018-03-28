@@ -18,6 +18,8 @@ Promise.prototype.finally = Promise.prototype.finally || async function(callback
 const pfp = user => `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`;
 const robot = user => `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`;
 
+const pick = array => array[~~(array.length * Math.random())];
+
 export const client = new Discord.Client();
 
 export const natsuki =
@@ -113,8 +115,14 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015715273113601/Nxd
 
 	kiss(message, content)
 	{
+		const images =
+		[
+			"https://cdn.discordapp.com/attachments/403299886352695297/428494387341688833/hJ6DcXJUurOfHcyG5Sv3wSzZafNqhSGbKTnpF6fFzV4.png",
+			"https://cdn.discordapp.com/attachments/403299886352695297/428483005389078528/WfvNDEnq_HoNHwr5-o9fIf0W7x2Rw5Q0tXbLNJy-a8Q.png",
+		];
+
 		return message.channel.send(`${message.author} kissed ${content || "Natsuki"}!
-https://cdn.discordapp.com/attachments/403697175948820481/413015676488515586/tumblr_inline_p2j9lgKnBS1ujm7ol_540.jpg`);
+${pick(images)}`);
 	},
 
 	lewd(message)
@@ -143,7 +151,6 @@ https://cdn.discordapp.com/attachments/421196261132075009/421920949277818891/Lic
 
 	poem1(message)
 	{
-		const pick = array => array[~~(array.length * Math.random())];
 		const word = pick(Object.keys(poetry));
 
 		const sayori = "424991418386350081";
@@ -180,7 +187,6 @@ https://cdn.discordapp.com/attachments/421196261132075009/421920949277818891/Lic
 
 	poem2(message)
 	{
-		const pick = array => array[~~(array.length * Math.random())];
 		const word = pick(Object.keys(poetry));
 
 		const natsuki = "423196976398729216";
