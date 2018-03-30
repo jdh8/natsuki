@@ -432,15 +432,23 @@ client.on("ready", () =>
 	channel.send(client.emojis.map(icon => `:${icon.name}: ${icon}`), { split: true });
 });
 
-client.on("message", message =>
+const main = async message =>
 {
-	const match = !message.author.bot && /^n\.(\S*)\s*([^]*)/.exec(message.content);
-	const f = match && natsuki.hasOwnProperty(match[1]) && natsuki[match[1]];
-	const promise = f && f(message, match[2]);
+	if (message.author.bot || message.channel instanceof Discord.DMChannel)
+		return;
 
-	promise && promise.catch(error => message.channel.send(`An error occurred.  Please leave a note on my shelf if it lingers.
+	const match = /^n\.(\S*)\s*([^]*)/.exec(message.content);
+
+	if (match) {
+		const [, command, content] = match;
+		const f = natsuki.hasOwnProperty(command) && natsuki[command];
+		return f && f(message, content);
+	}
+}
+
+client.on("message", message => main(message)
+	.catch(error => message.channel.send(`An error occurred.  Please leave a note on my shelf if it lingers.
 https://discord.gg/VdHYvMC
 \`\`\`
 ${error}
-\`\`\``).catch(() => message.author.send("I don't have permission to send messages to this channel.")));
-});
+\`\`\``).catch(() => message.author.send("I don't have permission to send messages to this channel."))));
