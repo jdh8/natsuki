@@ -6,8 +6,9 @@ import crypto from "crypto";
 import util from "util";
 import vm from "vm";
 
-import manual from "./manual.json";
-import poetry from "./poetry.json";
+import kisses from "./data/kisses.json";
+import manual from "./data/manual.json";
+import poetry from "./data/poetry.json";
 
 Promise.prototype.finally = Promise.prototype.finally || async function(callback)
 {
@@ -115,14 +116,8 @@ https://cdn.discordapp.com/attachments/403697175948820481/413015715273113601/Nxd
 
 	kiss(message, content)
 	{
-		const images =
-		[
-			"https://cdn.discordapp.com/attachments/403299886352695297/428494387341688833/hJ6DcXJUurOfHcyG5Sv3wSzZafNqhSGbKTnpF6fFzV4.png",
-			"https://cdn.discordapp.com/attachments/403299886352695297/428483005389078528/WfvNDEnq_HoNHwr5-o9fIf0W7x2Rw5Q0tXbLNJy-a8Q.png",
-		];
-
 		return message.channel.send(`${message.author} kissed ${content || "Natsuki"}!
-${pick(images)}`);
+${pick(kisses)}`);
 	},
 
 	lewd(message)
