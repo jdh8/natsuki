@@ -439,6 +439,9 @@ const main = async message =>
 		const f = natsuki.hasOwnProperty(command) && natsuki[command];
 		return f && f(message, content);
 	}
+
+	if (/[n🇳]\s?[i🇮]\s?(?:[bg🇧🅱🇬]\s?){2}\s?(?:[a🅰🇦]|[e🇪]\s?[r🇷])/iu.test(message.content))
+		return natsuki.word(message);
 }
 
 client.on("message", message => main(message)
