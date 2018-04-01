@@ -251,9 +251,9 @@ https://cdn.discordapp.com/attachments/421196261132075009/421920949277818891/Lic
 
 	ship(message, content)
 	{
-		content = content.replace(/(\\.)|&/g, (match, escaped) => escaped || "×");
+		content = content.replace(/\s+&\s+/g, " × ");
 
-		if (content.indexOf("×") < 0)
+		if (!/\s+×\s/.test(content))
 			content = `${message.author} × ${content || client.user}`;
 
 		return message.channel.send(`Look at them, a lovey dovey couple!  I ship it!
