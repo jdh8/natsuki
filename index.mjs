@@ -349,19 +349,19 @@ https://discord.gg/VdHYvMC`);
 			return message.channel.send([topic,...lines.map(prepend)]).then(react(0x1F1E6 + lines.length));
 		}
 
-		const options = content.match(/(?:(?:\\.|[^|\s])(?:\\.|[^|])*)(?=\||$)|(?=\|(?:\||$))|^(?=\|)/g).slice(0, 20);
+		const options = content.split(/\s+\|\s+/, 20);
 
 		if (options.length > 1)
 			return message.channel.send(options.map(prepend)).then(react(0x1F1E6 + options.length));
 
-		const yesno = async () =>
+		const yesno = async message =>
 		{
 			await message.react("👍").catch(() => {});
 			await message.react("👎").catch(() => {});
 			return message;
 		};
 
-		return content ? yesno() : message.reply("please provide a topic.");
+		return yesno(message);
 	},
 
 	react(message, content)
