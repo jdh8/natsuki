@@ -440,6 +440,9 @@ const main = async message =>
 		return f && f(message, content);
 	}
 
+	if (message.isMentioned(client.user))
+		return message.channel.send("<:didsomeonesay:408016032410894346>");
+
 	if (/[n🇳]\s?[i🇮]\s?(?:[bg🇧🅱🇬]\s?){2}\s?(?:[a🅰🇦]|[e🇪]\s?[r🇷])/iu.test(message.content))
 		return natsuki.word(message);
 }
