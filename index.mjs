@@ -433,13 +433,17 @@ const main = async message =>
 	if (message.author.bot || message.channel instanceof Discord.DMChannel)
 		return;
 
+	const greet = channel => channel.send("<:didsomeonesay:408016032410894346>");
 	const match = /^(?:n\.|(<@!?410315411695992833>)\s*)(\S*)\s*([^]*)/.exec(message.content);
 
 	if (match) {
 		const [, mention, command, content] = match;
 		const f = natsuki.hasOwnProperty(command) && natsuki[command];
-		return f ? f(message, content) : mention && message.channel.send("<:didsomeonesay:408016032410894346>");
+		return f ? f(message, content) : mention && greet(message.channel);
 	}
+
+	if (/<@!?410315411695992833>|\b(?:natsuki|anim[eéê]s?|mangas?)\b/i.test(message.content))
+		return greet(message.channel);
 
 	if (/[n🇳]\s?[i🇮]\s?(?:[bg🇧🅱🇬]\s?){2}\s?(?:[a🅰🇦]|[e🇪]\s?[r🇷])/iu.test(message.content))
 		return natsuki.word(message);
