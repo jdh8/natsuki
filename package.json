@@ -1,9 +1,9 @@
 {
     "name": "natsuki",
-    "version": "0.1.2",
+    "version": "0.2.0",
     "description": "Discord bot named after Natsuki from Doki Doki Literature Club",
     "main": "index.mjs",
-    "repository": "https://github.com/yurigang/natsuki",
+    "repository": "https://github.com/jdh8/natsuki",
     "license": "MIT",
     "contributors": [
         "Chen-Pang He (https://jdh8.org)",
