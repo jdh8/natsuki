@@ -52,7 +52,7 @@ export const natsuki =
 https://discord.gg/VdHYvMC
 
 I am free and open-source software.  Here comes my repository.  ~~Use the source, Luke!~~
-https://github.com/yurigang/natsuki`);
+https://github.com/jdh8/natsuki`);
 	},
 
 // Fun
