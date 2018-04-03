@@ -61,6 +61,13 @@ https://github.com/yurigang/natsuki`);
 		return message.channel.send(`<:Buffsuki:419995508443054080> **I'll beat the shit out of ${content || "my dad"}.**`);
 	},
 
+	bunny(message, content)
+	{
+		return message.channel.send(`(\\\\__/)
+( • - •)
+/つ ${content || " つ"}`);
+	},
+
 	async cupcake(message)
 	{
 		const buffer = stream => new Promise((resolve, reject) =>

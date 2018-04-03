@@ -5,6 +5,7 @@
     "support": "**`n.support`** GitHub repository of Natsuki\n\n**Usage**: n.support",
 
     "beat": "**`n.beat`** Ask Buffski to beat someone\n\n**Usage**: n.beat [user|text]",
+    "bunny": "**`n.bunny`** Have a bunny say something\n\n**Usage**: n.bunny [text]",
     "cupcake": "**`n.cupcake`** Bake cupcake out of someone\n\n**Usage**: n.cupcake [user]\n\nThe source of the cupcake is https://commons.wikimedia.org/wiki/File:Hostess-Cupcake-Whole.jpg",
     "cute": "**`n.cute`** Say that Natsuki is cute\n\n**Usage**: n.cute",
     "hug": "**`n.hug`** Hug someone\n\n**Usage**: n.hug [user|text]",
@@ -30,5 +31,5 @@
     "react": "**`n.react`** Have Natsuki react emojis to a message\n\n**Usage**: n.react [id|-before] [emojis]\nZero or negative message id points to the *n*th message before.  Emojis can be specified as id, name, or themselves.  Please separate emojis with whitespaces.\n\n**Example**:\nn.react -1 🍋 7\u20E3 :glitchyuri:",
     "say": "**`n.say`** is an alias of n.echo.",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `invite` `ping` `support`\n**Fun -** `beat` `cupcake` `cute` `hug` `kiss` `lewd` `lick` `nut` `poem` `rate` `shelf` `ship` `word`\n**Tools -** `avatar` `echo` `emoji` `eval` `keycaps` `poll` `react`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `invite` `ping` `support`\n**Fun -** `beat` `bunny` `cupcake` `cute` `hug` `kiss` `lewd` `lick` `nut` `poem` `rate` `shelf` `ship` `word`\n**Tools -** `avatar` `echo` `emoji` `eval` `keycaps` `poll` `react`"
 }
