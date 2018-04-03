@@ -291,29 +291,6 @@ N-not that I c-care...`)
 		return message.channel.send(big ? text : `${message.author}: ${text}`);
 	},
 
-	eval(message, content)
-	{
-		const block = result => "```javascript\n" + util.inspect(result, { depth: 5, customInspect: false }) + "\n```";
-
-		const run = code =>
-		{
-			try {
-				const script = new vm.Script(code);
-				const context = vm.createContext(Object.create(null));
-				const tick = process.hrtime();
-				const result = script.runInContext(context, { timeout: 500 });
-				const duration = process.hrtime(tick)[1] * 1e-6;
-
-				return `executed in ${duration.toFixed(6)} ms. ${block(result)}`;
-			}
-			catch (error) {
-				return `an error occurred. ${block(error)}`;
-			}
-		}
-
-		return message.reply(run(content));
-	},
-
 	emoji(message, content)
 	{
 		const respond = (match, id, name) =>
