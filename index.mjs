@@ -417,6 +417,7 @@ https://discord.gg/VdHYvMC`);
 };
 
 natsuki[""] = natsuki.help;
+natsuki.licc = natsuki.lick;
 natsuki.say = natsuki.echo;
 
 client.on("ready", () => client.user.setPresence({ game: { name: "n.help | n.invite" }}));
