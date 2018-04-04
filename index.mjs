@@ -434,9 +434,10 @@ const main = async message =>
 		return natsuki.word(message);
 }
 
-client.on("message", message => main(message)
-	.catch(error => message.channel.send(`An error occurred.  Please leave a note on my shelf if it lingers.
+const debug = error => message.channel.send(`An error occurred.  Please leave a note on my shelf if it lingers.
 https://discord.gg/VdHYvMC
 \`\`\`
 ${error}
-\`\`\``).catch(() => message.author.send("I don't have permission to send messages to this channel."))));
+\`\`\``);
+
+client.on("message", message => main(message).catch(debug).catch(() => {}));
