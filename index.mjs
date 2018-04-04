@@ -294,7 +294,7 @@ export const poll = (message, content) =>
 
 	if (lines.length > 1) {
 		const topic = lines.shift();
-		return message.channel.send([topic,...lines.map(prepend)]).then(react(0x1F1E6 + lines.length));
+		return message.channel.send([topic, ...lines.map(prepend)]).then(react(0x1F1E6 + lines.length));
 	}
 
 	const options = content.split(/\s+\|\s+/, 20);
@@ -314,11 +314,11 @@ export const poll = (message, content) =>
 
 export const react = (message, content) =>
 {
-	const pattern = /\S+/g;
-	const id = pattern.exec(content)[0];
+	if (!content)
+		return message.channel.send("Please specify id of the message and emojis to react.");
 
-	if (!id)
-		return message.channel.send("Please specify id of the message.");
+	const pattern = /\S+/g;
+	const [ id ] = pattern.exec(content);
 
 	const remainder = content.substr(pattern.lastIndex);
 	let target;
