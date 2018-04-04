@@ -1,5 +1,5 @@
 import Discord from "discord.js";
-import http2 from "http2";
+import snekfetch from "snekfetch";
 import loop from "./loop.mjs";
 
 export const client = new Discord.Client();
@@ -34,23 +34,10 @@ ${error}
 	}
 });
 
-const update = () =>
-{
-	const data = new Buffer(JSON.stringify({ server_count: client.guilds.size }));
-	const session = http2.connect("https://discordbots.org");
-
-	session.request({
-		":method": "POST",
-		":path": `/api/bots/${client.user.id}/stats`,
-		"authorization": process.env.DBL_TOKEN,
-		"content-type": "application/json",
-		"content-length": data.length
-	})
-	.on("data", () => {})
-	.on("error", () => {})
-	.on("end", () => session.shutdown({ grarceful: true }, () => session.destroy()))
-	.end(data);
-};
+const update = () => snekfetch.post(`https://discordbots.org/api/bots/${client.user.id}/stats`)
+	.set("Authorization", process.env.DBL_TOKEN)
+	.send({ server_count: client.guilds.size })
+	.catch(() => {});
 
 client.on("ready", update);
 client.on("guildCreate", update);
