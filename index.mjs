@@ -30,6 +30,12 @@ export const ping = (message, content) =>
 	return message.reply("pong!").then(message => message.edit(`${message.content} ${format(...process.hrtime(tick))}`));
 };
 
+export const stats = message =>
+{
+	const { client } = message;
+	return message.channel.send(`I'm in ${client.guilds.size} servers with ${client.users.size} users in total.`);
+}
+
 export const support = message =>
 	message.channel.send(`Stuck in a trouble?  Find you way to Natsuki's shelf, my support guild.
 https://discord.gg/VdHYvMC
