@@ -1,3 +1,4 @@
+import Discord from "discord.js";
 import Jimp from "jimp";
 import pngjs from "pngjs";
 
