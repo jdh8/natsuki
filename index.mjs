@@ -342,7 +342,7 @@ export const react = (message, content) =>
 	return target.then(async target =>
 	{
 		const pattern = /<a?:\w*:(\d*)>|:(\w*):|\S+/g;
-		const resolve = (match, id, name) => id || client.emojis.find("name", name || match) || match;
+		const resolve = (match, id, name) => id || message.client.emojis.find("name", name || match) || match;
 		const errors = [];
 		let match;
 
