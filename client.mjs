@@ -1,4 +1,5 @@
 import Discord from "discord.js";
+import http2 from "http2";
 import loop from "./loop.mjs";
 
 export const client = new Discord.Client();
@@ -32,5 +33,27 @@ ${error}
 \`\`\``).catch(() => {});
 	}
 });
+
+const update = () =>
+{
+	const data = new Buffer(JSON.stringify({ server_count: client.guilds.size }));
+	const session = http2.connect("https://discordbots.org");
+
+	session.request({
+		":method": "POST",
+		":path": `/api/bots/${client.user.id}/stats`,
+		"authorization": process.env.DBL_TOKEN,
+		"content-type": "application/json",
+		"content-length": data.length
+	})
+	.on("data", () => {})
+	.on("error", () => {})
+	.on("end", () => session.shutdown({ grarceful: true }, () => session.destroy()))
+	.end(data);
+};
+
+client.on("ready", update);
+client.on("guildCreate", update);
+client.on("guildRemove", update);
 
 client.login(process.env.TOKEN);
