@@ -45,7 +45,7 @@ I am free and open-source software.  Here comes my repository.  ~~Use the source
 https://github.com/jdh8/natsuki`);
 
 /******* Fun *******/
-export const beat = message =>
+export const beat = (message, content) =>
 	message.channel.send(`<:Buffsuki:419995508443054080> **I'll beat the shit out of ${content || "my dad"}.**`);
 
 export const bunny = (message, content) =>
