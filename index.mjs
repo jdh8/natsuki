@@ -36,12 +36,6 @@ export const ping = (message, content) =>
 export const repo = git;
 export const source = git;
 
-export const stats = message =>
-{
-	const { client } = message;
-	return message.channel.send(`I'm in ${client.guilds.size} servers with ${client.users.size} users in total.`);
-}
-
 export const support = message => message.channel.send("https://discord.gg/VdHYvMC");
 
 export const vote = message => message.channel.send(`https://discordbots.org/bot/${message.client.user.id}`);
