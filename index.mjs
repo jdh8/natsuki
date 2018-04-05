@@ -278,10 +278,12 @@ export const emojis = message =>
 	message.channel.send(`The list of emojis is on <#420885744077504532> on Natsuki's shelf, my support server.  Please check them out there.
 https://discord.gg/VdHYvMC`);
 
-export const keycaps = (message, content) => message.channel.send(content.toUpperCase()
-	.replace(/ /g, "\u2002")
-	.replace(/[0-9*#]/g, "$&\u20E3")
-	.replace(/[A-Z]/g, match => `${String.fromCodePoint(match.charCodeAt() + 0x1F1A5)}\xAD`));
+export const keycaps = (message, content) => message.channel.send(content ?
+	content.toUpperCase()
+		.replace(/ /g, "\u2002")
+		.replace(/[0-9*#]/g, "$&\u20E3")
+		.replace(/[A-Z]/g, match => `${String.fromCodePoint(match.charCodeAt() + 0x1F1A5)}\xAD`) :
+	"_ _");
 
 export const poll = (message, content) =>
 {
