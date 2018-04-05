@@ -20,8 +20,10 @@ export const help = (message, content) =>
 	return message.channel.send(manual[command] || `The command \`${command}\` is not found.`);
 };
 
+export const git = message => message.channel.send("https://github.com/jdh8/natsuki");
+
 export const invite = message =>
-	message.channel.send("https://discordapp.com/oauth2/authorize?&client_id=410315411695992833&scope=bot");
+	message.channel.send(`https://discordapp.com/oauth2/authorize?&client_id=${message.client.user.id}&scope=bot`);
 
 export const ping = (message, content) =>
 {
@@ -31,18 +33,18 @@ export const ping = (message, content) =>
 	return message.reply("pong!").then(message => message.edit(`${message.content} ${format(...process.hrtime(tick))}`));
 };
 
+export const repo = git;
+export const source = git;
+
 export const stats = message =>
 {
 	const { client } = message;
 	return message.channel.send(`I'm in ${client.guilds.size} servers with ${client.users.size} users in total.`);
 }
 
-export const support = message =>
-	message.channel.send(`Stuck in a trouble?  Find you way to Natsuki's shelf, my support guild.
-https://discord.gg/VdHYvMC
+export const support = message => message.channel.send("https://discord.gg/VdHYvMC");
 
-I am free and open-source software.  Here comes my repository.  ~~Use the source, Luke!~~
-https://github.com/jdh8/natsuki`);
+export const vote = message => message.channel.send(`https://discordbots.org/bot/${message.client.user.id}`);
 
 /******* Fun *******/
 export const beat = (message, content) =>

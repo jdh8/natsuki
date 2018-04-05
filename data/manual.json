@@ -1,9 +1,13 @@
 {
     "help": "**`n.help`** List of commands or information about a given command\n\n**Usage**: n.help [command]\n\n**Examples**:\n`n.help`  List of commands\n`n.help ping`  Usage of the `ping` command",
+    "git": "**`n.git`** Natsuki's source code repository\n\n**Usage**: n.git",
     "invite": "**`n.invite`** Get a link to invite Natsuki to your server\n\n**Usage**: n.invite",
     "ping": "**`n.ping`** Test if Natsuki responds\n\n**Usage**: n.ping",
+    "repo": "**`n.repo`** is an alias of n.git.",
+    "source": "**`n.source`** is an alias of n.git.",
     "stats": "**`n.stats`** Statistics about this bot\n\n**Usage**: n.stats",
-    "support": "**`n.support`** Support guild and source code\n\n**Usage**: n.support",
+    "support": "**`n.support`** Natsuki's shelf, the support guild\n\n**Usage**: n.support",
+    "vote": "**`n.vote`** Natsuki on the Discord Bot List\n\n**Usage**: n.vote\nThis command just shows Natsuki's page on the Discord Bot List.  To vote, you have to follow the link and log in there.",
 
     "beat": "**`n.beat`** Ask Buffski to beat someone\n\n**Usage**: n.beat [user|text]",
     "bunny": "**`n.bunny`** Have a bunny say something\n\n**Usage**: n.bunny [text]",
