@@ -43,6 +43,12 @@ export const support = message => message.channel.send("https://discord.gg/VdHYv
 
 export const vote = message => message.channel.send(`https://discordbots.org/bot/${message.client.user.id}`);
 
+export const yuri = message => message.channel.send(`My development team originates from Yuri Gang.  There are cool people.
+https://discord.gg/ftdYR75
+
+Also, meet my best friend, Yuri!  ~~I love her although she has big boobs.~~
+https://discordbots.org/bot/403715442201591818`);
+
 /******* Fun *******/
 export const beat = (message, content) =>
 	message.channel.send(`<:Buffsuki:419995508443054080> **I'll beat the shit out of ${content || "my dad"}.**`);
