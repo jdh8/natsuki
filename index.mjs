@@ -30,7 +30,7 @@ export const ping = (message, content) =>
 	const format = (seconds, nano) => seconds ? `${(seconds + 1e-9 * nano).toFixed(3)} s` : `${(1e-6 * nano).toFixed()} ms`;
 	const tick = process.hrtime();
 
-	return message.reply("pong!").then(message => message.edit(`${message.content} ${format(...process.hrtime(tick))}`));
+	return message.channel.send("Pong!").then(message => message.edit(`${message.content} ${format(...process.hrtime(tick))}`));
 };
 
 export const repo = git;
@@ -79,23 +79,23 @@ export const cupcake = async message =>
 	}
 };
 
-export const cute = async (message, content) =>
+export const cute = async message =>
 {
 	const sleep = duration => new Promise(resolve => setTimeout(resolve, duration));
-	const reply = await message.reply("don't say this embarassing thing, dummy!");
-	const append = string => reply.edit(`${reply.content}${string}`);
+	let content = "Don't say this embarassing thing, dummy!";
+	const reply = await message.channel.send(content);
 
 	message.channel.startTyping();
 
 	try {
 		await sleep(3000);
-		await append("\nY-You t-too....");
+		await reply.edit(content += "\nY-You t-too....");
 		await sleep(2000);
-		await append("\nI'M NOT CUUUUUUUUUUUTE!");
+		await reply.edit(content += "\nI'M NOT CUUUUUUUUUUUTE!");
 		await sleep(2000);
-		await append("\nDon't think you can make me say this embarassing thing just because we're not at school!");
+		await reply.edit(content += "\nDon't think you can make me say this embarassing thing just because we're not at school!");
 		await sleep(4000);
-		await append("\nI-I have to go to the bathroom.");
+		await reply.edit(content += "\nI-I have to go to the bathroom.");
 	}
 	finally {
 		message.channel.stopTyping();
@@ -211,7 +211,7 @@ export const poem3 = message => message.reply("whose word is **Monika**?  Please
 export const poem = (message, content) =>
 {
 	const f = [ poem1, poem2, poem3 ][(!content | content) - 1];
-	return f ? f(message) : message.reply("you input an invalid act.");
+	return f ? f(message) : message.channel.send("You input an invalid act.");
 };
 
 export const rate = (message, content) =>
@@ -329,11 +329,11 @@ export const react = (message, content) =>
 	let target;
 
 	if (id <= -100)
-		return message.reply("I can only trace back 100 messages, oof!");
+		return message.channel.send("I can only trace back 100 messages, oof!");
 	else if (id <= 0)
 		target = message.channel.fetchMessages({ limit: 1 - id }).then(collection => collection.last());
 	else if (/\D/.exec(id))
-		return message.reply(`${id} is not a message id, which is a positive integer`);
+		return message.channel.send(`${id} is not a message id, which is a positive integer`);
 	else
 		target = message.channel.fetchMessage(id);
 
