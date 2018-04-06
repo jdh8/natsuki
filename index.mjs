@@ -13,6 +13,9 @@ const robot = user => `https://cdn.discordapp.com/embed/avatars/${user.discrimin
 
 const pick = array => array[~~(array.length * Math.random())];
 
+const success = "431825476898652160";
+const failure = "431825476638474250";
+
 /******* Core *******/
 export const help = (message, content) =>
 {
@@ -132,10 +135,11 @@ export const poem1 = message =>
 	const monika = "424991419233730560";
 
 	const answer = [ natsuki, sayori, yuri, sayori ][poetry[word]];
+	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
 
-	return message.reply(`whose word is **${word}**?  Please answer in 15 seconds.`).then(async response =>
+	return message.reply(`${initial}hose word is **${word}**?  Please answer in 15 seconds.`).then(async response =>
 	{
-		const filter = (reaction, user) => user.id == message.author.id;
+		const filter = (reaction, user) => user.id === message.author.id && reaction.me;
 		const collector = response.createReactionCollector(filter, { time: 15000 });
 
 		collector.on("collect", reaction =>
@@ -143,13 +147,13 @@ export const poem1 = message =>
 			collector.stop();
 
 			switch (reaction.emoji.id) {
-				case answer: return message.reply("that's correct.  Congrats!");
-				case monika: return message.channel.send("Really?");
-				default: return message.reply("you didn't get it.");
+				case answer: return response.react(success);
+				case monika: return response.react("⁉");
+				default: return response.react(failure);
 			}
 		});
 
-		collector.on("end", (collection, reason) => reason == "time" && message.reply("you didn't answer."));
+		collector.on("end", (collection, reason) => reason == "time" && response.react(failure));
 
 		await response.react(sayori);
 		await response.react(natsuki);
@@ -167,10 +171,11 @@ export const poem2 = message =>
 	const monika = "405977244952166400";
 
 	const answer = [ natsuki, yuri ][poetry[word] >> 1];
+	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
 
-	return message.reply(`whose word is **${word}**?  Please answer in 15 seconds.`).then(async response =>
+	return message.reply(`${initial}hose word is **${word}**?  Please answer in 15 seconds.`).then(async response =>
 	{
-		const filter = (reaction, user) => user.id == message.author.id;
+		const filter = (reaction, user) => user.id === message.author.id && reaction.me;
 		const collector = response.createReactionCollector(filter, { time: 15000 });
 
 		collector.on("collect", reaction =>
@@ -178,13 +183,13 @@ export const poem2 = message =>
 			collector.stop();
 
 			switch (reaction.emoji.id) {
-				case answer: return message.reply("that's correct.  Congrats!");
-				case monika: return message.channel.send("Really?");
-				default: return message.reply("you didn't get it.");
+				case answer: return response.react(success);
+				case monika: return response.react("⁉");
+				default: return response.react(failure);
 			}
 		});
 
-		collector.on("end", (collection, reason) => reason == "time" && message.reply("you didn't answer."));
+		collector.on("end", (collection, reason) => reason == "time" && response.react(failure));
 
 		await response.react(natsuki);
 		await response.react(yuri);
@@ -192,21 +197,26 @@ export const poem2 = message =>
 	});
 };
 
-export const poem3 = message => message.reply("whose word is **Monika**?  Please answer in 15 seconds.").then(response =>
+export const poem3 = message =>
 {
-	const filter = (reaction, user) => user.id == message.author.id;
-	const collector = response.createReactionCollector(filter, { time: 15000 });
+	const monika = "416428171705974785";
+	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
 
-	collector.on("collect", () =>
+	message.reply(`${initial}hose word is **Monika**?  Please answer in 15 seconds.`).then(response =>
 	{
-		collector.stop();
-		message.channel.send("Just Monika");
+		const filter = (reaction, user) => user.id === message.author.id && reaction.emoji.id === monika;
+		const collector = response.createReactionCollector(filter, { time: 15000 });
+
+		collector.on("collect", () =>
+		{
+			collector.stop();
+			response.react(success);
+		});
+
+		collector.on("end", (collection, reason) => reason == "time" && message.react(failure));
+		response.react(monika);
 	});
-
-	collector.on("end", (collection, reason) => reason == "time" && message.reply("you didn't answer."));
-
-	response.react("416428171705974785");
-});
+}
 
 export const poem = (message, content) =>
 {
@@ -241,7 +251,13 @@ ${content}
 N-not that I c-care...`)
 };
 
-export const word = message => message.channel.send("🇳:regional_indicator_i:🅱🅱🅰");
+export const word = (message, content, mention) =>
+{
+	const nword = "🇳:regional_indicator_i:🅱🅱🅰";
+	const preferred = `Here are my preferred words.
+http://doki-doki-literature-club.wikia.com/wiki/Natsuki#Preferred_Words`;
+	return message.channel.send(mention ? preferred : nword);
+};
 
 /******* Tools *******/
 export const avatar = message =>
@@ -309,8 +325,8 @@ export const poll = (message, content) =>
 
 	const yesno = async message =>
 	{
-		await message.react("👍").catch(() => {});
-		await message.react("👎").catch(() => {});
+		await message.react(success).catch(() => {});
+		await message.react(failure).catch(() => {});
 		return message;
 	};
 
