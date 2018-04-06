@@ -73,7 +73,7 @@ export const cupcake = async message =>
 		const bitmap = (await image).composite(await avatar(user), 80, 80).bitmap;
 		const png = new pngjs.PNG({ width: bitmap.width, height: bitmap.height });
 
-		png.data = new Buffer(bitmap.data);
+		png.data = Buffer.from(bitmap.data);
 
 		return await message.channel.send(text, new Discord.Attachment(await buffer(png.pack()), "cupcake.png"));
 	}
