@@ -10,6 +10,6 @@ export default message =>
 	if (match) {
 		const [, mention, command, content] = match;
 		const f = natsuki[command];
-		return f ? f(message, content, mention) : mention && message.react("408016032410894346");
+		return f ? f(message, content, mention) : mention && message.react("433490397516267532");
 	}
 };
