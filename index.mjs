@@ -44,7 +44,7 @@ export const support = message => message.channel.send("https://discord.gg/VdHYv
 export const vote = message => message.channel.send(`https://discordbots.org/bot/${message.client.user.id}`);
 
 export const yuri = message => message.channel.send(`My development team originates from Yuri Gang.  There are cool people.
-https://discord.gg/zQZ4mYQ
+https://discord.gg/bZByhJf
 
 Also, meet my best friend, Yuri!  ~~I love her although she has big boobs.~~
 https://discordbots.org/bot/403715442201591818`);
