@@ -16,6 +16,12 @@ const pick = array => array[~~(array.length * Math.random())];
 const success = "431825476898652160";
 const failure = "431825476638474250";
 
+const mentioned = content =>
+{
+	const match = /<@!?(\d+)>/.exec(content);
+	return match && match[1];
+};
+
 /******* Core *******/
 export const help = (message, content) =>
 {
@@ -58,7 +64,7 @@ export const bunny = (message, content) =>
 ( • - •)
 /つ ${content || " つ"}`);
 
-export const cupcake = async message =>
+export const cupcake = async (message, content) =>
 {
 	const buffer = stream => new Promise((resolve, reject) =>
 	{
@@ -69,7 +75,7 @@ export const cupcake = async message =>
 	});
 
 	const avatar = async user => user.avatar ? await Jimp.read(pfp(user)) : (await Jimp.read(robot(user))).scale(0.5);
-	const user = message.mentions.users.first() || message.author;
+	const user = message.client.users.get(mentioned(content)) || message.author;
 	const text = `${user} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!`;
 	const image = Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg");
 
@@ -239,9 +245,9 @@ export const rate = (message, content) =>
 	return message.channel.send(`<:natsuki:424991419329937428> I'd give ${data} ${percentage}%.`);
 };
 
-export const shelf = message =>
+export const shelf = (message, content) =>
 {
-	const user = message.mentions.users.first() || message.author;
+	const user = message.client.users.get(mentioned(content)) || message.author;
 	return message.channel.send(`**Fucking ${user}${user.username[0].repeat(5 + 10 * Math.random())}**`);
 };
 
@@ -266,9 +272,9 @@ http://doki-doki-literature-club.wikia.com/wiki/Natsuki#Preferred_Words`;
 };
 
 /******* Tools *******/
-export const avatar = message =>
+export const avatar = (message, content) =>
 {
-	const user = message.mentions.users.first() || message.author;
+	const user = message.client.users.get(mentioned(content)) || message.author;
 	const url = user.avatar ? `${pfp(user)}${user.avatar.startsWith("a_") ? ".gif" : ""}?size=2048` : robot(user);
 
 	return message.channel.send(url);
