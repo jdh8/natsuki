@@ -61,7 +61,7 @@ https://discordbots.org/bot/403715442201591818`);
 
 /******* Fun *******/
 export const beat = (message, content) =>
-	message.channel.send(`<:Buffsuki:419995508443054080> **I'll beat the shit out of ${content || "my dad"}.**`);
+	message.channel.send(`<:buffsuki:436562981875089428> **I'll beat the shit out of ${content || "my dad"}.**`);
 
 export const bunny = (message, content) =>
 	message.channel.send(`(\\\\__/)
