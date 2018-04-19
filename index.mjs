@@ -306,6 +306,8 @@ export const emoji = (message, content) =>
 	return message.channel.send(respond(.../<a?:\w+:(\d+)>|:(\w+):|\S*/.exec(content)));
 };
 
+export const emote = emoji;
+
 export const emojis = message =>
 	message.channel.send(`The list of emojis is on <#420885744077504532> on Natsuki's shelf, my support server.  Please check them out there.
 https://discord.gg/VdHYvMC`);
