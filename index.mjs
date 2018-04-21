@@ -391,7 +391,7 @@ export const react = (message, content) =>
 
 		switch (errors.length) {
 			case 0:
-				return (await message.channel.send("... ..- -.-. -.-. . ... ...")).delete(5000);
+				return message.react(success);
 			case 1:
 				return message.channel.send(`Emoji ${errors[0]} was not found.`);
 			case 2:
