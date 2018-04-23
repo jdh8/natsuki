@@ -1,4 +1,5 @@
 {
+    "hanako": "**`n.hanako`** Information about Hanako Ikezawa, the best grill\n\n**Usage**: n.hanako",
     "help": "**`n.help`** List of commands or information about a given command\n\n**Usage**: n.help [command]\n\n**Examples**:\n`n.help`  List of commands\n`n.help ping`  Usage of the `ping` command",
     "git": "**`n.git`** Natsuki's source code repository\n\n**Usage**: n.git",
     "invite": "**`n.invite`** Get a link to invite Natsuki to your server\n\n**Usage**: n.invite",
@@ -37,5 +38,5 @@
     "react": "**`n.react`** Have Natsuki react emojis to a message\n\n**Usage**: n.react [id|-before] [emojis]\nZero or negative message id points to the *n*th message before.  Emojis can be specified as id, name, or themselves.  Please separate emojis with whitespaces.\n\n**Example**:\nn.react -1 🍋 7\u20E3 :glitchyuri:",
     "say": "**`n.say`** is an alias of n.echo.",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `cupcake` `cute` `hug` `kiss` `lewd` `lick` `nut` `poem` `rate` `shelf` `ship` `word`\n**Tools -** `avatar` `echo` `emoji` `keycaps` `poll` `react`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `cupcake` `cute` `hug` `kiss` `lewd` `lick` `nut` `poem` `rate` `shelf` `ship` `word`\n**Tools -** `avatar` `echo` `emoji` `keycaps` `poll` `react`"
 }

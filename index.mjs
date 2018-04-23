@@ -35,6 +35,9 @@ export const help = (message, content) =>
 
 export const git = message => message.channel.send("https://github.com/jdh8/natsuki");
 
+export const hanako = message => message.channel.send(`Meet Hanako Ikezawa, the best grill from Katawa Shoujo!
+https://discordapp.com/oauth2/authorize?client_id=414384608076103680&scope=bot&permissions=66186303`);
+
 export const invite = message =>
 	message.channel.send(`https://discordapp.com/oauth2/authorize?&client_id=${message.client.user.id}&scope=bot`);
 
