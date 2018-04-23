@@ -287,6 +287,26 @@ export const avatar = (message, content) =>
 	return message.channel.send(url);
 };
 
+export const base64 = (message, content) =>
+{
+	const encode = (message, text) => message.channel.send(text
+		? text.length > 1500 ? "The message is too long." : Buffer.from(text).toString("base64")
+		: "_ _");
+
+	const decode = (message, text) => message.channel.send(`${Buffer.from(text, "base64")}` || "_ _");
+
+	const [, command, text] = /(\S*)\s*([^]*)/.exec(content);
+
+	switch (command) {
+		case "encode":
+			return encode(message, text);
+		case "decode":
+			return decode(message, text);
+		default:
+			return message.channel.send(manual.base64);
+	}
+};
+
 export const echo = (message, content) =>
 {
 	const f = (match, name) => name && message.client.emojis.find("name", name) || match;
