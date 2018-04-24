@@ -1,6 +1,7 @@
 import Discord from "discord.js";
 import Jimp from "jimp";
 import pngjs from "pngjs";
+import snekfetch from "snekfetch";
 
 import crypto from "crypto";
 
@@ -289,11 +290,29 @@ export const avatar = (message, content) =>
 
 export const base64 = (message, content) =>
 {
-	const encode = (message, text) => message.channel.send(text
-		? text.length > 1500 ? "The message is too long." : Buffer.from(text).toString("base64")
-		: "_ _");
+	const encode = (message, text) =>
+	{
+		const code = text
+			? text.length > 1500 ? "The message is too long." : Buffer.from(text).toString("base64")
+			: message.attachments.size ? "" : "_ _";
 
-	const decode = (message, text) => message.channel.send(`${Buffer.from(text, "base64")}` || "_ _");
+		const transform = (attachment, index) => snekfetch.get(attachment.url)
+			.then(response => new Discord.Attachment(Buffer.from(response.body.toString("base64")), `${index}.txt`));
+
+		return Promise.all(message.attachments.map(transform))
+			.then(attachments => message.channel.send(code, { files: attachments }));
+	};
+
+	const decode = (message, code) =>
+	{
+		const text = `${Buffer.from(code, "base64")}` || (message.attachments.size ? "" : "_ _");
+
+		const transform = (attachment, index) => snekfetch.get(attachment.url)
+			.then(response => new Discord.Attachment(Buffer.from(response.text, "base64"), `${index}.bin`));
+
+		return Promise.all(message.attachments.map(transform))
+			.then(attachments => message.channel.send(text, { files: attachments }));
+	};
 
 	const [, command, text] = /(\S*)\s*([^]*)/.exec(content);
 
