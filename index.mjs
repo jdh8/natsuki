@@ -2,8 +2,10 @@ import Discord from "discord.js";
 import Jimp from "jimp";
 import pngjs from "pngjs";
 import snekfetch from "snekfetch";
+import xml2js from "xml2js";
 
 import crypto from "crypto";
+import util from "util";
 
 import kisses from "./data/kisses.json";
 import manual from "./data/manual.json";
@@ -446,3 +448,24 @@ export const react = (message, content) =>
 };
 
 export const say = echo;
+
+/******* NSFW *******/
+const XML = util.promisify(xml2js.parseString);
+
+export const rule34 = async (message, content) =>
+{
+	const fetch = async query =>
+	{
+		const response = await snekfetch.get(`https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=${query}`);
+		const { $ } = pick((await XML(response.text)).posts.post);
+
+		return `Score: ${$.score}
+${$.file_url}`;
+	};
+
+	return message.channel.send(message.channel.nsfw
+		? await fetch(content.split(/\s+/).map(encodeURIComponent).join("+")).catch(() => `No image found for ${content}`)
+		: "This command only works in NSFW channels!");
+};
+
+export const r34 = rule34;

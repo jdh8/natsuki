@@ -39,5 +39,8 @@
     "react": "**`n.react`** Have Natsuki react emojis to a message\n\n**Usage**: n.react [id|-before] [emojis]\nZero or negative message id points to the *n*th message before.  Emojis can be specified as id, name, or themselves.  Please separate emojis with whitespaces.\n\n**Example**:\nn.react -1 🍋 7\u20E3 :glitchyuri:",
     "say": "**`n.say`** is an alias of n.echo.",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `cupcake` `cute` `hug` `kiss` `lewd` `lick` `nut` `poem` `rate` `shelf` `ship` `word`\n**Tools -** `avatar` `echo` `emoji` `keycaps` `poll` `react`"
+    "r34": "**`n.r34`** is an alias of n.rule34.",
+    "rule34": "**`n.rule34`** Random picture from rule34.xxx\n\n**Usage**: n.rule34 [tags]\n\n**Example**: n.rule34 natsuki_(doki_doki_literature_club)",
+
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `cupcake` `cute` `hug` `kiss` `lewd` `lick` `nut` `poem` `rate` `shelf` `ship` `word`\n**Tools -** `avatar` `echo` `emoji` `keycaps` `poll` `react`\n**NSFW -** `rule34`"
 }
