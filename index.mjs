@@ -1,6 +1,5 @@
 import Discord from "discord.js";
 import Jimp from "jimp";
-import pngjs from "pngjs";
 import snekfetch from "snekfetch";
 import xml2js from "xml2js";
 
@@ -92,12 +91,9 @@ export const cupcake = async (message, content) =>
 	message.channel.startTyping();
 
 	try {
-		const bitmap = (await image).composite(await avatar(user), 80, 80).bitmap;
-		const png = new pngjs.PNG({ width: bitmap.width, height: bitmap.height });
-
-		png.data = Buffer.from(bitmap.data);
-
-		return await message.channel.send(text, new Discord.Attachment(await buffer(png.pack()), "cupcake.png"));
+		const composed = (await image).composite(await avatar(user), 80, 80);
+		const buffer = await util.promisify((...x) => composed.getBuffer(...x))("image/png");
+		return message.channel.send(text, new Discord.Attachment(buffer, "cupcake.png"));
 	}
 	finally {
 		message.channel.stopTyping();
