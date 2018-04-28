@@ -450,22 +450,33 @@ export const react = (message, content) =>
 export const say = echo;
 
 /******* NSFW *******/
-const XML = util.promisify(xml2js.parseString);
-
-export const rule34 = async (message, content) =>
+const NSFW = async (message, content, f) =>
 {
-	const fetch = async query =>
-	{
-		const response = await snekfetch.get(`https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=${query}`);
-		const { $ } = pick((await XML(response.text)).posts.post);
+	if (!message.channel.nsfw)
+		return await message.channel.send("This command only works in NSFW channels!");
 
-		return `Score: ${$.score}
+	try {
+		message.channel.startTyping();
+		return message.channel.send(await f(tags(content)));
+	}
+	catch (error) {
+		return message.channel.send(`No image found for ${content}`);
+	}
+	finally {
+		message.channel.stopTyping();
+	}
+}
+
+const XML = util.promisify(xml2js.parseString);
+const tags = query => query.split(/\s+/).map(encodeURIComponent).join("+");
+
+export const rule34 = (message, content) => NSFW(message, content, async query =>
+{
+	const response = await snekfetch.get(`https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=${query}`);
+	const { $ } = pick((await XML(response.text)).posts.post);
+
+	return `Score: ${$.score}
 ${$.file_url}`;
-	};
-
-	return message.channel.send(message.channel.nsfw
-		? await fetch(content.split(/\s+/).map(encodeURIComponent).join("+")).catch(() => `No image found for ${content}`)
-		: "This command only works in NSFW channels!");
-};
+});
 
 export const r34 = rule34;
