@@ -470,13 +470,19 @@ const NSFW = async (message, content, f) =>
 const XML = util.promisify(xml2js.parseString);
 const tags = query => query.split(/\s+/).map(encodeURIComponent).join("+");
 
+const weeb = object => `Score: ${object.score}
+${object.file_url}`;
+
 export const rule34 = (message, content) => NSFW(message, content, async query =>
 {
 	const response = await snekfetch.get(`https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=${query}`);
-	const { $ } = pick((await XML(response.text)).posts.post);
-
-	return `Score: ${$.score}
-${$.file_url}`;
+	return weeb(pick((await XML(response.text)).posts.post).$);
 });
 
 export const r34 = rule34;
+
+export const yandere = (message, content) => NSFW(message, content, async query =>
+{
+	const response = await snekfetch.get(`https://yande.re/post.json?tags=${query}`);
+	return weeb(pick(response.body));
+});
