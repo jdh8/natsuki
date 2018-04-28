@@ -40,7 +40,7 @@
     "say": "**`n.say`** is an alias of n.echo.",
 
     "r34": "**`n.r34`** is an alias of n.rule34.",
-    "rule34": "**`n.rule34`** Random picture from rule34.xxx\n\n**Usage**: n.rule34 [tags]\n\n**Example**: n.rule34 natsuki_(doki_doki_literature_club)",
+    "rule34": "**`n.rule34`** Random picture from rule34.xxx\n\n**Usage**: n.rule34 [tags]\n\n**Examples**:\nn.rule34 natsuki_(doki_doki_literature_club)\nn.rule34 himejima_akeno rias_gremory",
 
     "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `cupcake` `cute` `hug` `kiss` `lewd` `lick` `nut` `poem` `rate` `shelf` `ship` `word`\n**Tools -** `avatar` `echo` `emoji` `keycaps` `poll` `react`\n**NSFW -** `rule34`"
 }
