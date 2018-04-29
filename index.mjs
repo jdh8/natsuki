@@ -449,7 +449,7 @@ export const say = echo;
 const NSFW = async (message, content, f) =>
 {
 	if (!message.channel.nsfw)
-		return await message.channel.send("This command only works in NSFW channels!");
+		return await message.channel.send("🔞 This command only works in NSFW channels!");
 
 	try {
 		message.channel.startTyping();
