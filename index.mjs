@@ -477,6 +477,9 @@ export const rule34 = (message, content) => NSFW(message, content, async query =
 
 export const r34 = rule34;
 
+export const fuck = (message, content) => rule34(message, `vaginal ${content || "natsuki_(doki_doki_literature_club)"}`);
+export const fucc = fuck;
+
 export const yandere = (message, content) => NSFW(message, content, async query =>
 {
 	const response = await snekfetch.get(`https://yande.re/post.json?tags=${query}`);
