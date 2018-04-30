@@ -30,3 +30,6 @@ Want to be on this list?  Any contribution is welcome.
 [jdh8]: https://github.com/jdh8
 [YourWrstNightmare]: https://www.reddit.com/user/YourWrstNightmare
 [RoseQuartz6758]: https://www.reddit.com/user/RoseQuartz6758
+
+### Source of assets ###
+* `290px-Hostess-Cupcake-Whole.jpg` is from [Wikimedia](https://commons.wikimedia.org/wiki/File:Hostess-Cupcake-Whole.jpg).
