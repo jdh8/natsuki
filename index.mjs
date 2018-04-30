@@ -443,7 +443,7 @@ export const fuck = async (message, content) =>
 	if (!message.channel.nsfw)
 		return await message.channel.send("🔞 This command only works in NSFW channels!");
 
-	const avatar = user => Jimp.read(user.avatar ? `${pfp(user)}?size=256` : robot(user));
+	const avatar = async user => (await Jimp.read(user.avatar ? `${pfp(user)}?size=256` : robot(user))).resize(256, 256);
 	const user = message.client.users.get(mentioned(content));
 	const text = `${message.author} fucked ${user || "Natsuki"}`;
 	const image = Jimp.read("assets/566424ede431200e3985ca6f21287cee.png");
