@@ -438,6 +438,31 @@ export const react = (message, content) =>
 export const say = echo;
 
 /******* NSFW *******/
+export const fuck = async (message, content) =>
+{
+	if (!message.channel.nsfw)
+		return await message.channel.send("🔞 This command only works in NSFW channels!");
+
+	const avatar = user => Jimp.read(user.avatar ? `${pfp(user)}?size=256` : robot(user));
+	const user = message.client.users.get(mentioned(content));
+	const text = `${message.author} fucked ${user || "Natsuki"}`;
+	const image = Jimp.read("assets/566424ede431200e3985ca6f21287cee.png");
+
+	message.channel.startTyping();
+
+	try {
+		const composed = (await image).composite(await avatar(message.author), 364, 125);
+		if (user) composed.composite(await avatar(user), 110, 20);
+		const buffer = await util.promisify((...x) => composed.getBuffer(...x))("image/png");
+		return message.channel.send(text, new Discord.Attachment(buffer, "fuck.png"));
+	}
+	finally {
+		message.channel.stopTyping();
+	}
+};
+
+export const fucc = fuck;
+
 const NSFW = async (message, content, f) =>
 {
 	if (!message.channel.nsfw)
@@ -468,9 +493,6 @@ export const rule34 = (message, content) => NSFW(message, content, async query =
 });
 
 export const r34 = rule34;
-
-export const fuck = (message, content) => rule34(message, `vaginal ${content || "natsuki_(doki_doki_literature_club)"}`);
-export const fucc = fuck;
 
 export const yandere = (message, content) => NSFW(message, content, async query =>
 {

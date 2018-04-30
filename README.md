@@ -33,3 +33,4 @@ Want to be on this list?  Any contribution is welcome.
 
 ### Source of assets ###
 * `290px-Hostess-Cupcake-Whole.jpg` is from [Wikimedia](https://commons.wikimedia.org/wiki/File:Hostess-Cupcake-Whole.jpg).
+* `566424ede431200e3985ca6f21287cee.png` is from [Rule 34](https://rule34.xxx/index.php?page=post&s=view&id=2613028) (**NSFW**).
