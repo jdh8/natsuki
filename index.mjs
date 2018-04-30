@@ -75,14 +75,6 @@ export const bunny = (message, content) =>
 
 export const cupcake = async (message, content) =>
 {
-	const buffer = stream => new Promise((resolve, reject) =>
-	{
-		const buffers = [];
-		stream.on("error", reject);
-		stream.on("data", data => buffers.push(data));
-		stream.on("end", () => resolve(Buffer.concat(buffers)));
-	});
-
 	const avatar = async user => user.avatar ? await Jimp.read(pfp(user)) : (await Jimp.read(robot(user))).scale(0.5);
 	const user = message.client.users.get(mentioned(content)) || message.author;
 	const text = `${user} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!`;
