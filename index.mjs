@@ -427,20 +427,20 @@ export const react = (message, content) =>
 export const say = echo;
 
 /******* Information *******/
-export const avatar = (message, content) =>
-{
-	const user = message.client.users.get(mentioned(content)) || message.author;
-	const url = user.avatar ? `${pfp(user)}${user.avatar.startsWith("a_") ? ".gif" : ""}?size=2048` : robot(user);
-
-	return message.channel.send(url);
-};
-
 const best = (collection, name) =>
 {
 	const pattern = new RegExp(name, "i");
 	const filtered = collection.filterArray(x => pattern.test(x.name));
 
 	return filtered.length ? filtered.reduce((x, y) => x.name.length < y.name.length ? x : y) : null;
+};
+
+export const avatar = (message, content) =>
+{
+	const user = message.client.users.get(mentioned(content)) || message.author;
+	const url = user.avatar ? `${pfp(user)}${user.avatar.startsWith("a_") ? ".gif" : ""}?size=2048` : robot(user);
+
+	return message.channel.send(url);
 };
 
 export const role = (message, content) =>
@@ -468,6 +468,29 @@ export const role = (message, content) =>
 };
 
 /******* NSFW *******/
+const NSFW = async (message, content, f) =>
+{
+	if (!message.channel.nsfw)
+		return await message.channel.send("🔞 This command only works in NSFW channels!");
+
+	try {
+		message.channel.startTyping();
+		return message.channel.send(await f(tags(content)));
+	}
+	catch (error) {
+		return message.channel.send(`No image found for ${content}`);
+	}
+	finally {
+		message.channel.stopTyping();
+	}
+}
+
+const XML = util.promisify(xml2js.parseString);
+const tags = query => query.split(/\s+/).map(encodeURIComponent).join("+");
+
+const weeb = object => `Score: ${object.score}
+${object.file_url}`;
+
 export const fuck = async (message, content) =>
 {
 	if (!message.channel.nsfw)
@@ -492,29 +515,6 @@ export const fuck = async (message, content) =>
 };
 
 export const fucc = fuck;
-
-const NSFW = async (message, content, f) =>
-{
-	if (!message.channel.nsfw)
-		return await message.channel.send("🔞 This command only works in NSFW channels!");
-
-	try {
-		message.channel.startTyping();
-		return message.channel.send(await f(tags(content)));
-	}
-	catch (error) {
-		return message.channel.send(`No image found for ${content}`);
-	}
-	finally {
-		message.channel.stopTyping();
-	}
-}
-
-const XML = util.promisify(xml2js.parseString);
-const tags = query => query.split(/\s+/).map(encodeURIComponent).join("+");
-
-const weeb = object => `Score: ${object.score}
-${object.file_url}`;
 
 export const rule34 = (message, content) => NSFW(message, content, async query =>
 {
