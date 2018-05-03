@@ -39,7 +39,8 @@
     "say": "**`n.say`** is an alias of n.echo.",
 
     "avatar": "**`n.avatar`** Display URL of someone's avatar\n\n**Usage**: n.avatar [user]\n\n**Example**:\n`n.avatar` Get your own avatar\n`n.avatar @Natsuki#2934` Get my avatar",
-    "role": "**`n.role`** Information on a role\n\n**Usage**: n.avatar [role|name]",
+    "role": "**`n.role`** Information on a role\n\n**Usage**: n.role [role|name]",
+    "snowflake": "**`n.snowflake`** Extract information from a snowflake\n\n**Usage**: n.snowflake [id|user|role|channel]",
 
     "fucc": "**`n.fucc`** is an alias of n.fuck.",
     "fuck": "**`n.fuck`** Fuck someone\n\n**Usage**: n.fuck [user]\n\nThe source is NSFW and attributed at https://github.com/jdh8/natsuki/blob/master/README.md",
@@ -47,5 +48,5 @@
     "rule34": "**`n.rule34`** Random picture from rule34.xxx\n\n**Usage**: n.rule34 [tags]\n\n**Examples**:\nn.rule34 natsuki_(doki_doki_literature_club)\nn.rule34 himejima_akeno rias_gremory",
     "yandere": "**`n.yandere`** Random picture from yande.re\n\n**Usage**: n.yandere [tags]\n\n**Examples**:\nn.yandere natsuki_(doki_doki_literature_club)\nn.yandere himejima_akeno rias_gremory",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `cupcake` `cute` `hug` `kiss` `lewd` `lick` `nut` `poem` `rate` `shelf` `ship` `word`\n**Tools -** `echo` `emoji` `keycaps` `poll` `react`\n**Information -** `avatar` `role`\n**NSFW -** `fuck` `rule34` `yandere`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `cupcake` `cute` `hug` `kiss` `lewd` `lick` `nut` `poem` `rate` `shelf` `ship` `word`\n**Tools -** `echo` `emoji` `keycaps` `poll` `react`\n**Information -** `avatar` `role` `snowflake`\n**NSFW -** `fuck` `rule34` `yandere`"
 }

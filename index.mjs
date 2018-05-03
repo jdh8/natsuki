@@ -467,6 +467,23 @@ export const role = (message, content) =>
 	}));
 };
 
+export const snowflake = (message, content) =>
+{
+	const match = /\d+/.exec(content);
+
+	if (match == null)
+		return message.channel.send("No valid snowfake is found.");
+
+	const deconstructed = Discord.SnowflakeUtil.deconstruct(match[0]);
+
+	return message.channel.send(new Discord.RichEmbed({ fields: [
+		{ name: "Date", value: deconstructed.date.toISOString() },
+		{ name: "Worker", value: deconstructed.workerID },
+		{ name: "Process", value: deconstructed.processID },
+		{ name: "Increment", value: deconstructed.increment },
+	]}));
+};
+
 /******* NSFW *******/
 const erotic = async (message, content, f) =>
 {
