@@ -468,7 +468,7 @@ export const role = (message, content) =>
 };
 
 /******* NSFW *******/
-const NSFW = async (message, content, f) =>
+const erotic = async (message, content, f) =>
 {
 	if (!message.channel.nsfw)
 		return await message.channel.send("🔞 This command only works in NSFW channels!");
@@ -516,7 +516,7 @@ export const fuck = async (message, content) =>
 
 export const fucc = fuck;
 
-export const rule34 = (message, content) => NSFW(message, content, async query =>
+export const rule34 = (message, content) => erotic(message, content, async query =>
 {
 	const response = await snekfetch.get(`https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=${query}`);
 	return weeb(pick((await XML(response.text)).posts.post).$);
@@ -524,7 +524,7 @@ export const rule34 = (message, content) => NSFW(message, content, async query =
 
 export const r34 = rule34;
 
-export const yandere = (message, content) => NSFW(message, content, async query =>
+export const yandere = (message, content) => erotic(message, content, async query =>
 {
 	const response = await snekfetch.get(`https://yande.re/post.json?tags=${query}`);
 	return weeb(pick(response.body));
