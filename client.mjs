@@ -1,8 +1,9 @@
 import Discord from "discord.js";
-import snekfetch from "snekfetch";
+import DBL from "dblapi.js";
 import loop from "./loop.mjs";
 
 export const client = new Discord.Client();
+export const dbl = new DBL(process.env.DBL_TOKEN, client);
 
 client.on("ready", () => client.user.setPresence({ game: { name: "n.help | n.invite" }}));
 
@@ -19,14 +20,5 @@ ${error}
 \`\`\``).catch(() => {});
 	}
 });
-
-const update = () => snekfetch.post(`https://discordbots.org/api/bots/${client.user.id}/stats`)
-	.set("Authorization", process.env.DBL_TOKEN)
-	.send({ server_count: client.guilds.size })
-	.catch(() => {});
-
-client.on("ready", update);
-client.on("guildCreate", update);
-client.on("guildRemove", update);
 
 client.login(process.env.TOKEN);
