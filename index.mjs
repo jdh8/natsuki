@@ -267,14 +267,6 @@ http://doki-doki-literature-club.wikia.com/wiki/Natsuki#Preferred_Words`;
 };
 
 /******* Tools *******/
-export const avatar = (message, content) =>
-{
-	const user = message.client.users.get(mentioned(content)) || message.author;
-	const url = user.avatar ? `${pfp(user)}${user.avatar.startsWith("a_") ? ".gif" : ""}?size=2048` : robot(user);
-
-	return message.channel.send(url);
-};
-
 export const base64 = (message, content) =>
 {
 	const encode = (message, text) =>
@@ -433,6 +425,15 @@ export const react = (message, content) =>
 };
 
 export const say = echo;
+
+/******* Information *******/
+export const avatar = (message, content) =>
+{
+	const user = message.client.users.get(mentioned(content)) || message.author;
+	const url = user.avatar ? `${pfp(user)}${user.avatar.startsWith("a_") ? ".gif" : ""}?size=2048` : robot(user);
+
+	return message.channel.send(url);
+};
 
 /******* NSFW *******/
 export const fuck = async (message, content) =>

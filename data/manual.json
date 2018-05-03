@@ -29,7 +29,6 @@
     "ship": "**`n.ship`** Ship specified characters\n\n**Usage**: n.ship [characters]\nEvery unescaped & is replaced with a ×.\n\n**Examples**:\n`n.ship`  Shipping you and Natsuki\n`n.ship [text without &]`  Shipping you and the text\n`n.ship [text] & [text]...`  Shipping ampersand-separated text",
     "word": "**`n.word`** Pun command\n\n**Example**:\n`n.word` The n-word\n`@Natsuki word` List of Natsuki's preferred words",
 
-    "avatar": "**`n.avatar`** Display URL of someone's avatar\n\n**Usage**: n.avatar [user]\n\n**Example**:\n`n.avatar` Get your own avatar\n`n.avatar @Natsuki#2934` Get my avatar",
     "base64": "**`n.base64`** Encode or decode Base64\n\n**Usage**: n.base64 encode|decode [text|attachment]\n\n**Examples**:\nn.base64 encode I love you\nn.base64 decode SSdtIG5vdCBjdXRlIQ==",
     "echo": "**`n.echo`** Print what you type\n\n**Usage**: n.echo [text]\nThis function looks useless, but it can resolve animated emojis or ones from another server.",
     "emoji": "**`n.emoji`** Display URL of the first custom emoji\n\n**Usage**: n.emoji [emoji|name]\n\n**Example**:\n`n.emoji :glitchyuri:`  Display glitched Yuri",
@@ -39,11 +38,13 @@
     "react": "**`n.react`** Have Natsuki react emojis to a message\n\n**Usage**: n.react [id|-before] [emojis]\nZero or negative message id points to the *n*th message before.  Emojis can be specified as id, name, or themselves.  Please separate emojis with whitespaces.\n\n**Example**:\nn.react -1 🍋 7\u20E3 :glitchyuri:",
     "say": "**`n.say`** is an alias of n.echo.",
 
+    "avatar": "**`n.avatar`** Display URL of someone's avatar\n\n**Usage**: n.avatar [user]\n\n**Example**:\n`n.avatar` Get your own avatar\n`n.avatar @Natsuki#2934` Get my avatar",
+
     "fucc": "**`n.fucc`** is an alias of n.fuck.",
     "fuck": "**`n.fuck`** Fuck someone\n\n**Usage**: n.fuck [user]\n\nThe source is NSFW and attributed at https://github.com/jdh8/natsuki/blob/master/README.md",
     "r34": "**`n.r34`** is an alias of n.rule34.",
     "rule34": "**`n.rule34`** Random picture from rule34.xxx\n\n**Usage**: n.rule34 [tags]\n\n**Examples**:\nn.rule34 natsuki_(doki_doki_literature_club)\nn.rule34 himejima_akeno rias_gremory",
     "yandere": "**`n.yandere`** Random picture from yande.re\n\n**Usage**: n.yandere [tags]\n\n**Examples**:\nn.yandere natsuki_(doki_doki_literature_club)\nn.yandere himejima_akeno rias_gremory",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `cupcake` `cute` `hug` `kiss` `lewd` `lick` `nut` `poem` `rate` `shelf` `ship` `word`\n**Tools -** `avatar` `echo` `emoji` `keycaps` `poll` `react`\n**NSFW -** `fuck` `rule34` `yandere`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `cupcake` `cute` `hug` `kiss` `lewd` `lick` `nut` `poem` `rate` `shelf` `ship` `word`\n**Tools -** `echo` `emoji` `keycaps` `poll` `react`\n**Information -** `avatar`\n**NSFW -** `fuck` `rule34` `yandere`"
 }
