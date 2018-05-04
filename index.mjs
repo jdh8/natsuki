@@ -10,9 +10,6 @@ import kisses from "./data/kisses.json";
 import manual from "./data/manual.json";
 import poetry from "./data/poetry.json";
 
-const pfp = user => `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`;
-const robot = user => `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`;
-
 const pick = array => array[~~(array.length * Math.random())];
 
 const success = "431825476898652160";
@@ -22,6 +19,17 @@ const mentioned = content =>
 {
 	const match = /<@!?(\d+)>/.exec(content);
 	return match && match[1];
+};
+
+const Avatar = (user, size) =>
+{
+	if (user.id == 1) return user.avatar;
+	if (!user.avatar) return `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`;
+
+	const extension = user.avatar.startsWith("a_") ? ".gif" : "";
+	const query = size ? `?size=${size}` : "";
+
+	return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}${extension}${query}`;
 };
 
 const Image = (message, description, image) =>
@@ -72,7 +80,6 @@ export const bunny = (message, content) =>
 
 export const cupcake = async (message, content) =>
 {
-	const avatar = async user => user.avatar ? await Jimp.read(pfp(user)) : (await Jimp.read(robot(user))).scale(0.5);
 	const user = message.client.users.get(mentioned(content)) || message.author;
 	const text = `${user} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!`;
 	const image = Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg");
@@ -80,7 +87,7 @@ export const cupcake = async (message, content) =>
 	message.channel.startTyping();
 
 	try {
-		const composed = (await image).composite(await avatar(user), 80, 80);
+		const composed = (await image).composite((await Jimp.read(Avatar(user))).resize(128, 128), 80, 80);
 		const buffer = await util.promisify((...x) => composed.getBuffer(...x))("image/png");
 		return message.channel.send(text, new Discord.Attachment(buffer, "cupcake.png"));
 	}
@@ -436,12 +443,7 @@ const best = (collection, name) =>
 };
 
 export const avatar = (message, content) =>
-{
-	const user = message.client.users.get(mentioned(content)) || message.author;
-	const url = user.avatar ? `${pfp(user)}${user.avatar.startsWith("a_") ? ".gif" : ""}?size=2048` : robot(user);
-
-	return message.channel.send(url);
-};
+	message.channel.send(Avatar(message.client.users.get(mentioned(content)) || message.author, 2048));
 
 export const role = (message, content) =>
 {
@@ -513,7 +515,7 @@ export const fuck = async (message, content) =>
 	if (!message.channel.nsfw)
 		return await message.channel.send("🔞 This command only works in NSFW channels!");
 
-	const avatar = async user => (await Jimp.read(user.avatar ? `${pfp(user)}?size=256` : robot(user))).resize(256, 256);
+	const avatar = async user => (await Jimp.read(Avatar(user))).resize(256, 256);
 	const user = message.client.users.get(mentioned(content));
 	const text = `${message.author} fucked ${user || "Natsuki"}`;
 	const image = Jimp.read("assets/566424ede431200e3985ca6f21287cee.png");

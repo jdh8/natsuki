@@ -22,3 +22,5 @@ ${error}
 });
 
 client.login(process.env.TOKEN);
+
+client.on("ready", () => console.log(client.users.get("1").avatar));
