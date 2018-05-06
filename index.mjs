@@ -466,7 +466,11 @@ export const role = (message, content) =>
 			{ name: "Managed", value: role.managed },
 			{ name: "Mentionable", value: role.mentionable },
 		]
-	}));
+	})).catch(() => message.channel.send(`${role} (${role.id})
+**Color:** ${role.hexColor}
+**Hoist:** ${role.hoist}
+**Managed:** ${role.managed}
+**Mentionable:** ${role.mentionable}`));
 };
 
 export const snowflake = (message, content) =>
