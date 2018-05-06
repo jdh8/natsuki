@@ -478,12 +478,10 @@ export const snowflake = (message, content) =>
 
 	const deconstructed = Discord.SnowflakeUtil.deconstruct(match[0]);
 
-	return message.channel.send(new Discord.RichEmbed({ fields: [
-		{ name: "Date", value: deconstructed.date.toISOString() },
-		{ name: "Worker", value: deconstructed.workerID },
-		{ name: "Process", value: deconstructed.processID },
-		{ name: "Increment", value: deconstructed.increment },
-	]}));
+	return message.channel.send(`**Date:** ${deconstructed.date.toISOString()}
+**Worker:** ${deconstructed.workerID}
+**Process:** ${deconstructed.processID}
+**Increment:** ${deconstructed.increment}`);
 };
 
 /******* NSFW *******/
