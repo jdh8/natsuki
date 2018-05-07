@@ -33,9 +33,11 @@ const Avatar = (user, size) =>
 	return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}${extension}${query}`;
 };
 
-const Image = (message, description, image) =>
-	message.channel.send(new Discord.RichEmbed({ description: description }).setImage(image))
-		.catch(() => message.channel.send(description + "\n" + image));
+const URL = url => ({ url });
+
+const Image = (message, description, url) =>
+	message.channel.send(new Discord.RichEmbed({ description, image: URL(url) }))
+		.catch(() => message.channel.send(description + "\n" + url));
 
 /******* Core *******/
 export const help = (message, content) =>
@@ -287,7 +289,7 @@ export const base64 = (message, content) =>
 			.then(response => new Discord.Attachment(Buffer.from(response.body.toString("base64")), `${index}.txt`));
 
 		return Promise.all(message.attachments.map(transform))
-			.then(attachments => message.channel.send(code, { files: attachments }));
+			.then(files => message.channel.send(code, { files }));
 	};
 
 	const decode = (message, code) =>
@@ -298,7 +300,7 @@ export const base64 = (message, content) =>
 			.then(response => new Discord.Attachment(Buffer.from(response.text, "base64"), `${index}.bin`));
 
 		return Promise.all(message.attachments.map(transform))
-			.then(attachments => message.channel.send(text, { files: attachments }));
+			.then(files => message.channel.send(text, { files }));
 	};
 
 	const [, command, text] = /(\S*)\s*([^]*)/.exec(content);
