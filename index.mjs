@@ -434,6 +434,8 @@ export const react = (message, content) =>
 export const say = echo;
 
 /******* Information *******/
+const Field = (name, value, inline = false) => ({ name, value, inline });
+
 const best = (collection, name) =>
 {
 	const pattern = new RegExp(name, "i");
@@ -461,10 +463,10 @@ export const role = (message, content) =>
 		color: role.color,
 		description: `${role} (${role.id})`,
 		fields: [
-			{ name: "Color", value: role.hexColor },
-			{ name: "Hoist", value: role.hoist },
-			{ name: "Managed", value: role.managed },
-			{ name: "Mentionable", value: role.mentionable },
+			Field("Color", role.hexColor, true),
+			Field("Hoist", role.hoist, true),
+			Field("Managed", role.managed, true),
+			Field("Mentionable", role.mentionable, true),
 		]
 	})).catch(() => message.channel.send(`${role} (${role.id})
 **Color:** ${role.hexColor}
