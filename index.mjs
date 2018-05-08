@@ -339,7 +339,7 @@ export const color = async (message, content) =>
 	const size = 128;
 	const bit = 16;
 	const image = new Checkerboard(size, size, bit, 0xFFFFFFFF, 0x36393EFF).composite(new Jimp(size, size, rgba >>> 0), 0, 0);
-	const buffer = await util.promisify((...x) => image.getBuffer(...x))("image/png");
+	const buffer = await util.promisify((...x) => image.rgba(false).getBuffer(...x))("image/png");
 
 	return await message.channel.send(description, new Discord.Attachment(buffer, "color.png"));
 };
