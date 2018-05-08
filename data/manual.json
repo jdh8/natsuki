@@ -30,6 +30,7 @@
     "word": "**`n.word`** Pun command\n\n**Example**:\n`n.word` The n-word\n`@Natsuki word` List of Natsuki's preferred words",
 
     "base64": "**`n.base64`** Encode or decode Base64\n\n**Usage**: n.base64 encode|decode [text|attachment]\n\n**Examples**:\nn.base64 encode I love you\nn.base64 decode SSdtIG5vdCBjdXRlIQ==",
+    "color": "**`n.color`** Display color\n\n**Usage**: n.color [color]\n\n**Examples**:\nn.color abc\nn.color abcd\nn.color 123456\nn.color 12345678\nn.color pink\nn.color rgba(12, 34, 56, 0.78)\nn.color hsla(300, 80%, 80%, 0.6)",
     "echo": "**`n.echo`** Print what you type\n\n**Usage**: n.echo [text]\nThis function looks useless, but it can resolve animated emojis or ones from another server.",
     "emoji": "**`n.emoji`** Display URL of the first custom emoji\n\n**Usage**: n.emoji [emoji|name]\n\n**Example**:\n`n.emoji :glitchyuri:`  Display glitched Yuri",
     "emote": "**`n.emote`** is an alias of n.emoji.",
@@ -48,5 +49,5 @@
     "rule34": "**`n.rule34`** Random picture from rule34.xxx\n\n**Usage**: n.rule34 [tags]\n\n**Examples**:\nn.rule34 natsuki_(doki_doki_literature_club)\nn.rule34 himejima_akeno rias_gremory",
     "yandere": "**`n.yandere`** Random picture from yande.re\n\n**Usage**: n.yandere [tags]\n\n**Examples**:\nn.yandere natsuki_(doki_doki_literature_club)\nn.yandere himejima_akeno rias_gremory",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `cupcake` `cute` `hug` `kiss` `lewd` `lick` `nut` `poem` `rate` `shelf` `ship` `word`\n**Tools -** `echo` `emoji` `keycaps` `poll` `react`\n**Information -** `avatar` `role` `snowflake`\n**NSFW -** `fuck` `rule34` `yandere`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `cupcake` `cute` `hug` `kiss` `lewd` `lick` `nut` `poem` `rate` `shelf` `ship` `word`\n**Tools -** `base64` `color` `echo` `emoji` `keycaps` `poll` `react`\n**Information -** `avatar` `role` `snowflake`\n**NSFW -** `fuck` `rule34` `yandere`"
 }
