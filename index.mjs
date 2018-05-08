@@ -332,6 +332,8 @@ export const color = async (message, content) =>
 	return await message.channel.send(description, new Discord.Attachment(buffer, "color.png"));
 };
 
+export const colour = color;
+
 export const echo = (message, content) =>
 {
 	const f = (match, name) => name && message.client.emojis.find("name", name) || match;
