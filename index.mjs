@@ -54,7 +54,7 @@ https://discordapp.com/oauth2/authorize?client_id=414384608076103680&scope=bot&p
 export const invite = message =>
 	message.channel.send(`https://discordapp.com/oauth2/authorize?&client_id=${message.client.user.id}&scope=bot`);
 
-export const ping = (message, content) =>
+export const ping = message =>
 {
 	const format = (seconds, nano) => seconds ? `${(seconds + 1e-9 * nano).toFixed(3)} s` : `${(1e-6 * nano).toFixed()} ms`;
 	const tick = process.hrtime();
