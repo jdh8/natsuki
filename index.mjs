@@ -118,25 +118,6 @@ export const cute = type(async message =>
 	return message;
 });
 
-export const hug = (message, content) => message.channel.send(new Discord.RichEmbed({
-	description: `${message.author} hugged ${content || "Yuri"}!`,
-	image: { url: "https://cdn.discordapp.com/attachments/403697175948820481/413015715273113601/Nxdr0qO_1.jpg" },
-}));
-
-export const kiss = (message, content) => message.channel.send(new Discord.RichEmbed({
-	description: `${message.author} kissed ${content || "Natsuki"}!`,
-	image: { url: pick(kisses) },
-}));
-
-export const lewd = message => message.channel.send("https://youtu.be/qr89xoZyE1g");
-
-export const lick = (message, content) => message.channel.send(new Discord.RichEmbed({
-	description: `${message.author} licked ${content || "the air"}!`,
-	image: { url: "https://cdn.discordapp.com/attachments/421196261132075009/421920949277818891/LickTemplate.gif" },
-}));
-
-export const licc = lick;
-
 export const nut = (message, content) =>
 	message.channel.send(`${message.author} nuts on ${content || "the floor"}.
 <:pukesuki:405984820674428928> **You guys are so gross!**`);
@@ -274,6 +255,26 @@ export const word = (message, content, mention) =>
 http://doki-doki-literature-club.wikia.com/wiki/Natsuki#Preferred_Words`;
 	return message.channel.send(mention ? preferred : nword);
 };
+
+/******* Weeb *******/
+export const hug = (message, content) => message.channel.send(new Discord.RichEmbed({
+	description: `${message.author} hugged ${content || "Yuri"}!`,
+	image: { url: "https://cdn.discordapp.com/attachments/403697175948820481/413015715273113601/Nxdr0qO_1.jpg" },
+}));
+
+export const kiss = (message, content) => message.channel.send(new Discord.RichEmbed({
+	description: `${message.author} kissed ${content || "Natsuki"}!`,
+	image: { url: pick(kisses) },
+}));
+
+export const lewd = message => message.channel.send("https://youtu.be/qr89xoZyE1g");
+
+export const lick = (message, content) => message.channel.send(new Discord.RichEmbed({
+	description: `${message.author} licked ${content || "the air"}!`,
+	image: { url: "https://cdn.discordapp.com/attachments/421196261132075009/421920949277818891/LickTemplate.gif" },
+}));
+
+export const licc = lick;
 
 /******* Tools *******/
 export const base64 = (message, content) =>
