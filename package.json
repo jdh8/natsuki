@@ -1,6 +1,6 @@
 {
     "name": "natsuki",
-    "version": "1.8.0",
+    "version": "1.8.1",
     "description": "Discord bot named after Natsuki from Doki Doki Literature Club",
     "main": "index.mjs",
     "repository": "https://github.com/jdh8/natsuki",

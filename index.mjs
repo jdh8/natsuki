@@ -33,6 +33,13 @@ const Avatar = (user, size) =>
 	return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}${extension}${query}`;
 };
 
+const type = f => async (message, ...rest) =>
+{
+	message.channel.startTyping();
+	try { return await f(message, ...rest) }
+	finally { message.channel.stopTyping() }
+};
+
 /******* Core *******/
 export const help = (message, content) =>
 {
@@ -82,46 +89,34 @@ export const chat = async (message, content, mention) =>
 	return await (text ? message.channel.send(text) : message.react(mention ? "433490397516267532" : "❓"));
 };
 
-export const cupcake = async (message, content) =>
+export const cupcake = type(async (message, content) =>
 {
 	const user = message.client.users.get(mentioned(content)) || message.author;
 	const text = `${user} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!`;
 	const image = Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg");
+	const composed = (await image).composite((await Jimp.read(Avatar(user))).resize(128, 128), 80, 80);
+	const buffer = await util.promisify((...x) => composed.getBuffer(...x))("image/png");
 
-	message.channel.startTyping();
+	return message.channel.send(text, new Discord.Attachment(buffer, "cupcake.png"));
+});
 
-	try {
-		const composed = (await image).composite((await Jimp.read(Avatar(user))).resize(128, 128), 80, 80);
-		const buffer = await util.promisify((...x) => composed.getBuffer(...x))("image/png");
-		return message.channel.send(text, new Discord.Attachment(buffer, "cupcake.png"));
-	}
-	finally {
-		message.channel.stopTyping();
-	}
-};
-
-export const cute = async message =>
+export const cute = type(async message =>
 {
 	const sleep = duration => new Promise(resolve => setTimeout(resolve, duration));
 	let content = "Don't say this embarassing thing, dummy!";
 	const reply = await message.channel.send(content);
 
-	message.channel.startTyping();
+	await sleep(3000);
+	await reply.edit(content += "\nY-You t-too....");
+	await sleep(2000);
+	await reply.edit(content += "\nI'M NOT CUUUUUUUUUUUTE!");
+	await sleep(2000);
+	await reply.edit(content += "\nDon't think you can make me say this embarassing thing just because we're not at school!");
+	await sleep(4000);
+	await reply.edit(content += "\nI-I have to go to the bathroom.");
 
-	try {
-		await sleep(3000);
-		await reply.edit(content += "\nY-You t-too....");
-		await sleep(2000);
-		await reply.edit(content += "\nI'M NOT CUUUUUUUUUUUTE!");
-		await sleep(2000);
-		await reply.edit(content += "\nDon't think you can make me say this embarassing thing just because we're not at school!");
-		await sleep(4000);
-		await reply.edit(content += "\nI-I have to go to the bathroom.");
-	}
-	finally {
-		message.channel.stopTyping();
-	}
-};
+	return message;
+});
 
 export const hug = (message, content) => message.channel.send(new Discord.RichEmbed({
 	description: `${message.author} hugged ${content || "Yuri"}!`,
@@ -531,63 +526,44 @@ export const snowflake = (message, content) =>
 };
 
 /******* NSFW *******/
-const erotic = async (message, content, f) =>
-{
-	if (!message.channel.nsfw)
-		return await message.channel.send("🔞 This command only works in NSFW channels!");
-
-	try {
-		message.channel.startTyping();
-		return message.channel.send(await f(tags(content)));
-	}
-	finally {
-		message.channel.stopTyping();
-	}
-}
+const NSFW = f => (message, ...rest) =>
+	message.channel.nsfw ? f(message, ...rest) : message.channel.send("🔞 This command only works in NSFW channels!");
 
 const XML = util.promisify(xml2js.parseString);
-const tags = query => query.split(/\s+/).map(encodeURIComponent).join("+");
+const CGI = string => string.split(/\s+/).map(encodeURIComponent).join("+");
 
 const weeb = object => `Score: ${object.score}
 ${object.file_url}`;
 
-export const fuck = async (message, content) =>
+export const fuck = NSFW(type(async (message, content) =>
 {
-	if (!message.channel.nsfw)
-		return await message.channel.send("🔞 This command only works in NSFW channels!");
-
 	const avatar = async user => (await Jimp.read(Avatar(user))).resize(256, 256);
 	const user = message.client.users.get(mentioned(content));
 	const text = `${message.author} fucked ${user || "Natsuki"}`;
 	const image = Jimp.read("assets/566424ede431200e3985ca6f21287cee.png");
+	const composed = (await image).composite(await avatar(message.author), 364, 125);
 
-	message.channel.startTyping();
+	if (user)
+		composed.composite(await avatar(user), 110, 20);
 
-	try {
-		const composed = (await image).composite(await avatar(message.author), 364, 125);
-		if (user) composed.composite(await avatar(user), 110, 20);
-		const buffer = await util.promisify((...x) => composed.getBuffer(...x))("image/png");
-		return message.channel.send(text, new Discord.Attachment(buffer, "fuck.png"));
-	}
-	finally {
-		message.channel.stopTyping();
-	}
-};
+	const buffer = await util.promisify((...x) => composed.getBuffer(...x))("image/png");
+	return await message.channel.send(text, new Discord.Attachment(buffer, "fuck.png"));
+}));
 
 export const fucc = fuck;
 
-export const rule34 = (message, content) => erotic(message, content, async query =>
+export const rule34 = NSFW(type(async (message, content) =>
 {
-	const response = await snekfetch.get(`https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=${query}`);
-	const elements = (await XML(response.text)).posts.post;
-	return elements ? weeb(pick(elements).$) : `No image found for \`${content}\` on https://rule34.xxx/`;
-});
+	const response = await snekfetch.get(`https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=${CGI(content)}`);
+	const elements = (await XML(response.raw)).posts.post;
+	return message.channel.send(elements ? weeb(pick(elements).$) : `No image found for \`${content}\` on https://rule34.xxx/`);
+}));
 
 export const r34 = rule34;
 
-export const yandere = (message, content) => erotic(message, content, async query =>
+export const yandere = NSFW(type(async (message, content) =>
 {
-	const response = await snekfetch.get(`https://yande.re/post.json?tags=${query}`);
+	const response = await snekfetch.get(`https://yande.re/post.json?tags=${CGI(content)}`);
 	const array = response.body;
-	return array.length ? weeb(pick(array)) : `No image found for \`${content}\` on https://yande.re/`;
-});
+	return message.channel.send(array.length ? weeb(pick(array)) : `No image found for \`${content}\` on https://yande.re/`);
+}));
