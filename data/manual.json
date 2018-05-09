@@ -31,6 +31,7 @@
     "lewd": "**`n.lewd`** Display a video\n\n**Usage**: n.lewd",
     "licc": "**`n.licc`** is an alias of n.lick.",
     "lick": "**`n.lick`** Lick someone\n\n**Usage**: n.lick [user|text]",
+    "neko": "**`n.neko`** Display a random neko from nekos.life\n\n**Usage**: n.neko\n\nNSFW nekos may appear on NSFW channels.",
 
     "base64": "**`n.base64`** Encode or decode Base64\n\n**Usage**: n.base64 encode|decode [text|attachment]\n\n**Examples**:\nn.base64 encode I love you\nn.base64 decode SSdtIG5vdCBjdXRlIQ==",
     "color": "**`n.color`** Display color\n\n**Usage**: n.color [color]\n\n**Examples**:\nn.color abc\nn.color abcd\nn.color 123456\nn.color 12345678\nn.color pink\nn.color rgba(12, 34, 56, 0.78)\nn.color hsla(300, 80%, 80%, 0.6)",
@@ -54,5 +55,5 @@
     "slurp": "**`n.slurp`** Fuck someone\n\n**Usage**: n.slurp [text]\n\nNatsuki picks an appropriate image from https://nekos.life",
     "yandere": "**`n.yandere`** Random picture from yande.re\n\n**Usage**: n.yandere [tags]\n\n**Examples**:\nn.yandere natsuki_(doki_doki_literature_club)\nn.yandere himejima_akeno rias_gremory",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `chat` `cupcake` `cute` `nut` `poem` `rate` `shelf` `ship` `word`\n**Weeb -** `hug` `kiss` `lewd` `lick`\n**Tools -** `base64` `color` `echo` `emoji` `keycaps` `poll` `react`\n**Information -** `avatar` `role` `snowflake`\n**NSFW -** `fuck` `rule34` `slurp` `yandere`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `chat` `cupcake` `cute` `nut` `poem` `rate` `shelf` `ship` `word`\n**Weeb -** `hug` `kiss` `lewd` `lick` `neko`\n**Tools -** `base64` `color` `echo` `emoji` `keycaps` `poll` `react`\n**Information -** `avatar` `role` `snowflake`\n**NSFW -** `fuck` `rule34` `slurp` `yandere`"
 }

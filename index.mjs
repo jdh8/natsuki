@@ -276,6 +276,16 @@ export const lick = (message, content) => message.channel.send(new Discord.RichE
 
 export const licc = lick;
 
+export const neko = type(async (message, content) =>
+{
+	const endpoint = message.channel.nsfw ? "https://nekos.life/api/v2/img/lewd" : "https://nekos.life/api/v2/img/neko";
+
+	return await message.channel.send(new Discord.RichEmbed({
+		description: "Here comes your random neko.",
+		image: (await snekfetch.get(endpoint)).body,
+	}));
+});
+
 /******* Tools *******/
 export const base64 = (message, content) =>
 {
