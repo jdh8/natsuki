@@ -33,12 +33,6 @@ const Avatar = (user, size) =>
 	return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}${extension}${query}`;
 };
 
-const URL = url => ({ url });
-
-const Image = (message, description, url) =>
-	message.channel.send(new Discord.RichEmbed({ description, image: URL(url) }))
-		.catch(() => message.channel.send(description + "\n" + url));
-
 /******* Core *******/
 export const help = (message, content) =>
 {
@@ -122,19 +116,22 @@ export const cute = async message =>
 	}
 };
 
-export const hug = (message, content) => Image(message,
-	`${message.author} hugged ${content || "Yuri"}!`,
-	"https://cdn.discordapp.com/attachments/403697175948820481/413015715273113601/Nxdr0qO_1.jpg");
+export const hug = (message, content) => message.channel.send(new Discord.RichEmbed({
+	description: `${message.author} hugged ${content || "Yuri"}!`,
+	image: { url: "https://cdn.discordapp.com/attachments/403697175948820481/413015715273113601/Nxdr0qO_1.jpg" },
+}));
 
-export const kiss = (message, content) => Image(message,
-	`${message.author} kissed ${content || "Natsuki"}!`,
-	pick(kisses));
+export const kiss = (message, content) => message.channel.send(new Discord.RichEmbed({
+	description: `${message.author} kissed ${content || "Natsuki"}!`,
+	image: { url: pick(kisses) },
+}));
 
 export const lewd = message => message.channel.send("https://youtu.be/qr89xoZyE1g");
 
-export const lick = (message, content) => Image(message,
-	`${message.author} licked ${content || "the air"}!`,
-	"https://cdn.discordapp.com/attachments/421196261132075009/421920949277818891/LickTemplate.gif");
+export const lick = (message, content) => message.channel.send(new Discord.RichEmbed({
+	description: `${message.author} licked ${content || "the air"}!`,
+	image: { url: "https://cdn.discordapp.com/attachments/421196261132075009/421920949277818891/LickTemplate.gif" },
+}));
 
 export const licc = lick;
 
@@ -336,7 +333,7 @@ export const color = async (message, content) =>
 **HSL:** ${color.toHslString()}`;
 
 	const { r, g, b, a } = color.toRgb();
-	const rgba = Math.round(r) << 24 | Math.round(g) << 16 | Math.round(b) << 8 | Math.round(255 * a); 
+	const rgba = Math.round(r) << 24 | Math.round(g) << 16 | Math.round(b) << 8 | Math.round(255 * a);
 
 	const size = 128;
 	const bit = 16;
