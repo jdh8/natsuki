@@ -9,7 +9,7 @@ export default message =>
 
 	if (match) {
 		const [, mention, command, content] = match;
-		const f = natsuki[command];
+		const f = natsuki[command] || (mention && command == "," && content && natsuki.chat);
 		return f ? f(message, content, mention) : mention && message.react("433490397516267532");
 	}
 };

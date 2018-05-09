@@ -10,8 +10,10 @@
     "vote": "**`n.vote`** Natsuki on the Discord Bot List\n\n**Usage**: n.vote\nThis command just shows Natsuki's page on the Discord Bot List.  To vote, you have to follow the link and log in there.",
     "yuri": "**`n.yuri`** Information about Yuri, Natsuki's friend\n\n**Usage**: n.yuri",
 
+    ",": "**`@Natsuki#2934,`** is an alias of n.chat.",
     "beat": "**`n.beat`** Ask Buffski to beat someone\n\n**Usage**: n.beat [user|text]",
     "bunny": "**`n.bunny`** Have a bunny say something\n\n**Usage**: n.bunny [text]",
+    "chat": "**`n.chat`** Chat with Natsuki ~~nekos.life~~\n\n**Usage**: n.chat [text]",
     "cupcake": "**`n.cupcake`** Bake cupcake out of someone\n\n**Usage**: n.cupcake [user]\n\nThe source of the cupcake is https://commons.wikimedia.org/wiki/File:Hostess-Cupcake-Whole.jpg",
     "cute": "**`n.cute`** Say that Natsuki is cute\n\n**Usage**: n.cute",
     "hug": "**`n.hug`** Hug someone\n\n**Usage**: n.hug [user|text]",
@@ -50,5 +52,5 @@
     "rule34": "**`n.rule34`** Random picture from rule34.xxx\n\n**Usage**: n.rule34 [tags]\n\n**Examples**:\nn.rule34 natsuki_(doki_doki_literature_club)\nn.rule34 himejima_akeno rias_gremory",
     "yandere": "**`n.yandere`** Random picture from yande.re\n\n**Usage**: n.yandere [tags]\n\n**Examples**:\nn.yandere natsuki_(doki_doki_literature_club)\nn.yandere himejima_akeno rias_gremory",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `cupcake` `cute` `hug` `kiss` `lewd` `lick` `nut` `poem` `rate` `shelf` `ship` `word`\n**Tools -** `base64` `color` `echo` `emoji` `keycaps` `poll` `react`\n**Information -** `avatar` `role` `snowflake`\n**NSFW -** `fuck` `rule34` `yandere`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `chat` `cupcake` `cute` `hug` `kiss` `lewd` `lick` `nut` `poem` `rate` `shelf` `ship` `word`\n**Tools -** `base64` `color` `echo` `emoji` `keycaps` `poll` `react`\n**Information -** `avatar` `role` `snowflake`\n**NSFW -** `fuck` `rule34` `yandere`"
 }

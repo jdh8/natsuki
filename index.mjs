@@ -75,6 +75,13 @@ export const bunny = (message, content) =>
 ( • - •)
 /つ ${content || " つ"}`);
 
+export const chat = async (message, content, mention) =>
+{
+	const response = await snekfetch.get(`https://nekos.life/api/v2/chat?text=${encodeURIComponent(content)}`);
+	const text = response.body.response;
+	return await (text ? message.channel.send(text) : message.react(mention ? "433490397516267532" : "❓"));
+};
+
 export const cupcake = async (message, content) =>
 {
 	const user = message.client.users.get(mentioned(content)) || message.author;
