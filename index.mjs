@@ -536,9 +536,6 @@ const erotic = async (message, content, f) =>
 		message.channel.startTyping();
 		return message.channel.send(await f(tags(content)));
 	}
-	catch (error) {
-		return message.channel.send(`No image found for ${content}`);
-	}
 	finally {
 		message.channel.stopTyping();
 	}
@@ -578,7 +575,8 @@ export const fucc = fuck;
 export const rule34 = (message, content) => erotic(message, content, async query =>
 {
 	const response = await snekfetch.get(`https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=${query}`);
-	return weeb(pick((await XML(response.text)).posts.post).$);
+	const elements = (await XML(response.text)).posts.post;
+	return elements ? weeb(pick(elements).$) : `No image found for \`${content}\` on https://rule34.xxx/`;
 });
 
 export const r34 = rule34;
@@ -586,5 +584,6 @@ export const r34 = rule34;
 export const yandere = (message, content) => erotic(message, content, async query =>
 {
 	const response = await snekfetch.get(`https://yande.re/post.json?tags=${query}`);
-	return weeb(pick(response.body));
+	const array = response.body;
+	return array.length ? weeb(pick(array)) : `No image found for \`${content}\` on https://yande.re/`;
 });
