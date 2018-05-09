@@ -561,6 +561,11 @@ export const rule34 = NSFW(type(async (message, content) =>
 
 export const r34 = rule34;
 
+export const slurp = NSFW(type(async (message, content) => message.channel.send(new Discord.RichEmbed({
+	description: `${message.author} slurped ${content || "a random dick"}!`,
+	image: (await snekfetch.get("https://nekos.life/api/v2/img/bj")).body,
+}))));
+
 export const yandere = NSFW(type(async (message, content) =>
 {
 	const response = await snekfetch.get(`https://yande.re/post.json?tags=${CGI(content)}`);
