@@ -257,6 +257,11 @@ http://doki-doki-literature-club.wikia.com/wiki/Natsuki#Preferred_Words`;
 };
 
 /******* Weeb *******/
+export const feed = type(async (message, content) => await message.channel.send(new Discord.RichEmbed({
+	description: `${message.author} fed ${content || "a random anime character"}!`,
+	image: (await snekfetch.get("https://nekos.life/api/v2/img/feed")).body,
+})));
+
 export const hug = (message, content) => message.channel.send(new Discord.RichEmbed({
 	description: `${message.author} hugged ${content || "Yuri"}!`,
 	image: { url: "https://cdn.discordapp.com/attachments/403697175948820481/413015715273113601/Nxdr0qO_1.jpg" },
