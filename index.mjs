@@ -583,6 +583,9 @@ export const slurp = NSFW(type(async (message, content) => message.channel.send(
 	image: (await snekfetch.get("https://nekos.life/api/v2/img/bj")).body,
 }))));
 
+export const succ = slurp;
+export const suck = slurp;
+
 export const yandere = NSFW(type(async (message, content) =>
 {
 	const response = await snekfetch.get(`https://yande.re/post.json?tags=${CGI(content)}`);
