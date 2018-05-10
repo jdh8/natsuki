@@ -7,6 +7,7 @@ import xml2js from "xml2js";
 import crypto from "crypto";
 import util from "util";
 
+import hugs from "./data/hugs.json";
 import kisses from "./data/kisses.json";
 import manual from "./data/manual.json";
 import poetry from "./data/poetry.json";
@@ -264,7 +265,7 @@ export const feed = type(async (message, content) => await message.channel.send(
 
 export const hug = (message, content) => message.channel.send(new Discord.RichEmbed({
 	description: `${message.author} hugged ${content || "Yuri"}!`,
-	image: { url: "https://cdn.discordapp.com/attachments/403697175948820481/413015715273113601/Nxdr0qO_1.jpg" },
+	image: { url: pick(hugs) },
 }));
 
 export const kiss = (message, content) => message.channel.send(new Discord.RichEmbed({
