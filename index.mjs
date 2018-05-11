@@ -2,6 +2,8 @@ import * as Message from "./util/Message.mjs";
 import * as User from "./util/User.mjs";
 import * as Random from "./util/Random.mjs";
 
+import * as Dataset from "./data/index.mjs";
+
 import Discord from "discord.js";
 import Jimp from "jimp";
 import snekfetch from "snekfetch";
@@ -11,19 +13,11 @@ import xml2js from "xml2js";
 import crypto from "crypto";
 import util from "util";
 
-import hugs from "./data/hugs.json";
-import kisses from "./data/kisses.json";
-import manual from "./data/manual.json";
-import poetry from "./data/poetry.json";
-
-const success = "431825476898652160";
-const failure = "431825476638474250";
-
 /******* Core *******/
 export const help = (message, content) =>
 {
 	const command = /\S*/.exec(content);
-	return message.channel.send(manual[command] || `The command \`${command}\` is not found.`);
+	return message.channel.send(Dataset.manual[command] || `The command \`${command}\` is not found.`);
 };
 
 export const git = message => message.channel.send("https://github.com/jdh8/natsuki");
@@ -103,14 +97,14 @@ export const nut = (message, content) =>
 
 export const poem1 = message =>
 {
-	const word = Random.pick(Object.keys(poetry));
+	const word = Random.pick(Object.keys(Dataset.poetry));
 
 	const sayori = "424991418386350081";
 	const natsuki = "424991419329937428";
 	const yuri = "424987242986078218";
 	const monika = "424991419233730560";
 
-	const answer = [ natsuki, sayori, yuri, sayori ][poetry[word]];
+	const answer = [ natsuki, sayori, yuri, sayori ][Dataset.poetry[word]];
 	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
 
 	return message.reply(`${initial}hose word is **${word}**?  Please answer in 15 seconds.`).then(async response =>
@@ -123,13 +117,13 @@ export const poem1 = message =>
 			collector.stop();
 
 			switch (reaction.emoji.id) {
-				case answer: return response.react(success);
+				case answer: return response.react(Dataset.success);
 				case monika: return response.react("⁉");
-				default: return response.react(failure);
+				default: return response.react(Dataset.failure);
 			}
 		});
 
-		collector.on("end", (collection, reason) => reason == "time" && response.react(failure));
+		collector.on("end", (collection, reason) => reason == "time" && response.react(Dataset.failure));
 
 		await response.react(sayori);
 		await response.react(natsuki);
@@ -140,13 +134,13 @@ export const poem1 = message =>
 
 export const poem2 = message =>
 {
-	const word = Random.pick(Object.keys(poetry));
+	const word = Random.pick(Object.keys(Dataset.poetry));
 
 	const natsuki = "423196976398729216";
 	const yuri = "405392891490598913";
 	const monika = "405977244952166400";
 
-	const answer = [ natsuki, yuri ][poetry[word] >> 1];
+	const answer = [ natsuki, yuri ][Dataset.poetry[word] >> 1];
 	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
 
 	return message.reply(`${initial}hose word is **${word}**?  Please answer in 15 seconds.`).then(async response =>
@@ -159,13 +153,13 @@ export const poem2 = message =>
 			collector.stop();
 
 			switch (reaction.emoji.id) {
-				case answer: return response.react(success);
+				case answer: return response.react(Dataset.success);
 				case monika: return response.react("⁉");
-				default: return response.react(failure);
+				default: return response.react(Dataset.failure);
 			}
 		});
 
-		collector.on("end", (collection, reason) => reason == "time" && response.react(failure));
+		collector.on("end", (collection, reason) => reason == "time" && response.react(Dataset.failure));
 
 		await response.react(natsuki);
 		await response.react(yuri);
@@ -186,10 +180,10 @@ export const poem3 = message =>
 		collector.on("collect", () =>
 		{
 			collector.stop();
-			response.react(success);
+			response.react(Dataset.success);
 		});
 
-		collector.on("end", (collection, reason) => reason == "time" && message.react(failure));
+		collector.on("end", (collection, reason) => reason == "time" && message.react(Dataset.failure));
 		response.react(monika);
 	});
 }
@@ -243,12 +237,12 @@ export const feed = Message.typing(async (message, content) => await message.cha
 
 export const hug = (message, content) => message.channel.send(new Discord.RichEmbed({
 	description: `${message.author} hugged ${content || "Yuri"}!`,
-	image: { url: Random.pick(hugs) },
+	image: { url: Random.pick(Dataset.hugs) },
 }));
 
 export const kiss = (message, content) => message.channel.send(new Discord.RichEmbed({
 	description: `${message.author} kissed ${content || "Natsuki"}!`,
-	image: { url: Random.pick(kisses) },
+	image: { url: Random.pick(Dataset.kisses) },
 }));
 
 export const lewd = message => message.channel.send("https://youtu.be/qr89xoZyE1g");
@@ -305,7 +299,7 @@ export const base64 = (message, content) =>
 		case "decode":
 			return decode(message, text);
 		default:
-			return message.channel.send(manual.base64);
+			return message.channel.send(Dataset.manual.base64);
 	}
 };
 
@@ -409,8 +403,8 @@ export const poll = (message, content) =>
 
 	const yesno = async message =>
 	{
-		await message.react(success).catch(() => {});
-		await message.react(failure).catch(() => {});
+		await message.react(Dataset.success).catch(() => {});
+		await message.react(Dataset.failure).catch(() => {});
 		return message;
 	};
 
@@ -449,7 +443,7 @@ export const react = (message, content) =>
 
 		switch (errors.length) {
 			case 0:
-				return message.react(success);
+				return message.react(Dataset.success);
 			case 1:
 				return message.channel.send(`Emoji ${errors[0]} was not found.`);
 			case 2:
