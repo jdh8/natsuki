@@ -1,3 +1,7 @@
+import * as Message from "./util/Message.mjs";
+import * as User from "./util/User.mjs";
+import * as Random from "./util/Random.mjs";
+
 import Discord from "discord.js";
 import Jimp from "jimp";
 import snekfetch from "snekfetch";
@@ -12,28 +16,8 @@ import kisses from "./data/kisses.json";
 import manual from "./data/manual.json";
 import poetry from "./data/poetry.json";
 
-const pick = array => array[~~(array.length * Math.random())];
-
 const success = "431825476898652160";
 const failure = "431825476638474250";
-
-const pfp = (user, size) =>
-{
-	if (user.id == 1) return user.avatar;
-	if (!user.avatar) return `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`;
-
-	const extension = user.avatar.startsWith("a_") ? ".gif" : "";
-	const query = size ? `?size=${size}` : "";
-
-	return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}${extension}${query}`;
-};
-
-const type = f => async (message, ...rest) =>
-{
-	message.channel.startTyping();
-	try { return await f(message, ...rest) }
-	finally { message.channel.stopTyping() }
-};
 
 /******* Core *******/
 export const help = (message, content) =>
@@ -84,18 +68,18 @@ export const chat = async (message, content, mention) =>
 	return await (text ? message.channel.send(text) : message.react(mention ? "433490397516267532" : "❓"));
 };
 
-export const cupcake = type(async (message, content) =>
+export const cupcake = Message.typing(async (message, content) =>
 {
 	const user = message.client.users.get(/\d+/.exec(content)) || message.author;
 	const text = `${user} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!`;
 	const image = Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg");
-	const composed = (await image).composite((await Jimp.read(pfp(user))).resize(128, 128), 80, 80);
+	const composed = (await image).composite((await Jimp.read(User.avatar(user))).resize(128, 128), 80, 80);
 	const buffer = await util.promisify((...x) => composed.getBuffer(...x))("image/png");
 
 	return message.channel.send(text, new Discord.Attachment(buffer, "cupcake.png"));
 });
 
-export const cute = type(async message =>
+export const cute = Message.typing(async message =>
 {
 	const sleep = duration => new Promise(resolve => setTimeout(resolve, duration));
 	let content = "Don't say this embarassing thing, dummy!";
@@ -119,7 +103,7 @@ export const nut = (message, content) =>
 
 export const poem1 = message =>
 {
-	const word = pick(Object.keys(poetry));
+	const word = Random.pick(Object.keys(poetry));
 
 	const sayori = "424991418386350081";
 	const natsuki = "424991419329937428";
@@ -156,7 +140,7 @@ export const poem1 = message =>
 
 export const poem2 = message =>
 {
-	const word = pick(Object.keys(poetry));
+	const word = Random.pick(Object.keys(poetry));
 
 	const natsuki = "423196976398729216";
 	const yuri = "405392891490598913";
@@ -252,19 +236,19 @@ http://doki-doki-literature-club.wikia.com/wiki/Natsuki#Preferred_Words`;
 };
 
 /******* Weeb *******/
-export const feed = type(async (message, content) => await message.channel.send(new Discord.RichEmbed({
+export const feed = Message.typing(async (message, content) => await message.channel.send(new Discord.RichEmbed({
 	description: `${message.author} fed ${content || "a random anime character"}!`,
 	image: (await snekfetch.get("https://nekos.life/api/v2/img/feed")).body,
 })));
 
 export const hug = (message, content) => message.channel.send(new Discord.RichEmbed({
 	description: `${message.author} hugged ${content || "Yuri"}!`,
-	image: { url: pick(hugs) },
+	image: { url: Random.pick(hugs) },
 }));
 
 export const kiss = (message, content) => message.channel.send(new Discord.RichEmbed({
 	description: `${message.author} kissed ${content || "Natsuki"}!`,
-	image: { url: pick(kisses) },
+	image: { url: Random.pick(kisses) },
 }));
 
 export const lewd = message => message.channel.send("https://youtu.be/qr89xoZyE1g");
@@ -276,7 +260,7 @@ export const lick = (message, content) => message.channel.send(new Discord.RichE
 
 export const licc = lick;
 
-export const neko = type(async (message, content) =>
+export const neko = Message.typing(async (message, content) =>
 {
 	const endpoint = message.channel.nsfw ? "https://nekos.life/api/v2/img/lewd" : "https://nekos.life/api/v2/img/neko";
 
@@ -491,7 +475,7 @@ const best = (collection, name) =>
 };
 
 export const avatar = (message, content) =>
-	message.channel.send(pfp(message.client.users.get(/\d+/.exec(content)) || message.author, 2048));
+	message.channel.send(User.avatar(message.client.users.get(/\d+/.exec(content)) || message.author, 2048));
 
 export const role = (message, content) =>
 {
@@ -546,9 +530,9 @@ const cgi = string => string.split(/\s+/).map(encodeURIComponent).join("+");
 const weeb = object => `Score: ${object.score}
 ${object.file_url}`;
 
-export const fuck = NSFW(type(async (message, content) =>
+export const fuck = NSFW(Message.typing(async (message, content) =>
 {
-	const avatar = async user => (await Jimp.read(pfp(user))).resize(256, 256);
+	const avatar = async user => (await Jimp.read(User.avatar(user))).resize(256, 256);
 	const user = message.client.users.get(/\d+/.exec(content));
 	const text = `${message.author} fucked ${user || "Natsuki"}`;
 	const image = Jimp.read("assets/566424ede431200e3985ca6f21287cee.png");
@@ -563,16 +547,16 @@ export const fuck = NSFW(type(async (message, content) =>
 
 export const fucc = fuck;
 
-export const rule34 = NSFW(type(async (message, content) =>
+export const rule34 = NSFW(Message.typing(async (message, content) =>
 {
 	const response = await snekfetch.get(`https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=${cgi(content)}`);
 	const elements = (await XML(response.raw)).posts.post;
-	return message.channel.send(elements ? weeb(pick(elements).$) : `No image found for \`${content}\` on https://rule34.xxx/`);
+	return message.channel.send(elements ? weeb(Random.pick(elements).$) : `No image found for \`${content}\` on https://rule34.xxx/`);
 }));
 
 export const r34 = rule34;
 
-export const slurp = NSFW(type(async (message, content) => message.channel.send(new Discord.RichEmbed({
+export const slurp = NSFW(Message.typing(async (message, content) => message.channel.send(new Discord.RichEmbed({
 	description: `${message.author} slurped ${content || "a random dick"}!`,
 	image: (await snekfetch.get("https://nekos.life/api/v2/img/bj")).body,
 }))));
@@ -580,9 +564,9 @@ export const slurp = NSFW(type(async (message, content) => message.channel.send(
 export const succ = slurp;
 export const suck = slurp;
 
-export const yandere = NSFW(type(async (message, content) =>
+export const yandere = NSFW(Message.typing(async (message, content) =>
 {
 	const response = await snekfetch.get(`https://yande.re/post.json?tags=${cgi(content)}`);
 	const array = response.body;
-	return message.channel.send(array.length ? weeb(pick(array)) : `No image found for \`${content}\` on https://yande.re/`);
+	return message.channel.send(array.length ? weeb(Random.pick(array)) : `No image found for \`${content}\` on https://yande.re/`);
 }));
