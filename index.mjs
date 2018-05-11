@@ -17,7 +17,7 @@ const pick = array => array[~~(array.length * Math.random())];
 const success = "431825476898652160";
 const failure = "431825476638474250";
 
-const Avatar = (user, size) =>
+const pfp = (user, size) =>
 {
 	if (user.id == 1) return user.avatar;
 	if (!user.avatar) return `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`;
@@ -89,7 +89,7 @@ export const cupcake = type(async (message, content) =>
 	const user = message.client.users.get(/\d+/.exec(content)) || message.author;
 	const text = `${user} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!`;
 	const image = Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg");
-	const composed = (await image).composite((await Jimp.read(Avatar(user))).resize(128, 128), 80, 80);
+	const composed = (await image).composite((await Jimp.read(pfp(user))).resize(128, 128), 80, 80);
 	const buffer = await util.promisify((...x) => composed.getBuffer(...x))("image/png");
 
 	return message.channel.send(text, new Discord.Attachment(buffer, "cupcake.png"));
@@ -491,7 +491,7 @@ const best = (collection, name) =>
 };
 
 export const avatar = (message, content) =>
-	message.channel.send(Avatar(message.client.users.get(/\d+/.exec(content)) || message.author, 2048));
+	message.channel.send(pfp(message.client.users.get(/\d+/.exec(content)) || message.author, 2048));
 
 export const role = (message, content) =>
 {
@@ -548,7 +548,7 @@ ${object.file_url}`;
 
 export const fuck = NSFW(type(async (message, content) =>
 {
-	const avatar = async user => (await Jimp.read(Avatar(user))).resize(256, 256);
+	const avatar = async user => (await Jimp.read(pfp(user))).resize(256, 256);
 	const user = message.client.users.get(/\d+/.exec(content));
 	const text = `${message.author} fucked ${user || "Natsuki"}`;
 	const image = Jimp.read("assets/566424ede431200e3985ca6f21287cee.png");
