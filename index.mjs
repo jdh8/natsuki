@@ -17,12 +17,6 @@ const pick = array => array[~~(array.length * Math.random())];
 const success = "431825476898652160";
 const failure = "431825476638474250";
 
-const mentioned = content =>
-{
-	const match = /<@!?(\d+)>/.exec(content);
-	return match && match[1];
-};
-
 const Avatar = (user, size) =>
 {
 	if (user.id == 1) return user.avatar;
@@ -92,7 +86,7 @@ export const chat = async (message, content, mention) =>
 
 export const cupcake = type(async (message, content) =>
 {
-	const user = message.client.users.get(mentioned(content)) || message.author;
+	const user = message.client.users.get(/\d+/.exec(content)) || message.author;
 	const text = `${user} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!`;
 	const image = Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg");
 	const composed = (await image).composite((await Jimp.read(Avatar(user))).resize(128, 128), 80, 80);
@@ -233,7 +227,7 @@ export const rate = (message, content) =>
 
 export const shelf = (message, content) =>
 {
-	const user = message.client.users.get(mentioned(content)) || message.author;
+	const user = message.client.users.get(/\d+/.exec(content)) || message.author;
 	return message.channel.send(`**Fucking ${user}${user.username[0].repeat(5 + 10 * Math.random())}**`);
 };
 
@@ -497,7 +491,7 @@ const best = (collection, name) =>
 };
 
 export const avatar = (message, content) =>
-	message.channel.send(Avatar(message.client.users.get(mentioned(content)) || message.author, 2048));
+	message.channel.send(Avatar(message.client.users.get(/\d+/.exec(content)) || message.author, 2048));
 
 export const role = (message, content) =>
 {
@@ -505,8 +499,8 @@ export const role = (message, content) =>
 		return message.channel.send("Please specify role to search.");
 
 	const collection = message.guild.roles;
-	const mention = /<@&(\d+)>/.exec(content);
-	const role = mention ? collection.get(mention[1]) : best(collection, content);
+	const mention = /\d+/.exec(content);
+	const role = mention ? collection.get(mention[0]) : best(collection, content);
 
 	if (role == null)
 		return message.channel.send("This role is not found.");
@@ -555,7 +549,7 @@ ${object.file_url}`;
 export const fuck = NSFW(type(async (message, content) =>
 {
 	const avatar = async user => (await Jimp.read(Avatar(user))).resize(256, 256);
-	const user = message.client.users.get(mentioned(content));
+	const user = message.client.users.get(/\d+/.exec(content));
 	const text = `${message.author} fucked ${user || "Natsuki"}`;
 	const image = Jimp.read("assets/566424ede431200e3985ca6f21287cee.png");
 	const composed = (await image).composite(await avatar(message.author), 364, 125);
