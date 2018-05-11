@@ -541,7 +541,7 @@ const NSFW = f => (message, ...rest) =>
 	message.channel.nsfw ? f(message, ...rest) : message.channel.send("🔞 This command only works in NSFW channels!");
 
 const XML = util.promisify(xml2js.parseString);
-const CGI = string => string.split(/\s+/).map(encodeURIComponent).join("+");
+const cgi = string => string.split(/\s+/).map(encodeURIComponent).join("+");
 
 const weeb = object => `Score: ${object.score}
 ${object.file_url}`;
@@ -565,7 +565,7 @@ export const fucc = fuck;
 
 export const rule34 = NSFW(type(async (message, content) =>
 {
-	const response = await snekfetch.get(`https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=${CGI(content)}`);
+	const response = await snekfetch.get(`https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=${cgi(content)}`);
 	const elements = (await XML(response.raw)).posts.post;
 	return message.channel.send(elements ? weeb(pick(elements).$) : `No image found for \`${content}\` on https://rule34.xxx/`);
 }));
@@ -582,7 +582,7 @@ export const suck = slurp;
 
 export const yandere = NSFW(type(async (message, content) =>
 {
-	const response = await snekfetch.get(`https://yande.re/post.json?tags=${CGI(content)}`);
+	const response = await snekfetch.get(`https://yande.re/post.json?tags=${cgi(content)}`);
 	const array = response.body;
 	return message.channel.send(array.length ? weeb(pick(array)) : `No image found for \`${content}\` on https://yande.re/`);
 }));
