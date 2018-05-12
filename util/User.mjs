@@ -8,9 +8,3 @@ export const avatar = (user, size) =>
 
 	return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}${extension}${query}`;
 };
-
-export const snowflake = string =>
-{
-	const match = /\d+/.exec(string);
-	return match ? match[0] : "";
-};

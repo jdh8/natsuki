@@ -21,7 +21,7 @@ ${object.file_url}`;
 export const fuck = nsfw(Message.typing(async (message, content) =>
 {
 	const avatar = async user => (await Jimp.read(User.avatar(user))).resize(256, 256);
-	const user = message.client.users.get(User.snowflake(content));
+	const user = message.client.users.get(/\d+|$/.exec(content)[0]);
 	const text = `${message.author} fucked ${user || "Natsuki"}`;
 	const image = Jimp.read("assets/566424ede431200e3985ca6f21287cee.png");
 	const composed = (await image).composite(await avatar(message.author), 364, 125);

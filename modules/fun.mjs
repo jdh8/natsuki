@@ -28,7 +28,7 @@ export const chat = async (message, content, mention) =>
 
 export const cupcake = Message.typing(async (message, content) =>
 {
-	const user = message.client.users.get(User.snowflake(content)) || message.author;
+	const user = message.client.users.get(/\d+|$/.exec(content)[0]) || message.author;
 	const text = `${user} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!`;
 	const image = Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg");
 	const composed = (await image).composite((await Jimp.read(User.avatar(user))).resize(128, 128), 80, 80);
@@ -169,7 +169,7 @@ export const rate = (message, content) =>
 
 export const shelf = (message, content) =>
 {
-	const user = message.client.users.get(User.snowflake(content)) || message.author;
+	const user = message.client.users.get(/\d+|$/.exec(content)[0]) || message.author;
 	return message.channel.send(`**Fucking ${user}${user.username[0].repeat(5 + 10 * Math.random())}**`);
 };
 
