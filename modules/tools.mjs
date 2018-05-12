@@ -123,34 +123,33 @@ export const keycaps = (message, content) =>
 
 export const poll = (message, content) =>
 {
-	const react = code => async message =>
+	const code = (x, index) => String.fromCodePoint(0x1F1E6 + index);
+	const prepend = array => (x, index) => `${array[index]} ${x}`;
+
+	const implementation = async (first, ...rest) =>
 	{
-		for (let c = 0x1F1E6; c < code; ++c)
-			await message.react(String.fromCodePoint(c)).catch(() => {});
-		return message;
-	}
+		if (rest.length) {
+			const emotes = rest.map(code);
+			const response = await message.channel.send([first, ...rest.map(prepend(emotes))]);
+			for (let f of emotes.map(x => () => response.react(x))) await f().catch(() => {});
+			return response;
+		}
 
-	const prepend = (string, index) => `${String.fromCodePoint(0x1F1E6 + index)} ${string}`;
-	const lines = content.split("\n", 21);
+		const array = first.split(/\s+\|\s+/, 20);
 
-	if (lines.length > 1) {
-		const topic = lines.shift();
-		return message.channel.send([topic, ...lines.map(prepend)]).then(react(0x1F1E6 + lines.length));
-	}
+		if (array.length > 1) {
+			const emotes = array.map(code);
+			const response = await message.channel.send(array.map(prepend(emotes)));
+			for (let f of emotes.map(x => () => response.react(x))) await f().catch(() => {});
+			return response;
+		}
 
-	const options = content.split(/\s+\|\s+/, 20);
-
-	if (options.length > 1)
-		return message.channel.send(options.map(prepend)).then(react(0x1F1E6 + options.length));
-
-	const yesno = async message =>
-	{
 		await message.react(Dataset.success).catch(() => {});
 		await message.react(Dataset.failure).catch(() => {});
 		return message;
 	};
 
-	return yesno(message);
+	return implementation(...content.split("\n", 21));
 };
 
 export const react = (message, content) =>
