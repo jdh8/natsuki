@@ -154,46 +154,29 @@ export const poll = (message, content) =>
 
 export const react = (message, content) =>
 {
-	if (!content)
-		return message.channel.send("Please specify id of the message and emojis to react.");
+	const emote = (match, id, name) => id || message.client.emojis.find("name", name || match) || match;
+	const output = errors => errors.length ? `Failed to react ${errors.join(", ")}` : "All emojis were successfully reacted.";
 
-	const pattern = /\S+/g;
-	const [ id ] = pattern.exec(content);
-
-	const remainder = content.substr(pattern.lastIndex);
-	let target;
-
-	if (id <= -100)
-		return message.channel.send("I can only trace back 100 messages, oof!");
-	else if (id <= 0)
-		target = message.channel.fetchMessages({ limit: 1 - id }).then(collection => collection.last());
-	else if (/\D/.exec(id))
-		return message.channel.send(`${id} is not a message id, which is a positive integer`);
-	else
-		target = message.channel.fetchMessage(id);
-
-	return target.then(async target =>
+	const process = async (target, array) =>
 	{
-		const pattern = /<a?:\w*:(\d*)>|:(\w*):|\S+/g;
-		const resolve = (match, id, name) => id || message.client.emojis.find("name", name || match) || match;
 		const errors = [];
+		for (let f of array.map(x => () => target.react(emote(...x)).catch(() => errors.push(x[0])))) await f();
+		return await (await message.channel.send(output(errors))).delete(5000 + 1000 * errors.length);
+	}
+
+	const implementation = (first, ...rest) => message.channel.fetchMessage(first[0])
+		.then(target => process(target, rest))
+		.catch(() => process(message, [first, ...rest]));
+
+	function* iterate(pattern, string)
+	{
 		let match;
+		while (match = pattern.exec(string)) yield match;
+	}
 
-		while (match = pattern.exec(remainder))
-			await target.react(resolve(...match)).catch(() => errors.push(match[0]));
-
-		switch (errors.length) {
-			case 0:
-				return message.react(Dataset.success);
-			case 1:
-				return message.channel.send(`Emoji ${errors[0]} was not found.`);
-			case 2:
-				return message.channel.send(`Emojis ${errors[0]} and ${errors[1]} were not found.`);
-			default:
-				const last = errors.pop();
-				return message.channel.send(`Emojis ${errors.join(", ")}, and ${last} were not found.`);
-		}
-	}).catch(() => message.channel.send(`The message with id ${id} was not found.`));
+	return content
+		? implementation(...iterate(/<a?:\w*:(\d*)>|:(\w*):|\S+/g, content))
+		: message.channel.send("Please specify emojis to react.");
 };
 
 export const say = echo;
