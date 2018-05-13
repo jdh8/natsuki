@@ -126,26 +126,31 @@ export const poll = (message, content) =>
 	const code = (x, index) => String.fromCodePoint(0x1F1E6 + index);
 	const prepend = array => (x, index) => `${array[index]} ${x}`;
 
+	const process = async (message, emotes) =>
+	{
+		for (let f of emotes.map(x => () => message.react(x).catch(() => {})))
+			await f();
+
+		return message;
+	}
+
 	const implementation = async (first, ...rest) =>
 	{
 		if (rest.length) {
 			const emotes = rest.map(code);
-			const response = await message.channel.send([first, ...rest.map(prepend(emotes))]);
-			for (let f of emotes.map(x => () => response.react(x))) await f().catch(() => {});
-			return response;
+			return process(await message.channel.send([first, ...rest.map(prepend(emotes))]), emotes);
 		}
 
 		const array = first.split(/\s+\|\s+/, 20);
 
 		if (array.length > 1) {
 			const emotes = array.map(code);
-			const response = await message.channel.send(array.map(prepend(emotes)));
-			for (let f of emotes.map(x => () => response.react(x))) await f().catch(() => {});
-			return response;
+			return process(await message.channel.send(array.map(prepend(emotes))), emotes);
 		}
 
 		await message.react(Dataset.success).catch(() => {});
 		await message.react(Dataset.failure).catch(() => {});
+
 		return message;
 	};
 
@@ -160,7 +165,10 @@ export const react = (message, content) =>
 	const process = async (target, array) =>
 	{
 		const errors = [];
-		for (let f of array.map(x => () => target.react(emote(...x)).catch(() => errors.push(x[0])))) await f();
+
+		for (let f of array.map(x => () => target.react(emote(...x)).catch(() => errors.push(x[0]))))
+			await f();
+
 		return await (await message.channel.send(output(errors))).delete(5000 + 1000 * errors.length);
 	}
 
@@ -171,7 +179,9 @@ export const react = (message, content) =>
 	function* iterate(pattern, string)
 	{
 		let match;
-		while (match = pattern.exec(string)) yield match;
+
+		while (match = pattern.exec(string))
+			yield match;
 	}
 
 	return content
