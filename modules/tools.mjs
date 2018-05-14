@@ -1,3 +1,5 @@
+import * as Message from "../util/Message.mjs";
+
 import * as Dataset from "../data/index.mjs";
 
 import Discord from "discord.js";
@@ -126,26 +128,18 @@ export const poll = (message, content) =>
 	const code = (x, index) => String.fromCodePoint(0x1F1E6 + index);
 	const prepend = array => (x, index) => `${array[index]} ${x}`;
 
-	const process = async (message, emotes) =>
-	{
-		for (let x of emotes)
-			await message.react(x).catch(() => {});
-
-		return message;
-	}
-
 	const implementation = async (first, ...rest) =>
 	{
 		if (rest.length) {
 			const emotes = rest.map(code);
-			return process(await message.channel.send([first, ...rest.map(prepend(emotes))]), emotes);
+			return Messsage.react(emotes)(await message.channel.send([first, ...rest.map(prepend(emotes))]));
 		}
 
 		const array = first.split(/\s+\|\s+/, 20);
 
 		if (array.length > 1) {
 			const emotes = array.map(code);
-			return process(await message.channel.send(array.map(prepend(emotes))), emotes);
+			return Messsage.react(emotes)(await message.channel.send(array.map(prepend(emotes))));
 		}
 
 		await message.react(Dataset.success).catch(() => {});

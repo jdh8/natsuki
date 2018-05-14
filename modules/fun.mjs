@@ -59,6 +59,23 @@ export const nut = (message, content) =>
 	message.channel.send(`${message.author} nuts on ${content || "the floor"}.
 <:pukesuki:405984820674428928> **You guys are so gross!**`);
 
+const collect = (filter, get) => message =>
+{
+	const collector = message.createReactionCollector(filter, { time: 15000 });
+	collector.on("collect", reaction => (collector.stop(), message.react(get(reaction.emoji.id))));
+	collector.on("end", (collection, reason) => reason == "time" && message.react(Dataset.failure));
+	return message;
+}
+
+const check = (answer, monika) => id =>
+{
+	switch (id) {
+		case answer: return Dataset.success;
+		case monika: return "⁉";
+		default: return Dataset.failure;
+	}
+}
+
 export const poem1 = message =>
 {
 	const word = Random.pick(Object.keys(Dataset.poetry));
@@ -70,30 +87,11 @@ export const poem1 = message =>
 
 	const answer = [ natsuki, sayori, yuri, sayori ][Dataset.poetry[word]];
 	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
+	const filter = (reaction, user) => user.id === message.author.id && reaction.me;
 
-	return message.reply(`${initial}hose word is **${word}**?  Please answer in 15 seconds.`).then(async response =>
-	{
-		const filter = (reaction, user) => user.id === message.author.id && reaction.me;
-		const collector = response.createReactionCollector(filter, { time: 15000 });
-
-		collector.on("collect", reaction =>
-		{
-			collector.stop();
-
-			switch (reaction.emoji.id) {
-				case answer: return response.react(Dataset.success);
-				case monika: return response.react("⁉");
-				default: return response.react(Dataset.failure);
-			}
-		});
-
-		collector.on("end", (collection, reason) => reason == "time" && response.react(Dataset.failure));
-
-		await response.react(sayori);
-		await response.react(natsuki);
-		await response.react(yuri);
-		await response.react(monika);
-	});
+	return message.reply(`${initial}hose word is **${word}**?  Please answer in 15 seconds.`)
+		.then(collect(filter, check(answer, monika)))
+		.then(Message.react([ sayori, natsuki, yuri, monika ]));
 };
 
 export const poem2 = message =>
@@ -106,50 +104,21 @@ export const poem2 = message =>
 
 	const answer = [ natsuki, yuri ][Dataset.poetry[word] >> 1];
 	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
+	const filter = (reaction, user) => user.id === message.author.id && reaction.me;
 
-	return message.reply(`${initial}hose word is **${word}**?  Please answer in 15 seconds.`).then(async response =>
-	{
-		const filter = (reaction, user) => user.id === message.author.id && reaction.me;
-		const collector = response.createReactionCollector(filter, { time: 15000 });
-
-		collector.on("collect", reaction =>
-		{
-			collector.stop();
-
-			switch (reaction.emoji.id) {
-				case answer: return response.react(Dataset.success);
-				case monika: return response.react("⁉");
-				default: return response.react(Dataset.failure);
-			}
-		});
-
-		collector.on("end", (collection, reason) => reason == "time" && response.react(Dataset.failure));
-
-		await response.react(natsuki);
-		await response.react(yuri);
-		await response.react(monika);
-	});
+	return message.reply(`${initial}hose word is **${word}**?  Please answer in 15 seconds.`)
+		.then(collect(filter, check(answer, monika)))
+		.then(Message.react([ natsuki, yuri, monika ]));
 };
 
 export const poem3 = message =>
 {
 	const monika = "416428171705974785";
 	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
+	const filter = (reaction, user) => user.id === message.author.id && reaction.emoji.id === monika;
 
-	message.reply(`${initial}hose word is **Monika**?  Please answer in 15 seconds.`).then(response =>
-	{
-		const filter = (reaction, user) => user.id === message.author.id && reaction.emoji.id === monika;
-		const collector = response.createReactionCollector(filter, { time: 15000 });
-
-		collector.on("collect", () =>
-		{
-			collector.stop();
-			response.react(Dataset.success);
-		});
-
-		collector.on("end", (collection, reason) => reason == "time" && message.react(Dataset.failure));
-		response.react(monika);
-	});
+	message.reply(`${initial}hose word is **Monika**?  Please answer in 15 seconds.`)
+		.then(message => collect(filter, () => Dataset.success)(message).react(monika));
 }
 
 export const poem = (message, content) =>
