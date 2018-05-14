@@ -128,8 +128,8 @@ export const poll = (message, content) =>
 
 	const process = async (message, emotes) =>
 	{
-		for (let f of emotes.map(x => () => message.react(x).catch(() => {})))
-			await f();
+		for (let x of emotes)
+			await message.react(x).catch(() => {});
 
 		return message;
 	}
@@ -166,8 +166,8 @@ export const react = (message, content) =>
 	{
 		const errors = [];
 
-		for (let f of array.map(x => () => target.react(emote(...x)).catch(() => errors.push(x[0]))))
-			await f();
+		for (let x of array)
+			await target.react(emote(...x)).catch(() => errors.push(x[0]));
 
 		return await (await message.channel.send(output(errors))).delete(5000 + 1000 * errors.length);
 	}
