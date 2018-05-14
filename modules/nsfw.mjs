@@ -12,12 +12,6 @@ import util from "util";
 const nsfw = f => (message, ...rest) =>
 	message.channel.nsfw ? f(message, ...rest) : message.channel.send("🔞 This command only works in NSFW channels!");
 
-const XML = util.promisify(xml2js.parseString);
-const cgi = string => string.split(/\s+/).map(encodeURIComponent).join("+");
-
-const weeb = object => `Score: ${object.score}
-${object.file_url}`;
-
 export const fuck = nsfw(Message.typing(async (message, content) =>
 {
 	const avatar = async user => (await Jimp.read(User.avatar(user))).resize(256, 256);
@@ -34,6 +28,12 @@ export const fuck = nsfw(Message.typing(async (message, content) =>
 }));
 
 export const fucc = fuck;
+
+const XML = util.promisify(xml2js.parseString);
+const cgi = string => string.split(/\s+/).map(encodeURIComponent).join("+");
+
+const weeb = object => `Score: ${object.score}
+${object.file_url}`;
 
 export const rule34 = nsfw(Message.typing(async (message, content) =>
 {
