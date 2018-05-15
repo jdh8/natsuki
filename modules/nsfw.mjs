@@ -35,6 +35,11 @@ const cgi = string => string.split(/\s+/).map(encodeURIComponent).join("+");
 const weeb = object => `Score: ${object.score}
 ${object.file_url}`;
 
+export const flat = nsfw(Message.typing(async (message, content) => message.channel.send(new Discord.RichEmbed({
+	description: `Here comes ~~my~~ small boobs.`,
+	image: (await snekfetch.get("https://nekos.life/api/v2/img/smallboobs")).body,
+}))));
+
 export const rule34 = nsfw(Message.typing(async (message, content) =>
 {
 	const response = await snekfetch.get(`https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=${cgi(content)}`);

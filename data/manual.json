@@ -49,6 +49,7 @@
     "role": "**`n.role`** Information on a role\n\n**Usage**: n.role [role|name]",
     "snowflake": "**`n.snowflake`** Extract information from a snowflake\n\n**Usage**: n.snowflake [id|user|role|channel]",
 
+    "flat": "**`n.flat`** Show ~~my~~ random small boobs\n\n**Usage**: n.flat",
     "fucc": "**`n.fucc`** is an alias of n.fuck.",
     "fuck": "**`n.fuck`** Fuck someone\n\n**Usage**: n.fuck [user]\n\nThe source is NSFW and attributed at https://github.com/jdh8/natsuki/blob/master/README.md",
     "r34": "**`n.r34`** is an alias of n.rule34.",
