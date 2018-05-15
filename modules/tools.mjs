@@ -47,17 +47,14 @@ export const base64 = (message, content) =>
 	}
 };
 
-class Checkerboard extends Jimp
-{
-	constructor(width, height, bit, even, odd)
-	{
-		super(width, height);
-		this.scan(0, 0, width, height, (x, y) => this.setPixelColor((x ^ y) & bit ? odd : even, x, y));
-	}
-}
-
 export const color = async (message, content) =>
 {
+	const Checkerboard = (width, height, bit, even, odd) =>
+	{
+		const board = new Jimp(width, height);
+		return board.scan(0, 0, width, height, (x, y) => board.setPixelColor((x ^ y) & bit ? odd : even, x, y));
+	};
+
 	const color = new tinycolor(content);
 
 	if (!color.isValid())
@@ -72,7 +69,7 @@ export const color = async (message, content) =>
 
 	const size = 128;
 	const bit = 16;
-	const image = new Checkerboard(size, size, bit, 0xFFFFFFFF, 0x36393EFF).composite(new Jimp(size, size, rgba >>> 0), 0, 0);
+	const image = Checkerboard(size, size, bit, 0xFFFFFFFF, 0x36393EFF).composite(new Jimp(size, size, rgba >>> 0), 0, 0);
 	const buffer = await util.promisify((...x) => image.rgba(false).getBuffer(...x))("image/png");
 
 	return await message.channel.send(description, new Discord.Attachment(buffer, "color.png"));
