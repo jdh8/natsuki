@@ -132,14 +132,14 @@ export const poll = (message, content) =>
 	{
 		if (rest.length) {
 			const emotes = rest.map(code);
-			return Messsage.react(emotes)(await message.channel.send([first, ...rest.map(prepend(emotes))]));
+			return Message.react(emotes)(await message.channel.send([first, ...rest.map(prepend(emotes))]));
 		}
 
 		const array = first.split(/\s+\|\s+/, 20);
 
 		if (array.length > 1) {
 			const emotes = array.map(code);
-			return Messsage.react(emotes)(await message.channel.send(array.map(prepend(emotes))));
+			return Message.react(emotes)(await message.channel.send(array.map(prepend(emotes))));
 		}
 
 		await message.react(Dataset.success).catch(() => {});
