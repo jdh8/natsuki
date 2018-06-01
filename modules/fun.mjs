@@ -22,7 +22,7 @@ export const bunny = (message, content) =>
 export const chat = async (message, content, mention) =>
 {
 	const response = await snekfetch.get(`https://nekos.life/api/v2/chat?text=${encodeURIComponent(content)}`);
-	const text = response.body.response;
+	const text = decodeURIComponent(response.body.response);
 	return await (text ? message.channel.send(text) : message.react(mention ? "433490397516267532" : "❓"));
 };
 
