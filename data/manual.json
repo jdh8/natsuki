@@ -33,7 +33,7 @@
     "licc": "**`n.licc`** is an alias of n.lick.",
     "lick": "**`n.lick`** Lick someone\n\n**Usage**: n.lick [user|text]",
     "neko": "**`n.neko`** Display a random neko from nekos.life\n\n**Usage**: n.neko\n\nNSFW nekos may appear on NSFW channels.",
-    "smash": "**`n.smash`** Smash someone\n\n**Usage**: n.smash [user|text]",
+    "smash": "**`n.smash`** Smash someone\n\n**Usage**: n.smash [user|text]\n\nThis picture is from https://www.freepik.com/free-vector/smash-flash-on-white_1175559.htm",
 
     "base64": "**`n.base64`** Encode or decode Base64\n\n**Usage**: n.base64 encode|decode [text|attachment]\n\n**Examples**:\nn.base64 encode I love you\nn.base64 decode SSdtIG5vdCBjdXRlIQ==",
     "color": "**`n.color`** Display color\n\n**Usage**: n.color [color]\n\n**Examples**:\nn.color abc\nn.color abcd\nn.color 123456\nn.color 12345678\nn.color pink\nn.color rgba(12, 34, 56, 0.78)\nn.color hsla(300, 80%, 80%, 0.6)",
