@@ -7,6 +7,11 @@ import snekfetch from "snekfetch";
 
 import util from "util";
 
+export const buttpat = Message.typing(async (message, content) => await message.channel.send(new Discord.RichEmbed({
+	description: `${message.author} patted ${content || "Yuzu"} on the butts!`,
+	image: { url: "https://78.media.tumblr.com/165f23ece178a17968de50f084a9ecec/tumblr_p25cyprR041vptudso2_400.gif" },
+})));
+
 export const feed = Message.typing(async (message, content) => await message.channel.send(new Discord.RichEmbed({
 	description: `${message.author} fed ${content || "a random anime character"}!`,
 	image: (await snekfetch.get("https://nekos.life/api/v2/img/feed")).body,
