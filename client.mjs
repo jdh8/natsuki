@@ -5,7 +5,7 @@ import loop from "./loop.mjs";
 export const client = new Discord.Client();
 export const dbl = new DBL(process.env.DBL_TOKEN, client);
 
-client.on("ready", () => client.user.setPresence({ game: { name: "n.help | n.invite" }}));
+client.on("ready", () => client.user.setActivity("n.help | n.invite"));
 
 client.on("message", async message =>
 {
