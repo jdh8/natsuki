@@ -26,7 +26,7 @@ export const base64 = (message, content) =>
 
 	const decode = (message, code) =>
 	{
-		const text = `${Buffer.from(code, "base64")}` || (message.attachments.size ? "" : "_ _");
+		const text = `${message.author}: ${Buffer.from(code, "base64")}` || (message.attachments.size ? "" : "_ _");
 
 		const transform = (attachment, index) => snekfetch.get(attachment.url)
 			.then(response => new Discord.Attachment(Buffer.from(response.text, "base64"), `${index}.bin`));
