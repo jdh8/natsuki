@@ -30,4 +30,4 @@ export const support = message => message.channel.send("https://discord.gg/VdHYv
 export const vote = message => message.channel.send(`https://discordbots.org/bot/${message.client.user.id}`);
 
 export const yuri = message => message.channel.send(`Meet my best friend, Yuri!  ~~I love her although she has big boobs.~~
-https://discordapp.com/oauth2/authorize?&client_id=407652636054257665&scope=bot`);
+https://discordbots.org/bot/407652636054257665`);
