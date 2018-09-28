@@ -1,4 +1,5 @@
 import * as Message from "../util/Message.mjs";
+import * as Random from "../util/Random.mjs";
 
 import * as Dataset from "../data/index.mjs";
 
@@ -181,3 +182,5 @@ export const react = (message, content) =>
 };
 
 export const say = echo;
+
+export const someone = message => message.channel.send(Random.pick([...message.guild.members.values()]).user.tag);

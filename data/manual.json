@@ -47,6 +47,7 @@
     "poll": "**`n.poll`** Poll a yes-no question or multiple choices\n\n**Usage**: n.poll [question|choices]\n\n**Examples**:\nn.poll Is Miyuki Sone best waifu\nn.poll Sayori | Natsuki | Yuri | Monika",
     "react": "**`n.react`** Have Natsuki react emojis to a message\n\n**Usage**: n.react [id] [emojis]\nMessage ID is optional.  Emojis can be specified as id, name, or themselves.\n\n**Example**:\nn.react 🍋 7\u20E3 :glitchyuri:",
     "say": "**`n.say`** is an alias of n.echo.",
+    "someone": "**`n.someone`** Randomly pick someone in this guild\n\n**Usage**: n.someone",
 
     "avatar": "**`n.avatar`** Display URL of someone's avatar\n\n**Usage**: n.avatar [user]\n\n**Example**:\n`n.avatar` Get your own avatar\n`n.avatar @Natsuki` Get my avatar",
     "role": "**`n.role`** Information on a role\n\n**Usage**: n.role [role|name]",
@@ -62,5 +63,5 @@
     "suck": "**`n.suck`** is an alias of n.slurp.",
     "yandere": "**`n.yandere`** Random picture from yande.re\n\n**Usage**: n.yandere [tags]\n\n**Examples**:\nn.yandere natsuki_(doki_doki_literature_club)\nn.yandere himejima_akeno rias_gremory",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `chat` `cupcake` `cute` `nut` `poem` `rate` `shelf` `ship` `word`\n**Weeb -** `boobpat` `buttpat` `feed` `hug` `kiss` `lewd` `lick` `neko` `smash`\n**Tools -** `base64` `color` `echo` `emoji` `keycaps` `poll` `react`\n**Information -** `avatar` `role` `snowflake`\n**NSFW -** `flat` `fuck` `rule34` `slurp` `yandere`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `chat` `cupcake` `cute` `nut` `poem` `rate` `shelf` `ship` `word`\n**Weeb -** `boobpat` `buttpat` `feed` `hug` `kiss` `lewd` `lick` `neko` `smash`\n**Tools -** `base64` `color` `echo` `emoji` `keycaps` `poll` `react` `someone`\n**Information -** `avatar` `role` `snowflake`\n**NSFW -** `flat` `fuck` `rule34` `slurp` `yandere`"
 }
