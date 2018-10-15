@@ -133,9 +133,9 @@ export const poem2 = message =>
 {
 	const word = Random.pick(Object.keys(Dataset.poetry));
 
-	const natsuki = "423196976398729216";
-	const yuri = "405392891490598913";
-	const monika = "405977244952166400";
+	const natsuki = "424991419329937428";
+	const yuri = "501273832238088193";
+	const monika = "501272960175439872";
 
 	const answer = [ natsuki, yuri ][Dataset.poetry[word] >> 1];
 	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
@@ -148,7 +148,7 @@ export const poem2 = message =>
 
 export const poem3 = message =>
 {
-	const monika = "416428171705974785";
+	const monika = "501274687842680832";
 	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
 	const filter = (reaction, user) => user.id === message.author.id && reaction.emoji.id === monika;
 
