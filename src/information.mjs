@@ -1,4 +1,4 @@
-import * as User from "../util/User.mjs";
+import * as User from "../lib/User.mjs";
 
 import Discord from "discord.js";
 

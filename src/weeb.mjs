@@ -1,5 +1,5 @@
-import * as Message from "../util/Message.mjs";
-import * as Random from "../util/Random.mjs";
+import * as Message from "../lib/Message.mjs";
+import * as Random from "../lib/Random.mjs";
 import * as Dataset from "../data/index.mjs";
 
 import Discord from "discord.js";
