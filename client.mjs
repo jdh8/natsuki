@@ -2,8 +2,8 @@ import Discord from "discord.js";
 import DBL from "dblapi.js";
 import loop from "./loop.mjs";
 
-export const client = new Discord.Client();
-export const dbl = new DBL(process.env.DBL_TOKEN, client);
+const client = new Discord.Client();
+const dbl = new DBL(process.env.DBL_TOKEN, client);
 
 client.on("ready", () => client.user.setActivity("n.help | n.invite"));
 
@@ -22,3 +22,5 @@ ${error}
 });
 
 client.login(process.env.TOKEN);
+
+export default client;
