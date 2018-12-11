@@ -50,12 +50,7 @@ export const base64 = (message, content) =>
 
 export const color = async (message, content) =>
 {
-	const Checkerboard = (width, height, bit, even, odd) =>
-	{
-		const board = new Jimp(width, height);
-		return board.scan(0, 0, width, height, (x, y) => board.setPixelColor((x ^ y) & bit ? odd : even, x, y));
-	};
-
+	const rgba = ({ r, g, b, a }) => (Math.round(r) << 24 | Math.round(g) << 16 | Math.round(b) << 8 | Math.round(255 * a)) >>> 0;
 	const color = new tinycolor(content);
 
 	if (!color.isValid())
@@ -65,13 +60,8 @@ export const color = async (message, content) =>
 **RGB:** ${color.toRgbString()}
 **HSL:** ${color.toHslString()}`;
 
-	const { r, g, b, a } = color.toRgb();
-	const rgba = Math.round(r) << 24 | Math.round(g) << 16 | Math.round(b) << 8 | Math.round(255 * a);
-
-	const size = 128;
-	const bit = 16;
-	const image = Checkerboard(size, size, bit, 0xFFFFFFFF, 0x36393EFF).composite(new Jimp(size, size, rgba >>> 0), 0, 0);
-	const buffer = await util.promisify((...x) => image.rgba(false).getBuffer(...x))("image/png");
+	const image = new Jimp(128, 128, rgba(color.toRgb()));
+	const buffer = await util.promisify((...x) => image.getBuffer(...x))("image/png");
 
 	return await message.channel.send(description, new Discord.Attachment(buffer, "color.png"));
 };
