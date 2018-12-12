@@ -120,13 +120,13 @@ export const poem1 = message =>
 	const yuri = "424987242986078218";
 	const monika = "424991419233730560";
 
-	const answer = [ natsuki, sayori, yuri, sayori ][Dataset.poetry[word]];
+	const answer = [natsuki, sayori, yuri, sayori][Dataset.poetry[word]];
 	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
 	const filter = (reaction, user) => user.id === message.author.id && reaction.me;
 
 	return message.reply(`${initial}hose word is **${word}**?  Please answer in 15 seconds.`)
 		.then(collect(filter, check(answer, monika)))
-		.then(Message.react([ sayori, natsuki, yuri, monika ]));
+		.then(Message.react(sayori, natsuki, yuri, monika));
 };
 
 export const poem2 = message =>
@@ -137,13 +137,13 @@ export const poem2 = message =>
 	const yuri = "501273832238088193";
 	const monika = "501272960175439872";
 
-	const answer = [ natsuki, yuri ][Dataset.poetry[word] >> 1];
+	const answer = [natsuki, yuri][Dataset.poetry[word] >> 1];
 	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
 	const filter = (reaction, user) => user.id === message.author.id && reaction.me;
 
 	return message.reply(`${initial}hose word is **${word}**?  Please answer in 15 seconds.`)
 		.then(collect(filter, check(answer, monika)))
-		.then(Message.react([ natsuki, yuri, monika ]));
+		.then(Message.react(natsuki, yuri, monika));
 };
 
 export const poem3 = message =>
@@ -158,6 +158,6 @@ export const poem3 = message =>
 
 export const poem = (message, content) =>
 {
-	const f = [ poem1, poem2, poem3 ][(!content | content) - 1];
+	const f = [poem1, poem2, poem3][(!content | content) - 1];
 	return f ? f(message) : message.channel.send("You input an invalid act.");
 };

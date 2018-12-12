@@ -120,14 +120,14 @@ export const poll = (message, content) =>
 	{
 		if (rest.length) {
 			const emotes = rest.map(code);
-			return Message.react(emotes)(await message.channel.send([first, ...rest.map(prepend(emotes))]));
+			return Message.react(...emotes)(await message.channel.send([first, ...rest.map(prepend(emotes))]));
 		}
 
 		const array = first.split(/\s+\|\s+/, 20);
 
 		if (array.length > 1) {
 			const emotes = array.map(code);
-			return Message.react(emotes)(await message.channel.send(array.map(prepend(emotes))));
+			return Message.react(...emotes)(await message.channel.send(array.map(prepend(emotes))));
 		}
 
 		await message.react(Dataset.success).catch(() => {});
@@ -141,23 +141,29 @@ export const poll = (message, content) =>
 
 export const react = (message, content) =>
 {
-	const emote = (match, id, name) => id || message.client.emojis.find("name", name || match) || match;
-	const output = errors => errors.length ? `Failed to react ${errors.join(", ")}` : "All emojis were successfully reacted.";
-
-	const process = async (target, array) =>
+	const process = async (target, ...emotes) =>
 	{
+		const output = errors => errors.length ? `Failed to react ${errors.join(", ")}` : "All emojis were successfully reacted.";
 		const errors = [];
 
-		for (let x of array)
-			await target.react(emote(...x)).catch(() => errors.push(x[0]));
+		for (const [match, id] of emotes)
+			await target.react(id || match).catch(() => errors.push(match));
 
 		return await (await message.channel.send(output(errors))).delete(5000 + 1000 * errors.length);
 	}
 
-	const implementation = (first, ...rest) => message.channel.fetchMessage(first[0])
-		.then(target => process(target, rest))
-		.catch(() => process(message, [first, ...rest]));
+	const implementation = (first, ...rest) =>
+	{
+		const f = s => /<a?:\w*:(\d*)>|/.exec(s)[1] || s;
+		const emotes = rest.map(f);
 
+		return /^\d+$/.test(first)
+			? message.channel.fetchMessage(first)
+				.then(target => process(target, ...emotes))
+				.catch(() => message.channel.send(`Message ${first} not found.`))
+			: process(message, f(first), ...emotes);
+	};
+	
 	function* iterate(pattern, string)
 	{
 		let match;
@@ -166,9 +172,7 @@ export const react = (message, content) =>
 			yield match;
 	}
 
-	return content
-		? implementation(...iterate(/<a?:\w*:(\d*)>|:(\w*):|\S+/g, content))
-		: message.channel.send("Please specify emojis to react.");
+	return content ? implementation(...content.split(/\s+/)) : message.channel.send("Please specify emojis to react.");
 };
 
 export const say = echo;
