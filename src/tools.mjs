@@ -115,25 +115,22 @@ export const react = (message, content) =>
 {
 	const process = async (target, ...emotes) =>
 	{
-		const output = errors => errors.length ? `Failed to react ${errors.join(", ")}` : "All emojis were successfully reacted.";
 		const errors = [];
 
-		for (const [match, id] of emotes)
-			await target.react(id || match).catch(() => errors.push(match));
+		for (const s of emotes)
+			await target.react(/<a?:\w*:(\d*)>|/.exec(s)[1] || s).catch(() => errors.push(s));
 
-		return await (await message.channel.send(output(errors))).delete(5000 + 1000 * errors.length);
+		const output = errors.length ? `Failed to react ${errors.join(", ")}` : "All emojis were successfully reacted.";
+		return await (await message.channel.send(output)).delete(5000 + 1000 * errors.length);
 	}
 
 	const implementation = (first, ...rest) =>
 	{
-		const f = s => /<a?:\w*:(\d*)>|/.exec(s)[1] || s;
-		const emotes = rest.map(f);
-
 		return /^\d+$/.test(first)
 			? message.channel.fetchMessage(first)
-				.then(target => process(target, ...emotes))
+				.then(target => process(target, ...rest))
 				.catch(() => message.channel.send(`Message ${first} not found.`))
-			: process(message, f(first), ...emotes);
+			: process(message, first, ...rest);
 	};
 	
 	return content ? implementation(...content.split(/\s+/)) : message.channel.send("Please specify emojis to react.");
