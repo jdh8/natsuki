@@ -68,34 +68,6 @@ export const color = async (message, content) =>
 
 export const colour = color;
 
-export const echo = (message, content) =>
-{
-	const f = (match, name) => name && message.client.emojis.find("name", name) || match;
-	const text = content.replace(/<a?:\w*:\d*>|:(\w*):/g, f);
-	const big = /^(?:<a?:\w+:\d+>\s*)+$/.test(text);
-
-	return message.channel.send(big ? text : `${message.author}: ${text}`);
-};
-
-export const emoji = (message, content) =>
-{
-	const { emojis } = message.client;
-
-	const respond = (match, id, name) =>
-	{
-		const emoji = id ? emojis.get(id) : emojis.find("name", name || match);
-		return emoji ? emoji.url : match ? `The custom emoji ${match} is not found.` : "Please specify a custom emoji.";
-	}
-
-	return message.channel.send(respond(.../<a?:\w+:(\d+)>|:(\w+):|\S*/.exec(content)));
-};
-
-export const emote = emoji;
-
-export const emojis = message =>
-	message.channel.send(`The list of emojis is on <#420885744077504532> on Natsuki's shelf, my support server.  Please check them out there.
-https://discord.gg/VdHYvMC`);
-
 export const keycaps = (message, content) =>
 {
 	if (!content)
@@ -164,17 +136,7 @@ export const react = (message, content) =>
 			: process(message, f(first), ...emotes);
 	};
 	
-	function* iterate(pattern, string)
-	{
-		let match;
-
-		while (match = pattern.exec(string))
-			yield match;
-	}
-
 	return content ? implementation(...content.split(/\s+/)) : message.channel.send("Please specify emojis to react.");
 };
-
-export const say = echo;
 
 export const someone = message => message.channel.send(Random.pick([...message.guild.members.values()]).user.tag);
