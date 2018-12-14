@@ -102,8 +102,8 @@ export const poll = (message, content) =>
 			return Message.react(...emotes)(await message.channel.send(array.map(prepend(emotes))));
 		}
 
-		await message.react(Dataset.success).catch(() => {});
-		await message.react(Dataset.failure).catch(() => {});
+		await message.react(Dataset.success);
+		await message.react(Dataset.failure);
 
 		return message;
 	};
@@ -127,9 +127,7 @@ export const react = (message, content) =>
 	const implementation = (first, ...rest) =>
 	{
 		return /^\d+$/.test(first)
-			? message.channel.fetchMessage(first)
-				.then(target => process(target, ...rest))
-				.catch(() => message.channel.send(`Message ${first} not found.`))
+			? message.channel.fetchMessage(first).then(target => process(target, ...rest))
 			: process(message, first, ...rest);
 	};
 	

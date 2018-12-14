@@ -13,11 +13,7 @@ client.on("message", async message =>
 		await loop(message);
 	}
 	catch (error) {
-		message.channel.send(`An error occurred.  Please leave a note on my shelf if it lingers.
-https://discord.gg/VdHYvMC
-\`\`\`
-${error}
-\`\`\``).catch(() => {});
+		message.channel.send(`${error}`).catch(() => {});
 	}
 });
 
