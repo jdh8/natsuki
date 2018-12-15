@@ -1,5 +1,5 @@
-import * as Message from "../lib/Message.mjs";
-import * as Random from "../lib/Random.mjs";
+import pick from "../lib/pick.mjs";
+import reactions from "../lib/react.mjs";
 
 import * as Dataset from "../data/index.mjs";
 
@@ -92,14 +92,14 @@ export const poll = (message, content) =>
 	{
 		if (rest.length) {
 			const emotes = rest.map(code);
-			return Message.react(...emotes)(await message.channel.send([first, ...rest.map(prepend(emotes))]));
+			return reactions(...emotes)(await message.channel.send([first, ...rest.map(prepend(emotes))]));
 		}
 
 		const array = first.split(/\s+\|\s+/, 20);
 
 		if (array.length > 1) {
 			const emotes = array.map(code);
-			return Message.react(...emotes)(await message.channel.send(array.map(prepend(emotes))));
+			return reactions(...emotes)(await message.channel.send(array.map(prepend(emotes))));
 		}
 
 		await message.react(Dataset.success);
@@ -134,4 +134,4 @@ export const react = (message, content) =>
 	return content ? implementation(...content.split(/\s+/)) : message.channel.send("Please specify emojis to react.");
 };
 
-export const someone = message => message.channel.send(Random.pick([...message.guild.members.values()]).user.tag);
+export const someone = message => message.channel.send(pick([...message.guild.members.values()]).user.tag);

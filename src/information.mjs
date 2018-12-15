@@ -1,8 +1,5 @@
-import * as User from "../lib/User.mjs";
-
+import avt from "../lib/avatar.mjs";
 import Discord from "discord.js";
-
-const Field = (name, value, inline = false) => ({ name, value, inline });
 
 const best = (collection, name) =>
 {
@@ -13,7 +10,7 @@ const best = (collection, name) =>
 };
 
 export const avatar = (message, content) =>
-	message.channel.send(User.avatar(message.client.users.get(/\d+|$/.exec(content)[0]) || message.author, 2048));
+	message.channel.send(avt(message.client.users.get(/\d+|$/.exec(content)[0]) || message.author, 2048));
 
 export const role = (message, content) =>
 {
@@ -31,10 +28,10 @@ export const role = (message, content) =>
 		color: role.color,
 		description: `${role} (${role.id})`,
 		fields: [
-			Field("Color", role.hexColor, true),
-			Field("Hoist", role.hoist, true),
-			Field("Managed", role.managed, true),
-			Field("Mentionable", role.mentionable, true),
+			{ name: "Color", value: role.hexColor, inline: true },
+			{ name: "Hoist", value: role.hoist, inline: true },
+			{ name: "Managed", value: role.managed, inline: true },
+			{ name: "Mentionable", value: role.mentionable, inline: true },
 		]
 	})).catch(() => message.channel.send(`${role} (${role.id})
 **Color:** ${role.hexColor}
