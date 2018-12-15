@@ -13,7 +13,7 @@ const best = (collection, name) =>
 };
 
 export const avatar = (message, content) =>
-	message.channel.send(User.avatar(message.client.users.get(/\d+|/.exec(content)[0]) || message.author, 2048));
+	message.channel.send(User.avatar(message.client.users.get(/\d+|$/.exec(content)[0]) || message.author, 2048));
 
 export const role = (message, content) =>
 {
