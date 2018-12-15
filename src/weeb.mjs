@@ -1,6 +1,8 @@
 import pick from "../lib/pick.mjs";
 import typing from "../lib/typing.mjs";
-import * as Dataset from "../data/index.mjs";
+
+import hugs from "../data/hugs.json";
+import kisses from "../data/kisses.json";
 
 import Discord from "discord.js";
 import snekfetch from "snekfetch";
@@ -24,12 +26,12 @@ export const feed = typing(async (message, content) => await message.channel.sen
 
 export const hug = (message, content) => message.channel.send(new Discord.RichEmbed({
 	description: `${message.author} hugged ${content || "Yuri"}!`,
-	image: { url: pick(Dataset.hugs) },
+	image: { url: pick(hugs) },
 }));
 
 export const kiss = (message, content) => message.channel.send(new Discord.RichEmbed({
 	description: `${message.author} kissed ${content || "Natsuki"}!`,
-	image: { url: pick(Dataset.kisses) },
+	image: { url: pick(kisses) },
 }));
 
 export const lewd = message => message.channel.send("https://youtu.be/qr89xoZyE1g");

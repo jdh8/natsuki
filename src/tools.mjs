@@ -1,7 +1,8 @@
 import pick from "../lib/pick.mjs";
 import reactions from "../lib/react.mjs";
 
-import * as Dataset from "../data/index.mjs";
+import emotes from "../data/emotes.json";
+import manual from "../data/manual.json";
 
 import Discord from "discord.js";
 import Jimp from "jimp";
@@ -44,7 +45,7 @@ export const base64 = (message, content) =>
 		case "decode":
 			return decode(message, text);
 		default:
-			return message.channel.send(Dataset.manual.base64);
+			return message.channel.send(manual.base64);
 	}
 };
 
@@ -102,8 +103,8 @@ export const poll = (message, content) =>
 			return reactions(...emotes)(await message.channel.send(array.map(prepend(emotes))));
 		}
 
-		await message.react(Dataset.success);
-		await message.react(Dataset.failure);
+		await message.react(emotes.success);
+		await message.react(emotes.failure);
 
 		return message;
 	};

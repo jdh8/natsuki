@@ -1,9 +1,9 @@
-import * as Dataset from "../data/index.mjs";
+import manual from "../data/manual.json";
 
 export const help = (message, content) =>
 {
 	const command = /\S*/.exec(content);
-	return message.channel.send(Dataset.manual[command] || `The command \`${command}\` is not found.`);
+	return message.channel.send(manual[command] || `The command \`${command}\` is not found.`);
 };
 
 export const git = message => message.channel.send("https://github.com/jdh8/natsuki");

@@ -3,7 +3,8 @@ import pick from "../lib/pick.mjs";
 import react from "../lib/react.mjs";
 import typing from "../lib/typing.mjs";
 
-import * as Dataset from "../data/index.mjs";
+import emotes from "../data/emotes.json";
+import poetry from "../data/poetry.json";
 
 import Discord from "discord.js";
 import Jimp from "jimp";
@@ -99,29 +100,29 @@ const collect = (filter, get) => message =>
 {
 	const collector = message.createReactionCollector(filter, { time: 15000 });
 	collector.on("collect", reaction => (collector.stop(), message.react(get(reaction.emoji.id))));
-	collector.on("end", (collection, reason) => reason == "time" && message.react(Dataset.failure));
+	collector.on("end", (collection, reason) => reason == "time" && message.react(emotes.failure));
 	return message;
 }
 
 const check = (answer, monika) => id =>
 {
 	switch (id) {
-		case answer: return Dataset.success;
+		case answer: return emotes.success;
 		case monika: return "⁉";
-		default: return Dataset.failure;
+		default: return emotes.failure;
 	}
 }
 
 export const poem1 = message =>
 {
-	const word = pick(Object.keys(Dataset.poetry));
+	const word = pick(Object.keys(poetry));
 
 	const sayori = "424991418386350081";
 	const natsuki = "424991419329937428";
 	const yuri = "424987242986078218";
 	const monika = "424991419233730560";
 
-	const answer = [natsuki, sayori, yuri, sayori][Dataset.poetry[word]];
+	const answer = [natsuki, sayori, yuri, sayori][poetry[word]];
 	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
 	const filter = (reaction, user) => user.id === message.author.id && reaction.me;
 
@@ -132,13 +133,13 @@ export const poem1 = message =>
 
 export const poem2 = message =>
 {
-	const word = pick(Object.keys(Dataset.poetry));
+	const word = pick(Object.keys(poetry));
 
 	const natsuki = "424991419329937428";
 	const yuri = "501273832238088193";
 	const monika = "501272960175439872";
 
-	const answer = [natsuki, yuri][Dataset.poetry[word] >> 1];
+	const answer = [natsuki, yuri][poetry[word] >> 1];
 	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
 	const filter = (reaction, user) => user.id === message.author.id && reaction.me;
 
@@ -154,7 +155,7 @@ export const poem3 = message =>
 	const filter = (reaction, user) => user.id === message.author.id && reaction.emoji.id === monika;
 
 	message.reply(`${initial}hose word is **Monika**?  Please answer in 15 seconds.`)
-		.then(message => collect(filter, () => Dataset.success)(message).react(monika));
+		.then(message => collect(filter, () => emotes.success)(message).react(monika));
 }
 
 export const poem = (message, content) =>
