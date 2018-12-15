@@ -96,20 +96,31 @@ http://doki-doki-literature-club.wikia.com/wiki/Natsuki#Preferred_Words`;
 	return message.channel.send(mention ? preferred : nword);
 };
 
+const reply = (message, word) =>
+{
+	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
+	return message.reply(`${initial}hose word is **${word}**?  Please answer in 15 seconds.`);
+}
+
 const collect = (filter, get) => message =>
 {
 	const collector = message.createReactionCollector(filter, { time: 15000 });
+
 	collector.on("collect", reaction => (collector.stop(), message.react(get(reaction.emoji.id))));
 	collector.on("end", (collection, reason) => reason == "time" && message.react(emotes.failure));
+
 	return message;
 }
 
 const check = (answer, monika) => id =>
 {
 	switch (id) {
-		case answer: return emotes.success;
-		case monika: return "⁉";
-		default: return emotes.failure;
+		case answer:
+			return emotes.success;
+		case monika:
+			return "⁉";
+		default:
+			return emotes.failure;
 	}
 }
 
@@ -123,12 +134,9 @@ export const poem1 = message =>
 	const monika = "424991419233730560";
 
 	const answer = [natsuki, sayori, yuri, sayori][poetry[word]];
-	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
 	const filter = (reaction, user) => user.id === message.author.id && reaction.me;
 
-	return message.reply(`${initial}hose word is **${word}**?  Please answer in 15 seconds.`)
-		.then(collect(filter, check(answer, monika)))
-		.then(react(sayori, natsuki, yuri, monika));
+	return reply(message, word).then(collect(filter, check(answer, monika))).then(react(sayori, natsuki, yuri, monika));
 };
 
 export const poem2 = message =>
@@ -140,22 +148,17 @@ export const poem2 = message =>
 	const monika = "501272960175439872";
 
 	const answer = [natsuki, yuri][poetry[word] >> 1];
-	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
 	const filter = (reaction, user) => user.id === message.author.id && reaction.me;
 
-	return message.reply(`${initial}hose word is **${word}**?  Please answer in 15 seconds.`)
-		.then(collect(filter, check(answer, monika)))
-		.then(react(natsuki, yuri, monika));
+	return reply(message, word).then(collect(filter, check(answer, monika))).then(react(natsuki, yuri, monika));
 };
 
 export const poem3 = message =>
 {
 	const monika = "501274687842680832";
-	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
 	const filter = (reaction, user) => user.id === message.author.id && reaction.emoji.id === monika;
 
-	message.reply(`${initial}hose word is **Monika**?  Please answer in 15 seconds.`)
-		.then(message => collect(filter, () => emotes.success)(message).react(monika));
+	return reply(message, "Monika").then(collect(filter, () => emotes.success)).then(react(monika));
 }
 
 export const poem = (message, content) =>
