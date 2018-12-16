@@ -1,5 +1,5 @@
 import pick from "../lib/pick.mjs";
-import reactions from "../lib/react.mjs";
+import reactor from "../lib/reactor.mjs";
 
 import emotes from "../data/emotes.json";
 import manual from "../data/manual.json";
@@ -89,24 +89,21 @@ export const poll = (message, content) =>
 	const code = (x, index) => String.fromCodePoint(0x1F1E6 + index);
 	const prepend = array => (x, index) => `${array[index]} ${x}`;
 
-	const implementation = async (first, ...rest) =>
+	const implementation = (first, ...rest) =>
 	{
 		if (rest.length) {
 			const emotes = rest.map(code);
-			return reactions(...emotes)(await message.channel.send([first, ...rest.map(prepend(emotes))]));
+			return message.channel.send([first, ...rest.map(prepend(emotes))]).then(reactor(emotes));
 		}
 
 		const array = first.split(/\s+\|\s+/, 20);
 
 		if (array.length > 1) {
 			const emotes = array.map(code);
-			return reactions(...emotes)(await message.channel.send(array.map(prepend(emotes))));
+			return message.channel.send(array.map(prepend(emotes))).then(reactor(emotes));
 		}
 
-		await message.react(emotes.success);
-		await message.react(emotes.failure);
-
-		return message;
+		return reactor(emotes.values())(message);
 	};
 
 	return implementation(...content.split("\n", 21));

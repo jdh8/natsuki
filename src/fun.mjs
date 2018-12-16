@@ -1,6 +1,6 @@
 import avatar from "../lib/avatar.mjs";
 import pick from "../lib/pick.mjs";
-import react from "../lib/react.mjs";
+import reactor from "../lib/reactor.mjs";
 import typing from "../lib/typing.mjs";
 
 import emotes from "../data/emotes.json";
@@ -136,7 +136,7 @@ export const poem1 = message =>
 	const answer = [natsuki, sayori, yuri, sayori][poetry[word]];
 	const filter = (reaction, user) => user.id === message.author.id && reaction.me;
 
-	return reply(message, word).then(collect(filter, check(answer, monika))).then(react(sayori, natsuki, yuri, monika));
+	return reply(message, word).then(collect(filter, check(answer, monika))).then(reactor([sayori, natsuki, yuri, monika]));
 };
 
 export const poem2 = message =>
@@ -150,7 +150,7 @@ export const poem2 = message =>
 	const answer = [natsuki, yuri][poetry[word] >> 1];
 	const filter = (reaction, user) => user.id === message.author.id && reaction.me;
 
-	return reply(message, word).then(collect(filter, check(answer, monika))).then(react(natsuki, yuri, monika));
+	return reply(message, word).then(collect(filter, check(answer, monika))).then(reactor([natsuki, yuri, monika]));
 };
 
 export const poem3 = message =>
@@ -158,7 +158,7 @@ export const poem3 = message =>
 	const monika = "501274687842680832";
 	const filter = (reaction, user) => user.id === message.author.id && reaction.emoji.id === monika;
 
-	return reply(message, "Monika").then(collect(filter, () => emotes.success)).then(react(monika));
+	return reply(message, "Monika").then(collect(filter, () => emotes.success)).then(message => message.react(monika));
 }
 
 export const poem = (message, content) =>
