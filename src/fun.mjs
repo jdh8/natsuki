@@ -104,10 +104,9 @@ const reply = (message, word) =>
 
 const collect = (filter, get) => message =>
 {
-	const collector = message.createReactionCollector(filter, { time: 15000 });
-
-	collector.on("collect", reaction => (collector.stop(), message.react(get(reaction.emoji.id))));
-	collector.on("end", (collection, reason) => reason == "time" && message.react(emotes.failure));
+	message.createReactionCollector(filter, { time: 15000 }).next
+		.then(reaction => message.react(get(reaction.emoji.id)))
+		.catch(() => message.react(emotes.failure));
 
 	return message;
 }
