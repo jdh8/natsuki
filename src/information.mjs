@@ -1,4 +1,4 @@
-import avt from "../lib/avatar.mjs";
+import display from "../lib/display.mjs";
 import Discord from "discord.js";
 
 const best = (collection, name) =>
@@ -10,7 +10,7 @@ const best = (collection, name) =>
 };
 
 export const avatar = (message, content) =>
-	message.channel.send(avt(message.client.users.get(/\d+|$/.exec(content)[0]) || message.author, 2048));
+	message.channel.send(display(message.client.users.get(/\d+|$/.exec(content)[0]) || message.author, 2048));
 
 export const role = (message, content) =>
 {

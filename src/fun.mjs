@@ -1,4 +1,4 @@
-import avatar from "../lib/avatar.mjs";
+import display from "../lib/display.mjs";
 import pick from "../lib/pick.mjs";
 import reactor from "../lib/reactor.mjs";
 import typing from "../lib/typing.mjs";
@@ -33,7 +33,7 @@ export const cupcake = typing(async (message, content) =>
 	const user = message.client.users.get(/\d+|$/.exec(content)[0]) || message.author;
 	const text = `${user} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!`;
 	const image = Jimp.read("assets/290px-Hostess-Cupcake-Whole.jpg");
-	const composed = (await image).composite((await Jimp.read(avatar(user))).resize(128, 128), 80, 80);
+	const composed = (await image).composite((await Jimp.read(display(user))).resize(128, 128), 80, 80);
 	const buffer = await util.promisify((...x) => composed.getBuffer(...x))("image/png");
 
 	return message.channel.send(text, new Discord.Attachment(buffer, "cupcake.png"));
