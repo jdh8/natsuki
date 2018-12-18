@@ -1,4 +1,4 @@
-import avatar from "../lib/avatar.mjs";
+import avt from "../lib/avatar.mjs";
 import pick from "../lib/pick.mjs";
 import typing from "../lib/typing.mjs";
 
@@ -14,7 +14,7 @@ const nsfw = f => (message, ...rest) =>
 
 export const fuck = nsfw(typing(async (message, content) =>
 {
-	const avatar = async user => (await Jimp.read(avatar(user))).resize(256, 256);
+	const avatar = async user => (await Jimp.read(avt(user))).resize(256, 256);
 	const user = message.client.users.get(/\d+|$/.exec(content)[0]);
 	const text = `${message.author} fucked ${user || "Natsuki"}`;
 	const image = Jimp.read("assets/566424ede431200e3985ca6f21287cee.png");
