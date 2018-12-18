@@ -96,68 +96,58 @@ http://doki-doki-literature-club.wikia.com/wiki/Natsuki#Preferred_Words`;
 	return message.channel.send(mention ? preferred : nword);
 };
 
-const reply = (message, word) =>
+const ask = async (message, word, answer, monika) =>
 {
+	const solve = id =>
+	{
+		switch (id) {
+			case answer: return emotes.success;
+			case monika: return "⁉";
+			default:     return emotes.failure;
+		}
+	};
+
+	const filter = (reaction, user) => user.id === message.author.id && reaction.me;
 	const initial = message.channel instanceof Discord.DMChannel ? "W" : "w";
-	return message.reply(`${initial}hose word is **${word}**?  Please answer in 15 seconds.`);
-}
+	const question = await message.reply(`${initial}hose word is **${word}**?  Please answer in 15 seconds.`);
 
-const collect = (filter, get) => message =>
-{
-	message.createReactionCollector(filter, { time: 15000 }).next
-		.then(reaction => message.react(get(reaction.emoji.id)))
-		.catch(() => message.react(emotes.failure));
+	new Discord.ReactionCollector(question, filter, { time: 15000 }).next
+		.then(({ emoji }) => solve(emoji.id))
+		.catch(() => emotes.failure)
+		.then(emote => question.react(emote));
 
-	return message;
-}
-
-const check = (answer, monika) => id =>
-{
-	switch (id) {
-		case answer:
-			return emotes.success;
-		case monika:
-			return "⁉";
-		default:
-			return emotes.failure;
-	}
-}
+	return question;
+};
 
 export const poem1 = message =>
 {
-	const word = pick(Object.keys(poetry));
-
 	const sayori = "424991418386350081";
 	const natsuki = "424991419329937428";
 	const yuri = "424987242986078218";
 	const monika = "424991419233730560";
 
+	const word = pick(Object.keys(poetry));
 	const answer = [natsuki, sayori, yuri, sayori][poetry[word]];
-	const filter = (reaction, user) => user.id === message.author.id && reaction.me;
 
-	return reply(message, word).then(collect(filter, check(answer, monika))).then(reactor([sayori, natsuki, yuri, monika]));
+	return ask(message, word, answer, monika).then(reactor([sayori, natsuki, yuri, monika]));
 };
 
 export const poem2 = message =>
 {
-	const word = pick(Object.keys(poetry));
-
 	const natsuki = "424991419329937428";
 	const yuri = "501273832238088193";
 	const monika = "501272960175439872";
 
+	const word = pick(Object.keys(poetry));
 	const answer = [natsuki, yuri][poetry[word] >> 1];
-	const filter = (reaction, user) => user.id === message.author.id && reaction.me;
 
-	return reply(message, word).then(collect(filter, check(answer, monika))).then(reactor([natsuki, yuri, monika]));
+	return ask(message, word, answer, monika).then(reactor([natsuki, yuri, monika]));
 };
 
 export const poem3 = message =>
 {
 	const monika = "501274687842680832";
-	const filter = (reaction, user) => user.id === message.author.id && reaction.emoji.id === monika;
-
-	return reply(message, "Monika").then(collect(filter, () => emotes.success)).then(message => message.react(monika));
+	return ask(message, "Monika", monika).then(message => message.react(monika));
 }
 
 export const poem = (message, content) =>
