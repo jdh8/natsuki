@@ -103,7 +103,7 @@ export const poll = (message, content) =>
 			return message.channel.send(array.map(prepend(emotes))).then(reactor(emotes));
 		}
 
-		return reactor(emotes.values())(message);
+		return reactor(Object.values(emotes))(message);
 	};
 
 	return implementation(...content.split("\n", 21));
