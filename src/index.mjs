@@ -1,4 +1,11 @@
-export * from "./core.mjs";
+export * from "./core/git.mjs";
+export * from "./core/hanako.mjs";
+export * from "./core/help.mjs";
+export * from "./core/invite.mjs";
+export * from "./core/ping.mjs";
+export * from "./core/support.mjs";
+export * from "./core/vote.mjs";
+export * from "./core/yuri.mjs";
 
 export * from "./fun/beat.mjs";
 export * from "./fun/bunny.mjs";
@@ -29,7 +36,9 @@ export * from "./tools/poll.mjs";
 export * from "./tools/react.mjs";
 export * from "./tools/someone.mjs";
 
-export * from "./information.mjs";
+export * from "./information/avatar.mjs";
+export * from "./information/role.mjs";
+export * from "./information/snowflake.mjs";
 
 export * from "./nsfw/flat.mjs";
 export * from "./nsfw/fuck.mjs";

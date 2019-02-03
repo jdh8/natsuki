@@ -1,4 +1,3 @@
-import display from "../lib/display.mjs";
 import Discord from "discord.js";
 
 const best = (collection, name) =>
@@ -8,9 +7,6 @@ const best = (collection, name) =>
 
 	return filtered.length ? filtered.reduce((x, y) => x.name.length < y.name.length ? x : y) : null;
 };
-
-export const avatar = (message, content) =>
-	message.channel.send(display(message.client.users.get(/\d+|$/.exec(content)[0]) || message.author, 2048));
 
 export const role = (message, content) =>
 {
@@ -38,19 +34,4 @@ export const role = (message, content) =>
 **Hoist:** ${role.hoist}
 **Managed:** ${role.managed}
 **Mentionable:** ${role.mentionable}`));
-};
-
-export const snowflake = (message, content) =>
-{
-	const match = /\d+/.exec(content);
-
-	if (match == null)
-		return message.channel.send("No valid snowfake is found.");
-
-	const deconstructed = Discord.SnowflakeUtil.deconstruct(match[0]);
-
-	return message.channel.send(`**Date:** ${deconstructed.date.toISOString()}
-**Worker:** ${deconstructed.workerID}
-**Process:** ${deconstructed.processID}
-**Increment:** ${deconstructed.increment}`);
 };
