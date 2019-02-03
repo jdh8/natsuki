@@ -1,1 +1,1 @@
-import from "./ping.mjs";
+import "./ping.mjs";
