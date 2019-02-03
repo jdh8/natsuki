@@ -1,4 +1,4 @@
-import * as natsuki from "./index.mjs";
+import * as natsuki from "./src/index.mjs";
 
 export default message =>
 {
