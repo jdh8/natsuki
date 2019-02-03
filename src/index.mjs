@@ -12,7 +12,15 @@ export * from "./fun/ship.mjs";
 export * from "./fun/shelf.mjs";
 export * from "./fun/word.mjs";
 
-export * from "./weeb.mjs";
+export * from "./weeb/boobpat.mjs";
+export * from "./weeb/buttpat.mjs";
+export * from "./weeb/feed.mjs";
+export * from "./weeb/hug.mjs";
+export * from "./weeb/lewd.mjs";
+export * from "./weeb/lick.mjs";
+export * from "./weeb/neko.mjs";
+export * from "./weeb/kiss.mjs";
+export * from "./weeb/smash.mjs";
 
 export * from "./tools/base64.mjs";
 export * from "./tools/color.mjs";
