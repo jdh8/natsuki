@@ -3,9 +3,12 @@ import pick from "../../lib/pick.mjs";
 import query from "../../lib/query.mjs";
 import score from "../../lib/score.mjs";
 import typing from "../../lib/typing.mjs";
-import xml from "../../lib/xml.mjs";
 
 import snekfetch from "snekfetch";
+import xml2js from "xml2js";
+import util from "util";
+
+const xml = util.promisify(xml2js.parseString);
 
 export const rule34 = nsfw(typing(async (message, content) =>
 {
