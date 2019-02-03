@@ -3,7 +3,7 @@ import Discord from "discord.js";
 const best = (collection, name) =>
 {
 	const pattern = new RegExp(name, "i");
-	const filtered = collection.filterArray(x => pattern.test(x.name));
+	const filtered = collection.filter(x => pattern.test(x.name));
 
 	return filtered.length ? filtered.reduce((x, y) => x.name.length < y.name.length ? x : y) : null;
 };
