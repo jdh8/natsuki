@@ -22,4 +22,9 @@ export * from "./tools/react.mjs";
 export * from "./tools/someone.mjs";
 
 export * from "./information.mjs";
-export * from "./nsfw.mjs";
+
+export * from "./nsfw/flat.mjs";
+export * from "./nsfw/fuck.mjs";
+export * from "./nsfw/rule34.mjs";
+export * from "./nsfw/slurp.mjs";
+export * from "./nsfw/yandere.mjs";
