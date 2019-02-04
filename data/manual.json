@@ -52,6 +52,8 @@
     "flat": "**`n.flat`** Show ~~my~~ random small boobs\n\n**Usage**: n.flat",
     "fucc": "**`n.fucc`** is an alias of n.fuck.",
     "fuck": "**`n.fuck`** Fuck someone\n\n**Usage**: n.fuck [user]\n\nThe source is NSFW and attributed at https://github.com/jdh8/natsuki/blob/master/README.md",
+    "les": "**`n.les`** is an alias of n.lesbian.",
+    "lesbian": "**`n.lesbian`** No more boys.\n\n**Usage**: n.slurp [text]\n\nNatsuki picks an appropriate image from https://nekos.life",
     "r34": "**`n.r34`** is an alias of n.rule34.",
     "rule34": "**`n.rule34`** Random picture from rule34.xxx\n\n**Usage**: n.rule34 [tags]\n\n**Examples**:\nn.rule34 natsuki_(doki_doki_literature_club)\nn.rule34 himejima_akeno rias_gremory",
     "slurp": "**`n.slurp`** Fuck someone\n\n**Usage**: n.slurp [text]\n\nNatsuki picks an appropriate image from https://nekos.life",
@@ -59,5 +61,5 @@
     "suck": "**`n.suck`** is an alias of n.slurp.",
     "yandere": "**`n.yandere`** Random picture from yande.re\n\n**Usage**: n.yandere [tags]\n\n**Examples**:\nn.yandere natsuki_(doki_doki_literature_club)\nn.yandere himejima_akeno rias_gremory",
 
-    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `chat` `cupcake` `cute` `nut` `poem` `rate` `shelf` `ship` `word`\n**Weeb -** `boobpat` `buttpat` `feed` `hug` `kiss` `lewd` `lick` `neko` `smash`\n**Tools -** `base64` `color` `keycaps` `poll` `react` `someone`\n**Information -** `avatar` `role` `snowflake`\n**NSFW -** `flat` `fuck` `rule34` `slurp` `yandere`"
+    "": "Send `n.help [command]` for usage of a specific command, `n.help ping` for example.\n\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `chat` `cupcake` `cute` `nut` `poem` `rate` `shelf` `ship` `word`\n**Weeb -** `boobpat` `buttpat` `feed` `hug` `kiss` `lewd` `lick` `neko` `smash`\n**Tools -** `base64` `color` `keycaps` `poll` `react` `someone`\n**Information -** `avatar` `role` `snowflake`\n**NSFW -** `flat` `fuck` `lesbian` `rule34` `slurp` `yandere`"
 }
