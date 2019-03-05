@@ -40,7 +40,6 @@ export * from "./information/avatar.mjs";
 export * from "./information/role.mjs";
 export * from "./information/snowflake.mjs";
 
-export * from "./nsfw/flat.mjs";
 export * from "./nsfw/fuck.mjs";
 export * from "./nsfw/lesbian.mjs";
 export * from "./nsfw/rule34.mjs";
