@@ -63,5 +63,5 @@ export const poem3 = message =>
 export const poem = (message, content) =>
 {
 	const f = [poem1, poem2, poem3][(!content | content) - 1];
-	return f ? f(message) : message.channel.send("You input an invalid act.");
+	return f ? f(message) : message.channel.send("You entered an invalid act.");
 };
