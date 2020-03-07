@@ -11,8 +11,8 @@
         "u/RoseQuartz6758 (https://www.reddit.com/user/RoseQuartz6758)"
     ],
     "scripts": {
-        "start": "node --experimental-modules src/client.mjs",
-        "test": "node --experimental-modules test/index.mjs"
+        "start": "node --experimental-modules --es-module-specifier-resolution=node src/client.mjs",
+        "test": "node --experimental-modules --es-module-specifier-resolution=node test/index.mjs"
     },
     "dependencies": {
         "dblapi.js": "^2.3.0",
