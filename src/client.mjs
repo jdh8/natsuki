@@ -27,7 +27,11 @@ client.on("message", async message =>
 		await loop(message);
 	}
 	catch (error) {
-		message.channel.send(`${error}`).catch(() => {});
+		message.channel.send(`${error}`).catch(() =>
+		{
+			console.warn(message.content);
+			console.warn(error);
+		});
 	}
 });
 
