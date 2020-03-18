@@ -17,7 +17,11 @@ const loop = message =>
 	}
 };
 
-client.on("ready", () => client.user.setActivity("n.help | n.invite"));
+client.on("ready", () =>
+{
+	console.error("Natsuki is ready.");
+	client.user.setActivity("n.help | n.invite");
+});
 
 client.on("message", message =>
 {
