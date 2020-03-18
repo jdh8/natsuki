@@ -18,7 +18,7 @@ export const fuck = nsfw(typing(async (message, content) =>
 		composed.composite(await avatar(user), 110, 20);
 
 	const buffer = await util.promisify((...x) => composed.getBuffer(...x))("image/png");
-	return await message.channel.send(text, new Discord.Attachment(buffer, "fuck.png"));
+	return await message.channel.send(text, new Discord.MessageAttachment(buffer, "fuck.png"));
 }));
 
 export const fucc = fuck;

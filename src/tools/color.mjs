@@ -19,7 +19,7 @@ export const color = async (message, content) =>
 	const image = new Jimp(128, 128, rgba(color.toRgb()));
 	const buffer = await util.promisify((...x) => image.getBuffer(...x))("image/png");
 
-	return await message.channel.send(description, new Discord.Attachment(buffer, "color.png"));
+	return await message.channel.send(description, new Discord.MessageAttachment(buffer, "color.png"));
 };
 
 export const colour = color;

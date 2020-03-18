@@ -13,5 +13,5 @@ export const cupcake = typing(async (message, content) =>
 	const composed = (await image).composite((await Jimp.read(display(user))).resize(128, 128), 80, 80);
 	const buffer = await util.promisify((...x) => composed.getBuffer(...x))("image/png");
 
-	return message.channel.send(text, new Discord.Attachment(buffer, "cupcake.png"));
+	return message.channel.send(text, new Discord.MessageAttachment(buffer, "cupcake.png"));
 });
