@@ -20,7 +20,7 @@ export const role = (message, content) =>
 	if (role == null)
 		return message.channel.send("This role is not found.");
 
-	return message.channel.send(new Discord.RichEmbed({
+	return message.channel.send(new Discord.MessageEmbed({
 		color: role.color,
 		description: `${role} (${role.id})`,
 		fields: [
