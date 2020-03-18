@@ -21,12 +21,13 @@ const loop = message =>
 
 client.on("ready", () => client.user.setActivity("n.help | n.invite"));
 
-client.on("message", async message =>
+client.on("message", message =>
 {
 	const send = error => message.channel.send(`${error}`).catch(() => {});
 
 	try {
-		loop(message).then(send);
+		const promise = loop(message);
+		promise && promise.catch(send);
 	}
 	catch (error) {
 		send(error);
