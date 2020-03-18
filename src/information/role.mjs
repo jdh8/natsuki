@@ -13,9 +13,9 @@ export const role = (message, content) =>
 	if (!content)
 		return message.channel.send("Please specify role to search.");
 
-	const collection = message.guild.roles;
+	const { cache } = message.guild.roles;
 	const mention = /\d+/.exec(content);
-	const role = mention ? collection.get(mention[0]) : best(collection, content);
+	const role = mention ? cache.get(mention[0]) : best(cache, content);
 
 	if (role == null)
 		return message.channel.send("This role is not found.");
