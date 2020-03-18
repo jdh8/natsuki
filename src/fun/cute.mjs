@@ -1,4 +1,4 @@
-import typing from "../../lib/typing.mjs";
+import typing from "../lib/typing.mjs";
 
 const sleep = duration => new Promise(resolve => setTimeout(resolve, duration));
 

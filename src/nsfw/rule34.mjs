@@ -1,8 +1,8 @@
-import nsfw from "../../lib/nsfw.mjs";
-import pick from "../../lib/pick.mjs";
-import query from "../../lib/query.mjs";
-import score from "../../lib/score.mjs";
-import typing from "../../lib/typing.mjs";
+import nsfw from "../lib/nsfw.mjs";
+import pick from "../lib/pick.mjs";
+import query from "../lib/query.mjs";
+import score from "../lib/score.mjs";
+import typing from "../lib/typing.mjs";
 
 import snekfetch from "snekfetch";
 import xml2js from "xml2js";

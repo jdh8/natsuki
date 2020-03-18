@@ -1,5 +1,5 @@
-import nsfw from "../../lib/nsfw.mjs";
-import typing from "../../lib/typing.mjs";
+import nsfw from "../lib/nsfw.mjs";
+import typing from "../lib/typing.mjs";
 
 import Discord from "discord.js";
 import snekfetch from "snekfetch";

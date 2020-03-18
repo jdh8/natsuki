@@ -1,4 +1,4 @@
-import typing from "../../lib/typing.mjs";
+import typing from "../lib/typing.mjs";
 import Discord from "discord.js";
 
 export const buttpat = typing(async (message, content) => await message.channel.send(new Discord.MessageEmbed({

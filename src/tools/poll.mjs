@@ -1,4 +1,4 @@
-import reactor from "../../lib/reactor.mjs";
+import reactor from "../lib/reactor.mjs";
 import emotes from "../../data/emotes.json";
 
 const { success, failure } = emotes;

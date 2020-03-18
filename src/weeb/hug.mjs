@@ -1,4 +1,4 @@
-import pick from "../../lib/pick.mjs";
+import pick from "../lib/pick.mjs";
 import hugs from "../../data/hugs.json";
 import Discord from "discord.js";
 

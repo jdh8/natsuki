@@ -1,5 +1,5 @@
-import display from "../../lib/display.mjs";
-import typing from "../../lib/typing.mjs";
+import display from "../lib/display.mjs";
+import typing from "../lib/typing.mjs";
 
 import Discord from "discord.js";
 import Jimp from "jimp";

@@ -1,5 +1,5 @@
-import pick from "../../lib/pick.mjs";
-import reactor from "../../lib/reactor.mjs";
+import pick from "../lib/pick.mjs";
+import reactor from "../lib/reactor.mjs";
 
 import emotes from "../../data/emotes.json";
 import poetry from "../../data/poetry.json";
