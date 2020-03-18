@@ -23,15 +23,15 @@ client.on("ready", () => client.user.setActivity("n.help | n.invite"));
 
 client.on("message", async message =>
 {
+	const send = error => message.channel.send(`${error}`).catch(() => {});
+
 	try {
-		await loop(message);
+		loop(message).then(send);
 	}
 	catch (error) {
-		message.channel.send(`${error}`).catch(() =>
-		{
-			console.warn(message.content);
-			console.warn(error);
-		});
+		send(error);
+		console.warn(`[WARNING] ${message.content}
+${error}`);
 	}
 });
 
