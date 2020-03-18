@@ -1,10 +1,7 @@
-export default (user, size) =>
+import Jimp from "jimp";
+
+export default async (user, size) =>
 {
-	if (user.id == 1) return user.avatar;
-	if (!user.avatar) return `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`;
-
-	const extension = user.avatar.startsWith("a_") ? ".gif" : "";
-	const query = size ? `?size=${size}` : "";
-
-	return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}${extension}${query}`;
+	const url = user.avatarURL({ format: "png", size: size });
+	return url ? await Jimp.read(url) : (await Jimp.read(user.defaultAvatarURL)).resize(size, size);
 };
