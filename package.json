@@ -11,7 +11,7 @@
         "u/RoseQuartz6758 (https://www.reddit.com/user/RoseQuartz6758)"
     ],
     "scripts": {
-        "start": "node --unhandled-rejections=strict --experimental-modules --es-module-specifier-resolution=node src/client.mjs",
+        "start": "node --unhandled-rejections=strict --experimental-modules --es-module-specifier-resolution=node src/index.mjs",
         "test": "node --unhandled-rejections=strict --experimental-modules --es-module-specifier-resolution=node test/index.mjs"
     },
     "dependencies": {

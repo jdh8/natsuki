@@ -1,9 +1,7 @@
 import * as natsuki from "./natsuki.mjs";
 import Discord from "discord.js";
-import DBL from "dblapi.js";
 
 const client = new Discord.Client();
-const dbl = new DBL(process.env.DBL_TOKEN, client);
 
 const loop = message =>
 {
@@ -31,8 +29,8 @@ client.on("message", message =>
 	}
 	catch (error) {
 		send(error);
-		console.warn(`[WARNING] ${message.content}
-${error}`);
+		console.error(`[WARNING] ${message.content}
+${error instanceof Error && error.stack || error}`);
 	}
 });
 
