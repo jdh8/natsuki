@@ -2,10 +2,9 @@ import Discord from "discord.js";
 
 const best = (collection, name) =>
 {
-	const pattern = new RegExp(name, "i");
-	const filtered = collection.filter(x => pattern.test(x.name));
+	const filtered = collection.filter(x => x.name.toLowerCase().includes(name.toLowerCase()));
 
-	return filtered.length ? filtered.reduce((x, y) => x.name.length < y.name.length ? x : y) : null;
+	return filtered.size ? filtered.reduce((x, y) => x.name.length < y.name.length ? x : y) : null;
 };
 
 export const role = (message, content) =>
@@ -15,7 +14,7 @@ export const role = (message, content) =>
 
 	const { cache } = message.guild.roles;
 	const mention = /\d+/.exec(content);
-	const role = mention ? cache.get(mention[0]) : best(cache, content);
+	const role = mention && cache.get(mention[0]) || best(cache, content);
 
 	if (role == null)
 		return message.channel.send("This role is not found.");
