@@ -1,14 +1,14 @@
 import fetch from "node-fetch";
 import sharp from "sharp";
 
-export default async (user, size) =>
+export default async (user, size, top, left) =>
 {
-	const url = user.avatarURL({ size: size });
-	const buffer = await (await fetch(url || user.defaultAvatarURL)).buffer();
+	const buffer = await (await fetch(user.displayAvatarURL({ size }))).buffer();
 	const image = sharp(buffer);
 
 	if ((await image.metadata()).width == size)
-		return buffer;
+		return { input: buffer, top, left };
 
-	return await image.resize(size).webp({ lossless: true }).toBuffer();
+	const { data, info } = await image.resize(size).raw().toBuffer({ resolveWithObject: true });
+	return { input: data, raw: info, top, left };
 };
