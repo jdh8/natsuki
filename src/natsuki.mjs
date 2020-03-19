@@ -9,7 +9,6 @@ export * from "./core/yuri.mjs";
 
 export * from "./fun/beat.mjs";
 export * from "./fun/bunny.mjs";
-export * from "./fun/chat.mjs";
 export * from "./fun/cupcake.mjs";
 export * from "./fun/cute.mjs";
 export * from "./fun/nut.mjs";
