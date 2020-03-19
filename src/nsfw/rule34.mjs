@@ -4,16 +4,13 @@ import query from "../lib/query.mjs";
 import score from "../lib/score.mjs";
 import typing from "../lib/typing.mjs";
 
-import snekfetch from "snekfetch";
+import fetch from "node-fetch";
 import xml2js from "xml2js";
-import util from "util";
-
-const xml = util.promisify(xml2js.parseString);
 
 export const rule34 = nsfw(typing(async (message, content) =>
 {
-	const { raw } = await snekfetch.get(`https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=${query(content)}`);
-	const posts = (await xml(raw)).posts.post;
+	const response = await fetch(`https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=${query(content)}`);
+	const posts = (await xml2js.parseStringPromise(await response.text())).posts.post;
 	return await message.channel.send(posts ? score(pick(posts).$) : `No image found for \`${content}\` on https://rule34.xxx/`);
 }));
 

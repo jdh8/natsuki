@@ -583,11 +583,6 @@
                 "is-arrayish": "^0.3.1"
             }
         },
-        "snekfetch": {
-            "version": "4.0.4",
-            "resolved": "https://registry.npmjs.org/snekfetch/-/snekfetch-4.0.4.tgz",
-            "integrity": "sha512-dyycG9fvwtSJqKPfMVOpXt+60qvMGe7vWLwOJDiSJaiAx+hs2EnFChG2bXCWn7ulz+zGzrHdN9/yeEb0YqEPww=="
-        },
         "string-width": {
             "version": "1.0.2",
             "resolved": "https://registry.npmjs.org/string-width/-/string-width-1.0.2.tgz",

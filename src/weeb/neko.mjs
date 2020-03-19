@@ -1,6 +1,6 @@
 import typing from "../lib/typing.mjs";
 import Discord from "discord.js";
-import snekfetch from "snekfetch";
+import fetch from "node-fetch";
 
 export const neko = typing(async (message, content) =>
 {
@@ -8,6 +8,6 @@ export const neko = typing(async (message, content) =>
 
 	return await message.channel.send(new Discord.MessageEmbed({
 		description: "Here comes your random neko.",
-		image: (await snekfetch.get(endpoint)).body,
+		image: await (await fetch(endpoint)).json(),
 	}));
 });

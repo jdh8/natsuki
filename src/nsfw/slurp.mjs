@@ -2,11 +2,11 @@ import nsfw from "../lib/nsfw.mjs";
 import typing from "../lib/typing.mjs";
 
 import Discord from "discord.js";
-import snekfetch from "snekfetch";
+import fetch from "node-fetch";
 
 export const slurp = nsfw(typing(async (message, content) => await message.channel.send(new Discord.MessageEmbed({
 	description: `${message.author} slurped ${content || "a random dick"}!`,
-	image: (await snekfetch.get("https://nekos.life/api/v2/img/bj")).body,
+	image: await (await fetch("https://nekos.life/api/v2/img/bj")).json(),
 }))));
 
 export const succ = slurp;

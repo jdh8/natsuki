@@ -1,5 +1,5 @@
 import Discord from "discord.js";
-import snekfetch from "snekfetch";
+import fetch from "node-fetch";
 
 export const encode = (message, text) =>
 {
@@ -7,8 +7,9 @@ export const encode = (message, text) =>
 		? text.length > 1500 ? "The message is too long." : Buffer.from(text).toString("base64")
 		: message.attachments.size ? "" : "_ _";
 
-	const transform = (attachment, index) => snekfetch.get(attachment.url)
-		.then(response => new Discord.Attachment(Buffer.from(response.body.toString("base64")), `${index}.txt`));
+	const transform = async (attachment, index) => new Discord.MessageAttachment(
+		Buffer.from((await (await fetch(attachment.url)).buffer()).toString("base64")),
+		`${index}.txt`);
 
 	return Promise.all(message.attachments.map(transform))
 		.then(files => message.channel.send(code, { files }));
@@ -18,8 +19,9 @@ export const decode = (message, code) =>
 {
 	const text = `${message.author}: ${Buffer.from(code, "base64")}` || (message.attachments.size ? "" : "_ _");
 
-	const transform = (attachment, index) => snekfetch.get(attachment.url)
-		.then(response => new Discord.Attachment(Buffer.from(response.text, "base64"), `${index}.bin`));
+	const transform = async (attachment, index) => new Discord.MessageAttachment(
+		Buffer.from(await (await fetch(attachment.url)).text(), "base64"),
+		`${index}.bin`);
 
 	return Promise.all(message.attachments.map(transform))
 		.then(files => message.channel.send(text, { files }));
