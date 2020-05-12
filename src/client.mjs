@@ -1,13 +1,10 @@
 import * as natsuki from "./natsuki.mjs";
 import Discord from "discord.js";
+import TopGG from "dblapi.js";
 
 const client = new Discord.Client();
 
-client.on("ready", () =>
-{
-	console.log("Natsuki is ready.");
-	client.user.setActivity("n.help | n.invite");
-});
+client.on("ready", () => client.user.setActivity("n.help | n.invite"));
 
 client.on("message", message =>
 {
@@ -35,4 +32,4 @@ client.on("message", message =>
 
 client.login(process.env.TOKEN);
 
-export default client;
+new TopGG(process.env.TOP_GG_TOKEN, client);
