@@ -1,6 +1,6 @@
 {
     "name": "natsuki",
-    "version": "2.2.1",
+    "version": "2.2.2",
     "description": "Discord bot named after Natsuki from Doki Doki Literature Club",
     "main": "src/natsuki.mjs",
     "repository": "https://github.com/jdh8/natsuki",
@@ -11,7 +11,7 @@
         "u/RoseQuartz6758 (https://www.reddit.com/user/RoseQuartz6758)"
     ],
     "scripts": {
-        "start": "node --experimental-worker --experimental-modules --es-module-specifier-resolution=node index.mjs"
+        "start": "node --experimental-worker --experimental-modules --es-module-specifier-resolution=node --optimize_for_size --max_old_space_size=460 index.mjs"
     },
     "dependencies": {
         "bufferutil": "^4.0.1",
