@@ -5,7 +5,7 @@ export const react = (message, content) =>
 		const errors = [];
 
 		for (const s of emotes)
-			await target.react(/<a?:\w*:(\d*)>|$/.exec(s)[1] || s).catch(() => errors.push(s));
+			await target.react(/<(a?:\w*:\d*)>|$/.exec(s)[1] || s).catch(() => errors.push(s));
 
 		const output = errors.length ? `Failed to react ${errors.join(", ")}` : "All emojis were successfully reacted.";
 		return await (await message.channel.send(output)).delete({ timeout: 5000 + 1000 * errors.length });
