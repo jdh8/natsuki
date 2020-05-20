@@ -1,3 +1,3 @@
-import pick from "../lib/pick.mjs";
+import sample from "../lib/sample.mjs";
 
-export const someone = message => message.channel.send(pick([...message.guild.members.cache.values()]).user.tag);
+export const someone = message => message.channel.send(sample([...message.guild.members.cache.values()]).user.tag);

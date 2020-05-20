@@ -1,5 +1,3 @@
-import Discord from "discord.js";
-
 export const snowflake = (message, content) =>
 {
 	const match = /\d+/.exec(content);
@@ -7,10 +5,12 @@ export const snowflake = (message, content) =>
 	if (match == null)
 		return message.channel.send("No valid snowfake is found.");
 
-	const deconstructed = Discord.SnowflakeUtil.deconstruct(match[0]);
+	const flake = BigInt(match[0]);
+	const time = Number(flake >> 22n) + 1420070400000;
+	const id = ~~Number(BigInt.asUintN(22, flake));
 
-	return message.channel.send(`**Date:** ${deconstructed.date.toISOString()}
-**Worker:** ${deconstructed.workerID}
-**Process:** ${deconstructed.processID}
-**Increment:** ${deconstructed.increment}`);
+	return message.channel.send(`**Date:** ${new Date(time).toISOString()}
+**Worker:** ${id >> 17}
+**Process:** ${id >> 12 & 31}
+**Increment:** ${id & 0xFFF}`);
 };

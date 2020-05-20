@@ -1,26 +1,32 @@
-import reactor from "../lib/reactor.mjs";
+const consider = (x, index) => `${String.fromCodePoint(0x1F1E6 + index)} ${x}`;
 
-const code = (x, index) => String.fromCodePoint(0x1F1E6 + index);
-const prepend = array => (x, index) => `${array[index]} ${x}`;
-
-export const poll = (message, content) =>
+export const poll = async (message, content) =>
 {
-	const implementation = (first, ...rest) =>
-	{
-		if (rest.length) {
-			const choices = rest.map(code);
-			return message.channel.send([first, ...rest.map(prepend(choices))]).then(reactor(choices));
-		}
+	const [first, ...rest] = content.split("\n", 21);
 
-		const array = first.split(/\s+\|\s+/, 20);
+	if (rest.length) {
+		const choices = rest.map(consider);
+		const question = await message.channel.send([first, ...choices]);
 
-		if (array.length > 1) {
-			const choices = array.map(code);
-			return message.channel.send(array.map(prepend(choices))).then(reactor(choices));
-		}
+		for (const choice of choices)
+			await question.react(String.fromCodePoint(choice.codePointAt()));
 
-		return reactor(["✅", "❌"])(message);
-	};
+		return question;
+	}
 
-	return implementation(...content.split("\n", 21));
+	const array = first.split(/\s+\|\s+/, 20);
+
+	if (array.length > 1) {
+		const choices = array.map(consider);
+		const question = await message.channel.send(choices);
+
+		for (const choice of choices)
+			await question.react(String.fromCodePoint(choice.codePointAt()));
+
+		return question;
+	}
+
+	await message.react("✅");
+	await message.react("❌");
+	return message;
 };
