@@ -1,6 +1,6 @@
 {
     "name": "natsuki",
-    "version": "2.2.3",
+    "version": "2.2.4",
     "lockfileVersion": 1,
     "requires": true,
     "dependencies": {
@@ -219,7 +219,7 @@
             }
         },
         "erlpack": {
-            "version": "github:discordapp/erlpack#e27db8f82892bdb9b28a0547cc394d68b5d2242d",
+            "version": "github:discordapp/erlpack#c514d36ec81a7a61ef90b75df261025ab046574d",
             "from": "github:discordapp/erlpack",
             "requires": {
                 "bindings": "^1.5.0",
