@@ -6,7 +6,7 @@ export const slurp = nsfw(async (message, content) =>
 	message.channel.sendTyping();
 
 	return await message.reply({ embeds: [{
-		description: `${message.author} slurped ${content || "a random dick"}!`,
+		description: `${message.member || message.author} slurped ${content || "a random dick"}!`,
 		image: await (await fetch("https://nekos.life/api/v2/img/bj")).json(),
 	}]});
 });

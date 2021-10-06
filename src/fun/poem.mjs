@@ -10,7 +10,7 @@ const ask = async (message, word, answer, monika) =>
 		return id == answer ? "✅" : id == monika ? "⁉" : "❌";
 	};
 
-	const filter = (reaction, user) => user.id == message.author.id && reaction.me;
+	const filter = (reaction, user) => user.id == message.member || message.member.id && reaction.me;
 	const question = await message.reply(`Whose word is **${word}**?  Please answer in 15 seconds.`);
 
 	new ReactionCollector(question, filter, { time: 15000 }).next

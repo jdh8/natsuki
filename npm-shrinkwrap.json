@@ -1,12 +1,12 @@
 {
     "name": "natsuki",
-    "version": "2.2.6",
+    "version": "2.3.0",
     "lockfileVersion": 2,
     "requires": true,
     "packages": {
         "": {
             "name": "natsuki",
-            "version": "2.2.6",
+            "version": "2.3.0",
             "license": "MIT",
             "dependencies": {
                 "bufferutil": "^4.0.1",
