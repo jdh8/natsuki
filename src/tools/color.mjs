@@ -1,4 +1,4 @@
-import Discord from "discord.js";
+import { MessageAttachment } from "discord.js";
 import sharp from "sharp";
 import tinycolor from "tinycolor2";
 
@@ -10,7 +10,7 @@ export const color = async (message, content) =>
 	const opaque = color.getAlpha() == 1;
 
 	if (!color.isValid())
-		return await message.channel.send(`${content} is not a color.`);
+		return await message.reply(`${content} is not a color.`);
 
 	const description = `**Hex:** ${opaque ? color.toHexString() : color.toHex8String()}
 **RGB:** ${color.toRgbString()}
@@ -23,7 +23,10 @@ export const color = async (message, content) =>
 		background: convert(color.toRgb())
 	}}).webp({ lossless: true }).toBuffer();
 
-	return await message.channel.send(description, new Discord.MessageAttachment(await buffer, "color.webp"));
+	return await message.reply({
+		content: description,
+		files: [new MessageAttachment(await buffer, "color.webp")]
+	});
 };
 
 export const colour = color;

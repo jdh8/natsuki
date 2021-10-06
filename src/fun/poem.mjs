@@ -1,6 +1,6 @@
 import sample from "../lib/sample.mjs";
 import poetry from "../../data/poetry.json";
-import Discord from "discord.js";
+import { ReactionCollector } from "discord.js";
 
 const ask = async (message, word, answer, monika) =>
 {
@@ -11,10 +11,9 @@ const ask = async (message, word, answer, monika) =>
 	};
 
 	const filter = (reaction, user) => user.id == message.author.id && reaction.me;
-	const w = message.channel instanceof Discord.DMChannel ? "W" : "w";
-	const question = await message.reply(`${w}hose word is **${word}**?  Please answer in 15 seconds.`);
+	const question = await message.reply(`Whose word is **${word}**?  Please answer in 15 seconds.`);
 
-	new Discord.ReactionCollector(question, filter, { time: 15000 }).next
+	new ReactionCollector(question, filter, { time: 15000 }).next
 		.then(mark)
 		.catch(() => "❌")
 		.then(s => question.react(s));
@@ -69,5 +68,5 @@ export const poem3 = async message =>
 export const poem = (message, content) =>
 {
 	const f = [poem1, poem2, poem3][(!content | content) - 1];
-	return f ? f(message) : message.channel.send("You entered an invalid act.");
+	return f ? f(message) : message.reply("You entered an invalid act.");
 };

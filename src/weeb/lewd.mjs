@@ -1,1 +1,1 @@
-export const lewd = message => message.channel.send("https://youtu.be/qr89xoZyE1g");
+export const lewd = message => message.reply("https://youtu.be/qr89xoZyE1g");

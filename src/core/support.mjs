@@ -1,1 +1,1 @@
-export const support = message => message.channel.send("https://discord.gg/VdHYvMC");
+export const support = message => message.reply("https://discord.gg/VdHYvMC");

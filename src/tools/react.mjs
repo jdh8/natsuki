@@ -8,7 +8,7 @@ export const react = (message, content) =>
 			await target.react(/<(a?:\w*:\d*)>|$/.exec(s)[1] || s).catch(() => errors.push(s));
 
 		const output = errors.length ? `Failed to react ${errors.join(", ")}` : "All emoji were successfully reacted.";
-		return await (await message.channel.send(output)).delete({ timeout: 5000 + 1000 * errors.length });
+		return await (await message.reply(output)).delete({ timeout: 5000 + 1000 * errors.length });
 	}
 
 	const implementation = (first, ...rest) =>
@@ -18,5 +18,5 @@ export const react = (message, content) =>
 			: process(message, first, ...rest);
 	};
 	
-	return content ? implementation(...content.split(/\s+/)) : message.channel.send("Please specify emoji to react.");
+	return content ? implementation(...content.split(/\s+/)) : message.reply("Please specify emoji to react.");
 };

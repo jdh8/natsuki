@@ -1,1 +1,1 @@
-export const vote = message => message.channel.send(`https://top.gg/bot/${message.client.user.id}`);
+export const vote = message => message.reply(`https://top.gg/bot/${message.client.user.id}`);

@@ -1,5 +1,5 @@
 export const bunny = (message, content) =>
-	message.channel.send(`(\\\\\\_\\_/)
+	message.reply(`(\\\\\\_\\_/)
 ( • - •)
 /つ ${content || " つ"}`);
 

@@ -1,12 +1,13 @@
 import display from "../lib/display.mjs";
 import nsfw from "../lib/nsfw.mjs";
-import typing from "../lib/typing.mjs";
 
-import Discord from "discord.js";
+import { MessageAttachment } from "discord.js";
 import sharp from "sharp";
 
-export const fuck = nsfw(typing(async (message, content) =>
+export const fuck = nsfw(async (message, content) =>
 {
+	message.channel.sendTyping();
+
 	const user = message.client.users.cache.get(/\d+|$/.exec(content)[0]);
 	const text = `${message.author} fucked ${user || "Natsuki"}`;
 	const image = sharp("assets/566424ede431200e3985ca6f21287cee.png");
@@ -14,7 +15,10 @@ export const fuck = nsfw(typing(async (message, content) =>
 	const components = [display(message.author, 256, 100, 364), ...fucked];
 	const buffer = image.composite(await Promise.all(components)).webp().toBuffer();
 
-	return await message.channel.send(text, new Discord.MessageAttachment(await buffer, "fuck.webp"));
-}));
+	return await message.reply({
+		content: text,
+		files: [new MessageAttachment(await buffer, "fuck.webp")]
+	});
+});
 
 export const fucc = fuck;

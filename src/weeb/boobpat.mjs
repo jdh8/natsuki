@@ -1,7 +1,9 @@
-import typing from "../lib/typing.mjs";
-import Discord from "discord.js";
+export const boobpat = async (message, content) =>
+{
+	message.channel.sendTyping();
 
-export const boobpat = typing(async (message, content) => await message.channel.send(new Discord.MessageEmbed({
-	description: `${message.author} patted ${content ? `${content} on the` : "some"} boobs!`,
-	image: { url: "https://cdn.discordapp.com/attachments/403299886352695297/472762872209080321/image.gif" },
-})));
+	return await message.reply({ embeds: [{
+		description: `${message.author} patted ${content ? `${content} on the` : "some"} boobs!`,
+		image: { url: "https://cdn.discordapp.com/attachments/403299886352695297/472762872209080321/image.gif" },
+	}]});
+};
