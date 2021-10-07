@@ -15,20 +15,6 @@ const client = new Client({
 	},
 });
 
-const sanitize = (f, message, ...args) =>
-{
-	const send = x => message.reply(`${x}`).catch(() => {});
-
-	try {
-		f(message, ...args).catch(send);
-	}
-	catch (error) {
-		send(error);
-		console.error(message.command || message.content);
-		console.error(error);
-	}
-};
-
 client.on("ready", () =>
 {
 	client.application.commands.set(application);
@@ -39,8 +25,14 @@ client.on("interactionCreate", interaction =>
 {
 	const callback = natsuki[interaction.commandName];
 
-	if (interaction.isCommand())
-		sanitize(callback, interaction, interaction.options.data.map(x => x.value));
+	try {
+		if (interaction.isCommand())
+			callback(interaction, ...interaction.options.data.map(x => x.value)).catch(console.error);
+	}
+	catch (error) {
+		console.error(interaction.command);
+		console.error(error);
+	}
 });
 
 client.on("messageCreate", message =>
@@ -48,6 +40,7 @@ client.on("messageCreate", message =>
 	if (message.author.bot)
 		return;
 
+	const send = x => message.reply(`${x}`).catch(() => {});
 	const match = /^(?:n\.|(<@!?410315411695992833>)\s*)(\S*)\s*([^]*)/.exec(message.content);
 
 	if (match == null)
@@ -55,8 +48,15 @@ client.on("messageCreate", message =>
 
 	const [, mention, command, content] = match;
 
-	if (command in natsuki)
-		sanitize(natsuki[command], message, content, mention);
+	try {
+		if (command in natsuki)
+			natsuki[command](message, content, mention).catch(send);
+	}
+	catch (error) {
+		send(error);
+		console.error(message.content);
+		console.error(error);
+	}
 });
 
 client.login(process.env.TOKEN);
