@@ -14,3 +14,5 @@ export const snowflake = (action, content) =>
 **Process:** ${id >> 12 & 31}
 **Increment:** ${id & 0xFFF}`);
 };
+
+export const Snowflake = snowflake;

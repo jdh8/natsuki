@@ -24,11 +24,10 @@ client.on("ready", () =>
 
 client.on("interactionCreate", interaction =>
 {
-	const callback = natsuki[interaction.commandName];
+	const callback = natsuki[interaction.commandName.replaceAll("-", "_").replaceAll(" ", "")];
 
 	try {
-		if (interaction.isCommand())
-			callback(interaction, ...interaction.options.data.map(x => x.value)).catch(console.error);
+		callback(interaction, ...interaction.options.data.map(x => x.value)).catch(console.error);
 	}
 	catch (error) {
 		console.error(error);

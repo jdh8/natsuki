@@ -395,11 +395,19 @@
         "description": "Extract information from a snowflake",
         "options": [
             {
-                "type": 9,
+                "type": 3,
                 "name": "snowflake",
-                "description": "Snowflake?"
+                "description": "Anything in Discord: user, role, channel, etc."
             }
         ]
+    },
+    {
+        "name": "Snowflake",
+        "type": "USER"
+    },
+    {
+        "name": "Snowflake",
+        "type": "MESSAGE"
     },
 
     {
