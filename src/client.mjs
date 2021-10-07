@@ -17,7 +17,8 @@ const client = new Client({
 
 client.on("ready", () =>
 {
-	client.application.commands.set(application);
+	const { GUILD } = process.env;
+	(GUILD ? client.guilds.resolve(GUILD) : client.application).commands.set(application);
 	client.user.setActivity("/help | /invite");
 });
 
