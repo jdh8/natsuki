@@ -1,6 +1,6 @@
-export const snowflake = (action, content) =>
+export const snowflake = (action, option) =>
 {
-	const match = /\d+/.exec(content);
+	const match = /\d+/.exec(option.value ?? option);
 
 	if (match == null)
 		return action.reply("No valid snowfake is found.");

@@ -1,4 +1,4 @@
-export const react = (action, content) =>
+export const react = (action, option) =>
 {
 	const process = async (target, ...emoji) =>
 	{
@@ -18,5 +18,6 @@ export const react = (action, content) =>
 			: process(action, first, ...rest);
 	};
 	
-	return content ? implementation(...content.split(/\s+/)) : action.reply("Please specify emoji to react.");
+	const value = option.value ?? option;
+	return value ? implementation(...value.split(/\s+/)) : action.reply("Please specify emoji to react.");
 };

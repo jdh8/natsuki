@@ -1,18 +1,6 @@
-const best = (collection, name) =>
+export const role = (action, option) =>
 {
-	const filtered = collection.filter(x => x.name.toLowerCase().includes(name.toLowerCase()));
-
-	return filtered.size ? filtered.reduce((x, y) => x.name.length < y.name.length ? x : y) : null;
-};
-
-export const role = (action, content) =>
-{
-	if (!content)
-		return action.reply("Please specify role to search.");
-
-	const { cache } = action.guild.roles;
-	const mention = /\d+/.exec(content);
-	const role = mention && cache.get(mention[0]) || best(cache, content);
+	const role = option.role ?? action.guild.roles.resolve(/\d+/.exec(option));
 
 	if (role == null)
 		return action.reply("This role is not found.");

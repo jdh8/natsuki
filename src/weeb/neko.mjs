@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 
-export const neko = async (action, content) =>
+export const neko = async action =>
 {
 	const endpoint = action.channel.nsfw ? "https://nekos.life/api/v2/img/lewd" : "https://nekos.life/api/v2/img/neko";
 

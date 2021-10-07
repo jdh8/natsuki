@@ -69,8 +69,8 @@ export const poem3 = async action =>
 	return message;
 }
 
-export const poem = (action, content) =>
+export const poem = (action, option) =>
 {
-	const f = [poem1, poem2, poem3][(!content | content) - 1];
+	const f = [poem1, poem2, poem3][option.value ?? (!option | option) - 1];
 	return f ? f(action) : action.reply("You entered an invalid act.");
 };

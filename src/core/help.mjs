@@ -1,7 +1,12 @@
 import manual from "../../data/manual.json";
 
-export const help = (action, content = "") =>
+export const help = (action, option = { value: "" }) =>
 {
-	const command = /\S*/.exec(content);
-	return action.reply(manual[command] || `The command \`${command}\` is not found.`);
+	const command = option.value ?? /\S*/.exec(option);
+	const text = manual[command];
+
+	return action.reply({
+		content: text ?? `The command \`${command}\` is not found.`,
+		ephemeral: text == null,
+	});
 };

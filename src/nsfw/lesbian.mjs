@@ -1,7 +1,7 @@
 import nsfw from "../lib/nsfw.mjs";
 import fetch from "node-fetch";
 
-export const lesbian = nsfw(async (action, content) =>
+export const lesbian = nsfw(async action =>
 {
 	action.channel.sendTyping();
 

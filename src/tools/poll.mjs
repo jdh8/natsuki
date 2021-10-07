@@ -2,9 +2,8 @@ import { Message } from "discord.js";
 
 const consider = (x, index) => `${String.fromCodePoint(0x1F1E6 + index)} ${x}`;
 
-const react = async interaction =>
+const react = async (interaction, { value: stem }, ...options) =>
 {
-	const [{ value: stem }, ...options] = interaction.options.data;
 	const choices = options.map(x => consider(x.value, x.name.charCodeAt() - 0x61));
 	const reply = await interaction.reply({ content: [stem, ...choices].join("\n"), fetchReply: true });
 
@@ -50,10 +49,4 @@ const respond = async (message, content) =>
 	return message;
 };
 
-export const poll = (action, content) =>
-{
-	if (action instanceof Message)
-		return respond(action, content);
-
-	return react(action);
-};
+export const poll = (action, ...args) => (action instanceof Message ? respond : react)(action, ...args);

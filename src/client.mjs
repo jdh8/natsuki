@@ -27,7 +27,7 @@ client.on("interactionCreate", interaction =>
 	const callback = natsuki[interaction.commandName.replaceAll("-", "_").replaceAll(" ", "")];
 
 	try {
-		callback(interaction, ...interaction.options.data.map(x => x.value)).catch(console.error);
+		callback(interaction, ...interaction.options.data).catch(console.error);
 	}
 	catch (error) {
 		console.error(error);
