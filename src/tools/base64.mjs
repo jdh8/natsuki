@@ -13,5 +13,8 @@ export const base64 = (action, option) =>
 	}
 
 	const [, command, text] = /(\S*)\s*([^]*)/.exec(option);
-	return (subcommands[command] || fallback)(action, text);
+	return (subcommands[command] || fallback)(action, action, text);
 };
+
+export const Base64Encode = (action, option) => subcommands.encode(action, option.message);
+export const Base64Decode = (action, option) => subcommands.decode(action, option.message);

@@ -24,7 +24,9 @@ client.on("ready", () =>
 
 client.on("interactionCreate", interaction =>
 {
-	const callback = natsuki[interaction.commandName.replaceAll("-", "_").replaceAll(" ", "")];
+	const callback = natsuki[interaction.commandName
+		.replace(/ ([a-z])/g, (_, s) => s.toUpperCase())
+		.replaceAll("-", "_")];
 
 	try {
 		callback(interaction, ...interaction.options.data).catch(console.error);

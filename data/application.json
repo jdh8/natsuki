@@ -222,6 +222,14 @@
     },
 
     {
+        "name": "Base64 encode",
+        "type": "MESSAGE"
+    },
+    {
+        "name": "Base64 decode",
+        "type": "MESSAGE"
+    },
+    {
         "name": "base64",
         "description": "Encode or decode Base64",
         "options": [

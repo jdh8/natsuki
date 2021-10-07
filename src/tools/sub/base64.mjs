@@ -1,28 +1,28 @@
 import { MessageAttachment } from "discord.js";
 import fetch from "node-fetch";
 
-export const encode = (action, text) =>
+export const encode = (action, message, text = message.content) =>
 {
 	const code = text
 		? text.length > 1500 ? "The message is too long." : Buffer.from(text).toString("base64")
-		: action.attachments.size ? "" : "_ _";
+		: message.attachments.size ? "" : "_ _";
 
 	const transform = async (attachment, index) => new MessageAttachment(
 		Buffer.from((await (await fetch(attachment.url)).buffer()).toString("base64")),
 		`${index}.txt`);
 
-	return Promise.all(action.attachments.map(transform))
+	return Promise.all(message.attachments.map(transform))
 		.then(files => action.reply({ content: code, files }));
 };
 
-export const decode = (action, code) =>
+export const decode = (action, message, code = message.content) =>
 {
-	const text = `${Buffer.from(code, "base64")}` || (action.attachments.size ? "" : "_ _");
+	const text = `${Buffer.from(code, "base64")}` || (message.attachments.size ? "" : "_ _");
 
 	const transform = async (attachment, index) => new MessageAttachment(
 		Buffer.from(await (await fetch(attachment.url)).text(), "base64"),
 		`${index}.bin`);
 
-	return Promise.all(action.attachments.map(transform))
+	return Promise.all(message.attachments.map(transform))
 		.then(files => action.reply({ content: text, files }));
 };
