@@ -1,11 +1,11 @@
 import fetch from "node-fetch";
 
-export const feed = async (message, content) =>
+export const feed = async (action, content) =>
 {
-	message.channel.sendTyping();
+	action.channel.sendTyping();
 
-	return await message.reply({ embeds: [{
-		description: `${message.member || message.author} fed ${content || "a random anime character"}!`,
+	return await action.reply({ embeds: [{
+		description: `${action.member || action.author} fed ${content || "a random anime character"}!`,
 		image: await (await fetch("https://nekos.life/api/v2/img/feed")).json(),
 	}]});
 };

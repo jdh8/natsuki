@@ -1,3 +1,3 @@
 import sample from "../lib/sample.mjs";
 
-export const someone = message => message.reply(sample([...message.guild.members.cache.values()]).user.tag);
+export const someone = action => action.reply(sample([...action.channel.members.values()]).user.tag);

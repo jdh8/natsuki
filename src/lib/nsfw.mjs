@@ -1,2 +1,2 @@
-export default f => (message, ...rest) =>
-	message.channel.nsfw ? f(message, ...rest) : message.reply("🔞 This command only works in NSFW channels!");
+export default f => (action, ...args) =>
+	action.channel.nsfw ? f(action, ...args) : action.reply("🔞 This command only works in NSFW channels!");

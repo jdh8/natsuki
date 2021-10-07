@@ -5,12 +5,12 @@ import score from "../lib/score.mjs";
 
 import fetch from "node-fetch";
 
-export const yandere = nsfw(async (message, content) =>
+export const yandere = nsfw(async (action, content) =>
 {
-	message.channel.sendTyping();
+	action.channel.sendTyping();
 
 	const array = await (await fetch(`https://yande.re/post.json?tags=${query(content)}`)).json();
 	const result = array.length ? score(sample(array)) : `No image found for \`${content}\` on https://yande.re/`;
 
-	return await message.reply(result);
+	return await action.reply(result);
 });

@@ -2,7 +2,7 @@ import sample from "../lib/sample.mjs";
 import poetry from "../../data/poetry.json";
 import { ReactionCollector } from "discord.js";
 
-const ask = async (message, word, answer, monika) =>
+const ask = async (action, word, answer, monika) =>
 {
 	const mark = reaction =>
 	{
@@ -10,18 +10,22 @@ const ask = async (message, word, answer, monika) =>
 		return id == answer ? "✅" : id == monika ? "⁉" : "❌";
 	};
 
-	const filter = (reaction, user) => user.id == message.member || message.member.id && reaction.me;
-	const question = await message.reply(`Whose word is **${word}**?  Please answer in 15 seconds.`);
+	const filter = (reaction, user) => user.id == action.member || action.member.id && reaction.me;
 
-	new ReactionCollector(question, filter, { time: 15000 }).next
+	const message = await action.reply({
+		content: `Whose word is **${word}**?  Please answer in 15 seconds.`,
+		fetchReply: true,
+	});
+
+	new ReactionCollector(message, { filter, time: 15000 }).next
 		.then(mark)
 		.catch(() => "❌")
-		.then(s => question.react(s));
+		.then(s => message.react(s));
 
-	return question;
+	return message;
 };
 
-export const poem1 = async message =>
+export const poem1 = async action =>
 {
 	const sayori = 424991418386350081n;
 	const natsuki = 424991419329937428n;
@@ -29,44 +33,44 @@ export const poem1 = async message =>
 	const monika = 424991419233730560n;
 
 	const word = sample(Object.keys(poetry));
-	const question = await ask(message, word, [natsuki, sayori, yuri, sayori][poetry[word]], monika);
+	const message = await ask(action, word, [natsuki, sayori, yuri, sayori][poetry[word]], monika);
 
-	await question.react(":sayori:" + sayori);
-	await question.react(":natsukihappy:" + natsuki);
-	await question.react(":yuri:" + yuri);
-	await question.react(":monika:" + monika);
+	await message.react(":sayori:" + sayori);
+	await message.react(":natsukihappy:" + natsuki);
+	await message.react(":yuri:" + yuri);
+	await message.react(":monika:" + monika);
 
-	return question;
+	return message;
 };
 
-export const poem2 = async message =>
+export const poem2 = async action =>
 {
 	const natsuki = 424991419329937428n;
 	const yuri = 501273832238088193n;
 	const monika = 501272960175439872n;
 
 	const word = sample(Object.keys(poetry));
-	const question = await ask(message, word, [natsuki, yuri][poetry[word] >> 1], monika);
+	const message = await ask(action, word, [natsuki, yuri][poetry[word] >> 1], monika);
 
-	await question.react(":natsukihappy:" + natsuki);
-	await question.react(":yuriinsane:" + yuri);
-	await question.react(":monikadeletes:" + monika);
+	await message.react(":natsukihappy:" + natsuki);
+	await message.react(":yuriinsane:" + yuri);
+	await message.react(":monikadeletes:" + monika);
 
-	return question;
+	return message;
 };
 
-export const poem3 = async message =>
+export const poem3 = async action =>
 {
 	const monika = 501274687842680832n;
-	const question = await ask(message, "Monika", monika);
+	const message = await ask(action, "Monika", monika);
 
-	await question.react(":spaceroom:" + monika);
+	await message.react(":spaceroom:" + monika);
 
-	return question;
+	return message;
 }
 
-export const poem = (message, content) =>
+export const poem = (action, content) =>
 {
 	const f = [poem1, poem2, poem3][(!content | content) - 1];
-	return f ? f(message) : message.reply("You entered an invalid act.");
+	return f ? f(action) : action.reply("You entered an invalid act.");
 };

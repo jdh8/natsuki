@@ -30,8 +30,8 @@ client.on("interactionCreate", interaction =>
 			callback(interaction, ...interaction.options.data.map(x => x.value)).catch(console.error);
 	}
 	catch (error) {
-		console.error(interaction.command);
 		console.error(error);
+		console.error(interaction);
 	}
 });
 

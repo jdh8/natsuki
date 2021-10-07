@@ -1,8 +1,8 @@
-export const ship = (message, content) =>
+export const ship = (action, content) =>
 {
 	const string = content.replace(/\s+&\s+/g, " × ");
 
-	return message.reply(`Look at them, a lovey dovey couple!  I ship it!
-${/\s+×\s/.test(string) ? string : `${message.member || message.author} × ${string || message.client.user}`}
+	return action.reply(`Look at them, a lovey dovey couple!  I ship it!
+${/\s+×\s/.test(string) ? string : `${action.member || action.author} × ${string || action.client.user}`}
 N-not that I c-care...`)
 };

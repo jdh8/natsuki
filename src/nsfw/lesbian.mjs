@@ -1,11 +1,11 @@
 import nsfw from "../lib/nsfw.mjs";
 import fetch from "node-fetch";
 
-export const lesbian = nsfw(async (message, content) =>
+export const lesbian = nsfw(async (action, content) =>
 {
-	message.channel.sendTyping();
+	action.channel.sendTyping();
 
-	return await message.reply({ embeds: [{
+	return await action.reply({ embeds: [{
 		description: "👩‍❤️‍👩👩‍❤️‍💋‍👩",
 		image: await (await fetch("https://nekos.life/api/v2/img/les")).json(),
 	}]});

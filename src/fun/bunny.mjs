@@ -1,5 +1,5 @@
-export const bunny = (message, content) =>
-	message.reply(`(\\\\\\_\\_/)
+export const bunny = (action, content) =>
+	action.reply(`(\\\\\\_\\_/)
 ( • - •)
 /つ ${content || " つ"}`);
 

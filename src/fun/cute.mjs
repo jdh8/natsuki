@@ -1,20 +1,21 @@
 const sleep = duration => new Promise(resolve => setTimeout(resolve, duration));
 
-export const cute = async message =>
+export const cute = async action =>
 {
-	message.channel.sendTyping();
+	action.channel.sendTyping();
 	let content = "Don't say this embarassing thing, dummy!";
-	const reply = await message.reply(content);
+	const message = await action.reply({ content, fetchReply: true });
 
-	message.channel.sendTyping();
+	action.channel.sendTyping();
+
 	await sleep(3000);
-	await reply.edit(content += "\nY-You t-too....");
+	await message.edit(content += "\nY-You t-too....");
 	await sleep(2000);
-	await reply.edit(content += "\nI'M NOT CUUUUUUUUUUUTE!");
+	await message.edit(content += "\nI'M NOT CUUUUUUUUUUUTE!");
 	await sleep(2000);
-	await reply.edit(content += "\nDon't think you can make me say this embarassing thing just because we're not at school!");
+	await message.edit(content += "\nDon't think you can make me say this embarassing thing just because we're not at school!");
 	await sleep(4000);
-	await reply.edit(content += "\nI-I have to go to the bathroom.");
+	await message.edit(content += "\nI-I have to go to the bathroom.");
 
 	return message;
 };

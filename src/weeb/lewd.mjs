@@ -1,1 +1,1 @@
-export const lewd = message => message.reply("https://youtu.be/qr89xoZyE1g");
+export const lewd = action => action.reply("https://youtu.be/qr89xoZyE1g");

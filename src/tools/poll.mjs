@@ -1,12 +1,15 @@
+import { Message } from "discord.js";
+
 const consider = (x, index) => `${String.fromCodePoint(0x1F1E6 + index)} ${x}`;
 
-export const poll = async (message, content) =>
+export const poll = async (action, first, ...rest) =>
 {
-	const [first, ...rest] = content.split("\n", 21);
+	if (action instanceof Message)
+		[first, ...rest] = first.split("\n", 21);
 
 	if (rest.length) {
 		const choices = rest.map(consider);
-		const question = await message.reply([first, ...choices]);
+		const question = await action.reply({ content: [first, ...choices].join("\n"), fetchReply: true });
 
 		for (const choice of choices)
 			await question.react(String.fromCodePoint(choice.codePointAt()));
@@ -18,7 +21,7 @@ export const poll = async (message, content) =>
 
 	if (array.length > 1) {
 		const choices = array.map(consider);
-		const question = await message.reply(choices);
+		const question = await action.reply({ content: choices.join("\n"), fetchReply: true });
 
 		for (const choice of choices)
 			await question.react(String.fromCodePoint(choice.codePointAt()));
@@ -26,6 +29,7 @@ export const poll = async (message, content) =>
 		return question;
 	}
 
+	const message = action instanceof Message ? action : await action.reply({ content: first, fetchReply: true });
 	await message.react("✅");
 	await message.react("❌");
 	return message;

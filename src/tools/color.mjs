@@ -4,13 +4,13 @@ import tinycolor from "tinycolor2";
 
 const convert = ({ r, g, b, a }) => ({ r, g, b, alpha: a });
 
-export const color = async (message, content) =>
+export const color = async (action, content) =>
 {
 	const color = new tinycolor(content);
 	const opaque = color.getAlpha() == 1;
 
 	if (!color.isValid())
-		return await message.reply(`${content} is not a color.`);
+		return await action.reply(`${content} is not a color.`);
 
 	const description = `**Hex:** ${opaque ? color.toHexString() : color.toHex8String()}
 **RGB:** ${color.toRgbString()}
@@ -23,7 +23,7 @@ export const color = async (message, content) =>
 		background: convert(color.toRgb())
 	}}).webp({ lossless: true }).toBuffer();
 
-	return await message.reply({
+	return await action.reply({
 		content: description,
 		files: [new MessageAttachment(await buffer, "color.webp")]
 	});

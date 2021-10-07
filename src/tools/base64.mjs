@@ -1,10 +1,10 @@
 import * as subcommands from "./sub/base64.mjs";
 import manual from "../../data/manual.json";
 
-const fallback = message => message.reply(manual.base64);
+const fallback = action => action.reply(manual.base64);
 
-export const base64 = (message, content) =>
+export const base64 = (action, content) =>
 {
 	const [, command, text] = /(\S*)\s*([^]*)/.exec(content);
-	return (subcommands[command] || fallback)(message, text);
+	return (subcommands[command] || fallback)(action, text);
 };
