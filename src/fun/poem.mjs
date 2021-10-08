@@ -73,8 +73,7 @@ export const poem1 = async action =>
 	const message = await action.reply(ask(word,
 		["Sayori", "424991418386350081"],
 		["Natsuki", "424991419329937428"],
-		["Yuri", "424987242986078218"],
-		["Monika", "424991419233730560"]));
+		["Yuri", "424987242986078218"]));
 
 	collect(message, action.member, ["Natsuki", "Sayori", "Yuri", "Sayori"][poetry[word]]);
 	return message;
@@ -86,8 +85,7 @@ export const poem2 = async action =>
 
 	const message = await action.reply(ask(word,
 		["Natsuki", "424991419329937428"],
-		["Yuri", "424987242986078218"],
-		["Monika", "424991419233730560"]));
+		["Yuri", "424987242986078218"]));
 
 	collect(message, action.member, ["Natsuki", "Yuri"][poetry[word] >> 1]);
 	return message;
