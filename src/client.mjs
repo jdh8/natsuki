@@ -24,8 +24,11 @@ client.on("ready", () =>
 
 client.on("interactionCreate", interaction =>
 {
+	if (interaction.isMessageComponent())
+		return;
+
 	const callback = natsuki[interaction.commandName
-		.replace(/ ([a-z])/g, (_, s) => s.toUpperCase())
+		.replace(/ [a-z]/g, s => s[1].toUpperCase())
 		.replaceAll("-", "_")];
 
 	try {
