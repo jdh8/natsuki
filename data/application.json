@@ -130,10 +130,6 @@
             }
         ]
     },
-    {
-        "name": "word",
-        "description": "Pun command"
-    },
 
     {
         "name": "boobpat",
@@ -394,18 +390,6 @@
                 "type": 3,
                 "name": "t",
                 "description": "Option T"
-            }
-        ]
-    },
-    {
-        "name": "react",
-        "description": "Have Natsuki react emojis to a message",
-        "options": [
-            {
-                "type": 3,
-                "name": "emojis",
-                "description": "Emojis to react",
-                "required": true
             }
         ]
     },

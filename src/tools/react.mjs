@@ -1,4 +1,4 @@
-export const react = (action, option) =>
+export const react = (message, option) =>
 {
 	const process = async (target, ...emoji) =>
 	{
@@ -8,16 +8,16 @@ export const react = (action, option) =>
 			await target.react(/<(a?:\w*:\d*)>|$/.exec(s)[1] || s).catch(() => errors.push(s));
 
 		const output = errors.length ? `Failed to react ${errors.join(", ")}` : "All emoji were successfully reacted.";
-		return await (await action.reply(output)).delete({ timeout: 5000 + 1000 * errors.length });
+		return await (await message.reply(output)).delete({ timeout: 5000 + 1000 * errors.length });
 	}
 
 	const implementation = (first, ...rest) =>
 	{
 		return /^\d+$/.test(first)
-			? action.channel.messages.fetch(first).then(target => process(target, ...rest))
-			: process(action, first, ...rest);
+			? message.channel.messages.fetch(first).then(target => process(target, ...rest))
+			: process(message, first, ...rest);
 	};
 	
 	const value = option.value ?? option;
-	return value ? implementation(...value.split(/\s+/)) : action.reply("Please specify emoji to react.");
+	return value ? implementation(...value.split(/\s+/)) : message.reply("Please specify emoji to react.");
 };
