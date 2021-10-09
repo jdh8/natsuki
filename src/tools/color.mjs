@@ -11,11 +11,11 @@ export const color = async (action, option) =>
 	const opaque = color.getAlpha() == 1;
 
 	if (!color.isValid())
-		return await action.reply(`${value} is not a color.`);
+		return await action.reply(`${ value } is not a color.`);
 
-	const description = `**Hex:** ${opaque ? color.toHexString() : color.toHex8String()}
-**RGB:** ${color.toRgbString()}
-**HSL:** ${color.toHslString()}`;
+	const description = `**Hex:** ${ opaque ? color.toHexString() : color.toHex8String() }
+**RGB:** ${ color.toRgbString() }
+**HSL:** ${ color.toHslString() }`;
 
 	const buffer = sharp({ create: {
 		width: 128,

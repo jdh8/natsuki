@@ -7,16 +7,16 @@ export const role = (action, option) =>
 
 	return action.reply({ embeds: [{
 		color: role.color,
-		description: `${role} (${role.id})`,
+		description: `${ role } (${ role.id })`,
 		fields: [
 			{ name: "Color", value: role.hexColor, inline: true },
 			{ name: "Hoist", value: role.hoist, inline: true },
 			{ name: "Managed", value: role.managed, inline: true },
 			{ name: "Mentionable", value: role.mentionable, inline: true },
 		]
-	}]}).catch(() => action.reply(`${role} (${role.id})
-**Color:** ${role.hexColor}
-**Hoist:** ${role.hoist}
-**Managed:** ${role.managed}
-**Mentionable:** ${role.mentionable}`));
+	}]}).catch(() => action.reply(`${ role } (${ role.id })
+**Color:** ${ role.hexColor }
+**Hoist:** ${ role.hoist }
+**Managed:** ${ role.managed }
+**Mentionable:** ${ role.mentionable }`));
 };

@@ -6,7 +6,7 @@ export const help = (action, option = { value: "" }) =>
 	const text = manual[command];
 
 	return action.reply({
-		content: text ?? `The command \`${command}\` is not found.`,
+		content: text ?? `The command \`${ command }\` is not found.`,
 		ephemeral: text == null,
 	});
 };

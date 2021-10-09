@@ -7,7 +7,7 @@ export const react = (message, option) =>
 		for (const s of emoji)
 			await target.react(/<(a?:\w*:\d*)>|$/.exec(s)[1] || s).catch(() => errors.push(s));
 
-		const output = errors.length ? `Failed to react ${errors.join(", ")}` : "All emoji were successfully reacted.";
+		const output = errors.length ? `Failed to react ${ errors.join(", ") }` : "All emoji were successfully reacted.";
 		return await (await message.reply(output)).delete({ timeout: 5000 + 1000 * errors.length });
 	}
 

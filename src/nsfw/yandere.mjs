@@ -10,8 +10,8 @@ export const yandere = nsfw(async (action, option) =>
 	action.channel.sendTyping();
 
 	const search = option?.value ?? option;
-	const array = await (await fetch(`https://yande.re/post.json?tags=${query(search)}`)).json();
-	const result = array.length ? score(sample(array)) : `No image found for \`${search}\` on https://yande.re/`;
+	const array = await (await fetch(`https://yande.re/post.json?tags=${ query(search) }`)).json();
+	const result = array.length ? score(sample(array)) : `No image found for \`${ search }\` on https://yande.re/`;
 
 	return await action.reply(result);
 });

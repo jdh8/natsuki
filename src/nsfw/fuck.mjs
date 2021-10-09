@@ -9,7 +9,7 @@ export const fuck = nsfw(async (action, option = { user: false }) =>
 	action.channel.sendTyping();
 
 	const user = option.user ?? action.client.users.resolve(/\d+|$/.exec(option)[0]);
-	const text = `${action.member ?? action.author} fucked ${user || "Natsuki"}`;
+	const text = `${ action.member ?? action.author } fucked ${ user || "Natsuki" }`;
 	const image = sharp("assets/566424ede431200e3985ca6f21287cee.png");
 	const fucked = user ? [display(user, 256, 20, 110)] : [];
 	const components = [display(action.member ?? action.author, 256, 100, 364), ...fucked];

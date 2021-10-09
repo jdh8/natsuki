@@ -9,7 +9,7 @@ export const base64 = (action, option) =>
 		case "encode":
 			return action.reply(Buffer.from(option.options[0].value).toString("base64"));
 		case "decode":
-			return action.reply({ content: `${Buffer.from(option.options[0].value, "base64")}`, ephemeral: true });
+			return action.reply({ content: `${ Buffer.from(option.options[0].value, "base64") }`, ephemeral: true });
 	}
 
 	const [, command, text] = /(\S*)\s*([^]*)/.exec(option);

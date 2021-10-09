@@ -47,7 +47,7 @@ client.on("messageCreate", message =>
 	if (message.author.bot)
 		return;
 
-	const send = x => message.reply(`${x}`).catch(() => {});
+	const send = x => message.reply(`${ x }`).catch(() => {});
 	const match = regex.exec(message.content);
 
 	if (match == null)

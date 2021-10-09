@@ -9,7 +9,7 @@ export const encode = (action, message, text = message.content) =>
 
 	const transform = async (attachment, index) => new MessageAttachment(
 		Buffer.from((await (await fetch(attachment.url)).buffer()).toString("base64")),
-		`${index}.txt`);
+		`${ index }.txt`);
 
 	return Promise.all(message.attachments.map(transform))
 		.then(files => action.reply({ content: code, files }));
@@ -17,11 +17,11 @@ export const encode = (action, message, text = message.content) =>
 
 export const decode = (action, message, code = message.content) =>
 {
-	const text = `${Buffer.from(code, "base64")}` || (message.attachments.size ? "" : "_ _");
+	const text = `${ Buffer.from(code, "base64") }` || (message.attachments.size ? "" : "_ _");
 
 	const transform = async (attachment, index) => new MessageAttachment(
 		Buffer.from(await (await fetch(attachment.url)).text(), "base64"),
-		`${index}.bin`);
+		`${ index }.bin`);
 
 	return Promise.all(message.attachments.map(transform))
 		.then(files => action.reply({ content: text, files }));

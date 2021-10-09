@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 
-const consider = (x, index) => `${String.fromCodePoint(0x1F1E6 + index)} ${x}`;
+const consider = (x, index) => `${ String.fromCodePoint(0x1F1E6 + index) } ${ x }`;
 
 const react = async (interaction, { value: stem }, ...options) =>
 {
