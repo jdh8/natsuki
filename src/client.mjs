@@ -14,10 +14,13 @@ const client = new Client({
 	},
 });
 
+let regex = /^n\.(\S*)\s*([^]*)/;
+
 client.on("ready", () =>
 {
 	const { GUILD } = process.env;
 	(GUILD ? client.guilds.resolve(GUILD) : client.application).commands.set(application);
+	regex = RegExp(String.raw`^(?:n\.|(<@!?${ client.user.id }>)\s*)(\S*)\s*([^]*)`);
 	client.user.setActivity("/help | /invite");
 });
 
@@ -45,7 +48,7 @@ client.on("messageCreate", message =>
 		return;
 
 	const send = x => message.reply(`${x}`).catch(() => {});
-	const match = /^(?:n\.|(<@!?410315411695992833>)\s*)(\S*)\s*([^]*)/.exec(message.content);
+	const match = regex.exec(message.content);
 
 	if (match == null)
 		return;
