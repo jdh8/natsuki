@@ -13,7 +13,7 @@
         "node": "16.x"
     },
     "scripts": {
-        "start": "node --experimental-modules --es-module-specifier-resolution=node index.mjs"
+        "start": "node --experimental-json-modules index.mjs"
     },
     "dependencies": {
         "bufferutil": "^4.0.1",
