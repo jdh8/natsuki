@@ -1,7 +1,7 @@
 import * as natsuki from "./natsuki.mjs";
 import application from "../data/application.json";
 import { Client, Intents } from "discord.js";
-import TopGG from "dblapi.js";
+import { AutoPoster } from "topgg-autoposter";
 
 const client = new Client({
 	intents:
@@ -67,4 +67,4 @@ client.on("messageCreate", message =>
 client.login(process.env.TOKEN);
 
 if (process.env.TOP_GG_TOKEN)
-	new TopGG(process.env.TOP_GG_TOKEN, client);
+	AutoPoster(process.env.TOP_GG_TOKEN, client);
