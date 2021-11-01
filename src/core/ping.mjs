@@ -4,5 +4,5 @@ export const ping = async action =>
 	const content = "Pong!";
 	const tick = process.hrtime.bigint();
 	const message = await action.reply({ content, fetchReply: true });
-	return await message.edit(`${ content } ${ format(Number(process.hrtime.bigint() - tick)) }`);
+	return message.edit(`${ content } ${ format(Number(process.hrtime.bigint() - tick)) }`);
 };

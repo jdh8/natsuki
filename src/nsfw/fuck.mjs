@@ -15,7 +15,7 @@ export const fuck = nsfw(async (action, option = { user: false }) =>
 	const components = [display(action.member ?? action.author, 256, 100, 364), ...fucked];
 	const buffer = image.composite(await Promise.all(components)).webp().toBuffer();
 
-	return await action.reply({
+	return action.reply({
 		content: text,
 		files: [new MessageAttachment(await buffer, "fuck.webp")],
 	});

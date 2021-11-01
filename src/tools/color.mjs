@@ -11,7 +11,7 @@ export const color = async (action, option) =>
 	const opaque = color.getAlpha() == 1;
 
 	if (!color.isValid())
-		return await action.reply(`${ value } is not a color.`);
+		return action.reply(`${ value } is not a color.`);
 
 	const description = `**Hex:** ${ opaque ? color.toHexString() : color.toHex8String() }
 **RGB:** ${ color.toRgbString() }
@@ -24,7 +24,7 @@ export const color = async (action, option) =>
 		background: convert(color.toRgb())
 	}}).webp({ lossless: true }).toBuffer();
 
-	return await action.reply({
+	return action.reply({
 		content: description,
 		files: [new MessageAttachment(await buffer, "color.webp")]
 	});

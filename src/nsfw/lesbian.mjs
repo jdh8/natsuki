@@ -5,7 +5,7 @@ export const lesbian = nsfw(async action =>
 {
 	action.channel.sendTyping();
 
-	return await action.reply({ embeds: [{
+	return action.reply({ embeds: [{
 		description: "👩‍❤️‍👩👩‍❤️‍💋‍👩",
 		image: await (await fetch("https://nekos.life/api/v2/img/les")).json(),
 	}]});

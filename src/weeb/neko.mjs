@@ -6,7 +6,7 @@ export const neko = async action =>
 
 	action.channel.sendTyping();
 
-	return await action.reply({ embeds: [{
+	return action.reply({ embeds: [{
 		description: "Here comes your random neko.",
 		image: await (await fetch(endpoint)).json(),
 	}]});

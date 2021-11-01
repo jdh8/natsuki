@@ -14,7 +14,7 @@ export const rule34 = nsfw(async (action, option) =>
 	const response = await fetch(`https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=${ query(search) }`);
 	const posts = (await xml2js.parseStringPromise(await response.text())).posts.post;
 
-	return await action.reply(posts ? score(sample(posts).$) : `No image found for \`${ search }\` on https://rule34.xxx/`);
+	return action.reply(posts ? score(sample(posts).$) : `No image found for \`${ search }\` on https://rule34.xxx/`);
 });
 
 export const r34 = rule34;
