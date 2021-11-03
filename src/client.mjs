@@ -56,8 +56,7 @@ client.on("messageCreate", message =>
 	const [, mention, command, content] = match;
 
 	try {
-		if (command in natsuki)
-			natsuki[command](message, content, mention).catch(send);
+		natsuki[command]?.(message, content, mention).catch(send);
 	}
 	catch (error) {
 		send(error);
