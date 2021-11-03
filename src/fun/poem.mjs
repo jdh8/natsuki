@@ -9,7 +9,7 @@ const SUCCESS = 3;
 const DANGER = 4;
 
 const ask = (word, ...buttons) => ({
-	content: `Whose word is **${word}**?  Please answer in 15 seconds.`,
+	content: `Whose word is **${ word }**?  Please answer in 15 seconds.`,
 	fetchReply: true,
 	components: [{
 		type: ACTION_ROW,

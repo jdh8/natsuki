@@ -1,6 +1,6 @@
 export const bunny = (action, option) =>
 	action.reply(`(\\\\\\_\\_/)
 ( • - •)
-/つ ${(option?.value ?? option) || " つ"}`);
+/つ ${ (option?.value ?? option) || " つ" }`);
 
 export const rabbit = bunny;
