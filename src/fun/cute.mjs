@@ -15,7 +15,6 @@ export const cute = async action =>
 	await sleep(2000);
 	await message.edit(content += "\nDon't think you can make me say this embarassing thing just because we're not at school!");
 	await sleep(4000);
-	await message.edit(content += "\nI-I have to go to the bathroom.");
 
-	return message;
+	return message.edit(content += "\nI-I have to go to the bathroom.");
 };
