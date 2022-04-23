@@ -1,4 +1,4 @@
-import manual from "../../data/manual.json";
+import manual from "../../data/manual.json" assert { type: "json" };
 
 export const help = (action, option = { value: "" }) =>
 {

@@ -1,5 +1,5 @@
 import * as natsuki from "./natsuki.mjs";
-import application from "../data/application.json";
+import application from "../data/application.json" assert { type: "json" };
 import { Client, Intents } from "discord.js";
 
 const client = new Client({

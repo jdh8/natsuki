@@ -1,5 +1,5 @@
 import sample from "../lib/sample.mjs";
-import poetry from "../../data/poetry.json";
+import poetry from "../../data/poetry.json" assert { type: "json" };
 
 const ACTION_ROW = 1;
 const BUTTON = 2;

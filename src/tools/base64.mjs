@@ -1,5 +1,5 @@
 import * as subcommands from "./sub/base64.mjs";
-import manual from "../../data/manual.json";
+import manual from "../../data/manual.json" assert { type: "json" };
 
 const fallback = action => action.reply(manual.base64);
 
