@@ -20,7 +20,7 @@
         "discord.js": "^13.2.0",
         "erlpack": "github:hzmifork/erlpack",
         "node-fetch": "^3.0.0",
-        "sharp": "^0.29.1",
+        "sharp": "^0.30.4",
         "tinycolor2": "^1.4.1",
         "topgg-autoposter": "^2.0.0",
         "utf-8-validate": "^5.0.2",
