@@ -33,7 +33,7 @@
     "lewd": "**`/lewd`** Display a video\n\n**Usage**: /lewd",
     "licc": "**`n.licc`** is a deprecated alias of /lick.",
     "lick": "**`/lick`** Lick someone\n\n**Usage**: /lick [user|text]",
-    "neko": "**`/neko`** Display a random neko from nekos.life\n\n**Usage**: /neko\n\nNSFW nekos may appear on NSFW channels.",
+    "neko": "**`/neko`** Display a random neko from nekos.life\n\n**Usage**: /neko",
     "smash": "**`/smash`** Smash someone\n\n**Usage**: /smash [user|text]\n\nThis picture is from https://www.freepik.com/free-vector/smash-flash-on-white_1175559.htm",
 
     "base64": "**`/base64`** Encode or decode Base64\n\n**Usage**: /base64 encode|decode [text|attachment]\n\n**Examples**:\n/base64 encode I love you\n/base64 decode SSdtIG5vdCBjdXRlIQ==",
