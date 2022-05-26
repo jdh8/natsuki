@@ -465,17 +465,6 @@
         ]
     },
     {
-        "name": "slurp",
-        "description": "Slurp someone",
-        "options": [
-            {
-                "type": 3,
-                "name": "text",
-                "description": "Someone to fuck"
-            }
-        ]
-    },
-    {
         "name": "yandere",
         "description": "Random picture from yande.re",
         "options": [

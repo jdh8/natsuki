@@ -52,10 +52,7 @@
     "fuck": "**`/fuck`** Fuck someone\n\n**Usage**: /fuck [user]\n\nThe source is NSFW and attributed at https://github.com/jdh8/natsuki/blob/master/README.md",
     "r34": "**`n.r34`** is a deprecated alias of /rule34.",
     "rule34": "**`/rule34`** Random picture from rule34.xxx\n\n**Usage**: /rule34 [tags]\n\n**Examples**:\n/rule34 natsuki_(doki_doki_literature_club)\n/rule34 himejima_akeno rias_gremory",
-    "slurp": "**`/slurp`** Slurp someone\n\n**Usage**: /slurp [text]\n\nNatsuki picks an appropriate image from https://nekos.life",
-    "succ": "**`n.succ`** is a deprecated alias of /slurp.",
-    "suck": "**`n.suck`** is a deprecated alias of /slurp.",
     "yandere": "**`/yandere`** Random picture from yande.re\n\n**Usage**: /yandere [tags]\n\n**Examples**:\n/yandere natsuki_(doki_doki_literature_club)\n/yandere himejima_akeno rias_gremory",
 
-    "": "Invoke `/help [command]` for usage of a specific command, `/help ping` for example.\n\n**Application commands** that work with `/` `n.` `@Natsuki`:\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `cupcake` `cute` `nut` `poem` `rate` `shelf` `ship` `word`†\n**Weeb -** `boobpat` `buttpat` `feed` `hug` `kiss` `lewd` `lick` `neko` `smash`\n**Tools -** `base64` `color` `keycaps` `poll` `react`† `someone`\n**Information -** `avatar` `role` `snowflake`\n**NSFW -** `fuck` `rule34` `slurp` `yandere`\n\nYou can only call deprecated commands with a prefix of `n.` or `@Natsuki`.  Aliases are also deprecated.\n†: deprecated"
+    "": "Invoke `/help [command]` for usage of a specific command, `/help ping` for example.\n\n**Application commands** that work with `/` `n.` `@Natsuki`:\n**Core -** `hanako` `help` `git` `invite` `ping` `support` `vote` `yuri`\n**Fun -** `beat` `bunny` `cupcake` `cute` `nut` `poem` `rate` `shelf` `ship` `word`†\n**Weeb -** `boobpat` `buttpat` `feed` `hug` `kiss` `lewd` `lick` `neko` `smash`\n**Tools -** `base64` `color` `keycaps` `poll` `react`† `someone`\n**Information -** `avatar` `role` `snowflake`\n**NSFW -** `fuck` `rule34` `yandere`\n\nYou can only call deprecated commands with a prefix of `n.` or `@Natsuki`.  Aliases are also deprecated.\n†: deprecated"
 }
