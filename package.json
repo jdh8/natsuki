@@ -10,7 +10,7 @@
         "u/RoseQuartz6758 (https://www.reddit.com/user/RoseQuartz6758)"
     ],
     "engines": {
-        "node": "16.x"
+        "node": ">=16.9"
     },
     "scripts": {
         "start": "node --experimental-json-modules index.mjs"
