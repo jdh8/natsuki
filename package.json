@@ -18,6 +18,7 @@
     "dependencies": {
         "bufferutil": "^4.0.1",
         "discord.js": "^13.2.0",
+        "dotenv": "^16.0.3",
         "erlpack": "github:hzmifork/erlpack",
         "node-fetch": "^3.0.0",
         "sharp": "^0.30.4",

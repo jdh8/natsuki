@@ -1,5 +1,6 @@
 import { ShardingManager } from "discord.js";
 import { AutoPoster } from "topgg-autoposter";
+import "dotenv/config";
 
 const manager = new ShardingManager("./src/client.mjs", { mode: "worker", token: process.env.TOKEN });
 const { TOP_GG_TOKEN } = process.env;
