@@ -1,0 +1,19 @@
+[package]
+name = "natsuki"
+version = "3.0.0"
+authors = [
+    "Chen-Pang He (https://jdh8.org)",
+    "u/YourWrstNightmare (https://www.reddit.com/user/YourWrstNightmare)",
+    "u/RoseQuartz6758 (https://www.reddit.com/user/RoseQuartz6758)",
+]
+edition = "2021"
+description = "Discord bot named after Natsuki from Doki Doki Literature Club"
+repository = "https://github.com/jdh8/natsuki"
+license = "MIT"
+keywords = ["discord", "ddlc"]
+
+[dependencies]
+anyhow = "1.0.75"
+dotenvs = "0.1.0"
+poise = "0.5.5"
+tokio = { version = "1.32.0", features = ["full"] }
