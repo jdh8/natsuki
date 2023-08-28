@@ -62,3 +62,14 @@ pub async fn invite(ctx: Context<'_>) -> anyhow::Result<()> {
     ctx.say("https://discordapp.com/oauth2/authorize?&client_id=410315411695992833&scope=bot").await?;
     Ok(())
 }
+
+/// Support server
+///
+/// Get the invite link for Natsuki's shelf
+///
+/// **Usage**: /support
+#[poise::command(prefix_command, slash_command)]
+pub async fn support(ctx: Context<'_>) -> anyhow::Result<()> {
+    ctx.say("https://discord.gg/VdHYvMC").await?;
+    Ok(())
+}
