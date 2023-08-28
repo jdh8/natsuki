@@ -51,3 +51,14 @@ pub async fn git(ctx: Context<'_>) -> anyhow::Result<()> {
     ctx.say("https://github.com/jdh8/natsuki").await?;
     Ok(())
 }
+
+/// Invite Natsuki to your server
+///
+/// Get the invite link for Natsuki
+///
+/// **Usage**: /invite
+#[poise::command(prefix_command, slash_command)]
+pub async fn invite(ctx: Context<'_>) -> anyhow::Result<()> {
+    ctx.say("https://discordapp.com/oauth2/authorize?&client_id=410315411695992833&scope=bot").await?;
+    Ok(())
+}

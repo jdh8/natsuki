@@ -1,7 +1,9 @@
 mod core;
 use poise::serenity_prelude as serenity;
 
+#[derive(Debug)]
 pub struct Data;
+
 type Context<'a> = poise::Context<'a, Data, anyhow::Error>;
 
 #[tokio::main]
@@ -11,9 +13,10 @@ async fn main() -> anyhow::Result<()> {
         .intents(serenity::GatewayIntents::non_privileged())
         .options(poise::FrameworkOptions {
             commands: vec![
-                core::help(),
-                core::ping(),
                 core::git(),
+                core::help(),
+                core::invite(),
+                core::ping(),
             ],
             prefix_options: poise::PrefixFrameworkOptions {
                 prefix: Some("n.".into()),
