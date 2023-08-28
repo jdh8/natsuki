@@ -73,3 +73,14 @@ pub async fn support(ctx: Context<'_>) -> anyhow::Result<()> {
     ctx.say("https://discord.gg/VdHYvMC").await?;
     Ok(())
 }
+
+/// Vote for Natsuki
+///
+/// Vote for Natsuki on top.gg
+///
+/// **Usage**: /vote
+#[poise::command(prefix_command, slash_command)]
+pub async fn vote(ctx: Context<'_>) -> anyhow::Result<()> {
+    ctx.say("https://top.gg/bot/410315411695992833/vote").await?;
+    Ok(())
+}

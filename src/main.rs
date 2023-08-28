@@ -18,6 +18,7 @@ async fn main() -> anyhow::Result<()> {
                 core::invite(),
                 core::ping(),
                 core::support(),
+                core::vote(),
             ],
             prefix_options: poise::PrefixFrameworkOptions {
                 prefix: Some("n.".into()),
