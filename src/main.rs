@@ -13,6 +13,7 @@ async fn main() -> anyhow::Result<()> {
         .intents(serenity::GatewayIntents::non_privileged())
         .options(poise::FrameworkOptions {
             commands: vec![
+                // Core
                 core::git(),
                 core::help(),
                 core::invite(),
@@ -20,10 +21,6 @@ async fn main() -> anyhow::Result<()> {
                 core::support(),
                 core::vote(),
             ],
-            prefix_options: poise::PrefixFrameworkOptions {
-                prefix: Some("n.".into()),
-                ..Default::default()
-            },
             ..Default::default()
         })
         .setup(|ctx, _ready, framework| {

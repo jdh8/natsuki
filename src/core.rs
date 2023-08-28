@@ -5,7 +5,7 @@ use crate::Context;
 /// Show list of commands or information about a given command
 ///
 /// **Usage**: /help [command]
-#[poise::command(prefix_command, slash_command)]
+#[poise::command(category = "Core", slash_command)]
 pub async fn help(ctx: Context<'_>,
     #[description = "Specific command to show help about"]
     #[autocomplete = "poise::builtins::autocomplete_command"]
@@ -24,7 +24,7 @@ pub async fn help(ctx: Context<'_>,
 /// Test if Natsuki responds and get the latency
 ///
 /// **Usage**: /ping
-#[poise::command(prefix_command, slash_command)]
+#[poise::command(category = "Core", slash_command)]
 pub async fn ping(ctx: Context<'_>) -> anyhow::Result<()> {
     let tick = std::time::Instant::now();
     let reply = ctx.say("Pong!").await?;
@@ -46,7 +46,7 @@ pub async fn ping(ctx: Context<'_>) -> anyhow::Result<()> {
 /// Natsuki's source code repository
 ///
 /// **Usage**: /git
-#[poise::command(prefix_command, slash_command, aliases("repo", "source"))]
+#[poise::command(category = "Core", slash_command)]
 pub async fn git(ctx: Context<'_>) -> anyhow::Result<()> {
     ctx.say("https://github.com/jdh8/natsuki").await?;
     Ok(())
@@ -57,7 +57,7 @@ pub async fn git(ctx: Context<'_>) -> anyhow::Result<()> {
 /// Get the invite link for Natsuki
 ///
 /// **Usage**: /invite
-#[poise::command(prefix_command, slash_command)]
+#[poise::command(category = "Core", slash_command)]
 pub async fn invite(ctx: Context<'_>) -> anyhow::Result<()> {
     ctx.say("https://discordapp.com/oauth2/authorize?&client_id=410315411695992833&scope=bot").await?;
     Ok(())
@@ -68,7 +68,7 @@ pub async fn invite(ctx: Context<'_>) -> anyhow::Result<()> {
 /// Get the invite link for Natsuki's shelf
 ///
 /// **Usage**: /support
-#[poise::command(prefix_command, slash_command)]
+#[poise::command(category = "Core", slash_command)]
 pub async fn support(ctx: Context<'_>) -> anyhow::Result<()> {
     ctx.say("https://discord.gg/VdHYvMC").await?;
     Ok(())
@@ -79,7 +79,7 @@ pub async fn support(ctx: Context<'_>) -> anyhow::Result<()> {
 /// Vote for Natsuki on top.gg
 ///
 /// **Usage**: /vote
-#[poise::command(prefix_command, slash_command)]
+#[poise::command(category = "Core", slash_command)]
 pub async fn vote(ctx: Context<'_>) -> anyhow::Result<()> {
     ctx.say("https://top.gg/bot/410315411695992833/vote").await?;
     Ok(())
