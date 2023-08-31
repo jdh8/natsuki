@@ -1,4 +1,5 @@
 mod core;
+mod fun;
 use poise::serenity_prelude as serenity;
 
 #[derive(Debug)]
@@ -20,6 +21,8 @@ async fn main() -> anyhow::Result<()> {
                 core::ping(),
                 core::support(),
                 core::vote(),
+                // Fun
+                fun::cupcake(),
             ],
             ..Default::default()
         })
