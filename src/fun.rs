@@ -1,5 +1,6 @@
 use crate::Context;
-use image::{GenericImage, GenericImageView};
+use image::{GenericImageView, Pixel};
+use image::buffer::ConvertBuffer;
 use image::imageops::FilterType::CatmullRom;
 use poise::serenity_prelude as serenity;
 use serenity::Mentionable;
@@ -30,20 +31,21 @@ pub async fn cupcake(ctx: Context<'_>,
 ) -> anyhow::Result<()> {
     let target = user.as_ref().unwrap_or_else(|| ctx.author());
     let face = face_image(target).await?.resize(128, 128, CatmullRom);
-    let mut cake = image::open("assets/290px-Hostess-Cupcake-Whole.jpg")?.to_rgba8();
+    let mut cake = image::open("assets/290px-Hostess-Cupcake-Whole.jpg")?.into_rgba8();
 
     for x in 0..128 {
         for y in 0..128 {
-            cake.blend_pixel(x + 80, y + 80, face.get_pixel(x, y));
+            cake.get_pixel_mut(x + 80, y + 80).blend(&face.get_pixel(x, y));
         }
     }
 
-    let encoder = webp::Encoder::from_rgba(&cake, cake.width(), cake.height());
+    let opaque : image::RgbImage = cake.convert();
+    let encoder = webp::Encoder::from_rgb(&opaque, opaque.width(), opaque.height());
 
     ctx.send(|f| f
         .content(format!("{} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!", target.mention()))
         .attachment(serenity::model::channel::AttachmentType::Bytes {
-            data: encoder.encode(90.0).to_vec().into(),
+            data: encoder.encode(85.0).to_vec().into(),
             filename: "cupcake.webp".into(),
         })
     ).await?;
