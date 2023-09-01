@@ -19,6 +19,20 @@ async fn face_image(user: &serenity::User) -> anyhow::Result<image::DynamicImage
     }
 }
 
+fn blend_image<P : Pixel, Container : core::ops::DerefMut<Target = [P::Subpixel]>>(
+    mut base : image::ImageBuffer<P, Container>,
+    top : &impl GenericImageView<Pixel = P>,
+    x : u32,
+    y : u32,
+) -> image::ImageBuffer<P, Container> {
+    for i in 0..top.width() {
+        for j in 0..top.height() {
+            base.get_pixel_mut(x + i, y + j).blend(&top.get_pixel(i, j));
+        }
+    }
+    base
+}
+
 /// Bake a cupcake
 ///
 /// Bake a cupcake out of someone
@@ -31,15 +45,8 @@ pub async fn cupcake(ctx: Context<'_>,
 ) -> anyhow::Result<()> {
     let target = user.as_ref().unwrap_or_else(|| ctx.author());
     let face = face_image(target).await?.resize(128, 128, CatmullRom);
-    let mut cake = image::open("assets/290px-Hostess-Cupcake-Whole.jpg")?.into_rgba8();
-
-    for x in 0..128 {
-        for y in 0..128 {
-            cake.get_pixel_mut(x + 80, y + 80).blend(&face.get_pixel(x, y));
-        }
-    }
-
-    let opaque : image::RgbImage = cake.convert();
+    let cake = image::open("assets/290px-Hostess-Cupcake-Whole.jpg")?.into_rgba8();
+    let opaque : image::RgbImage = blend_image(cake, &face, 80, 80).convert();
     let encoder = webp::Encoder::from_rgb(&opaque, opaque.width(), opaque.height());
 
     ctx.send(|f| f
