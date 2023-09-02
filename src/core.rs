@@ -29,7 +29,7 @@ pub async fn ping(ctx: Context<'_>) -> anyhow::Result<()> {
     let tick = std::time::Instant::now();
     let reply = ctx.say("Pong!").await?;
     let duration = tick.elapsed();
-    
+
     reply.edit(ctx, |m| m.content(
         if duration < std::time::Duration::from_secs(1) {
             format!("Pong! {} ms", duration.as_millis())

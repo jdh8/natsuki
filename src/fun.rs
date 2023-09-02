@@ -36,7 +36,7 @@ fn blend_image<P : Pixel, Container : core::ops::DerefMut<Target = [P::Subpixel]
 /// Bake a cupcake
 ///
 /// Bake a cupcake out of someone
-/// 
+///
 /// **Usage**: /bake [user]
 #[poise::command(category = "Fun", slash_command)]
 pub async fn cupcake(ctx: Context<'_>,
@@ -86,9 +86,9 @@ async fn fuck(ctx: Context<'_>, user: Option<&serenity::User>) -> anyhow::Result
 }
 
 /// Smash someone
-/// 
+///
 /// Smash someone or nothing or Natsuki
-/// 
+///
 /// **Usage**: /smash [user]
 #[poise::command(category = "Fun", slash_command)]
 pub async fn smash(ctx: Context<'_>,
