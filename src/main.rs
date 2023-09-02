@@ -23,6 +23,7 @@ async fn main() -> anyhow::Result<()> {
                 core::vote(),
                 // Fun
                 fun::cupcake(),
+                fun::smash(),
             ],
             ..Default::default()
         })

@@ -56,6 +56,56 @@ pub async fn cupcake(ctx: Context<'_>,
             filename: "cupcake.webp".into(),
         })
     ).await?;
+    Ok(())
+}
 
+async fn fuck(ctx: Context<'_>, user: Option<&serenity::User>) -> anyhow::Result<()> {
+    let base = image::open("assets/566424ede431200e3985ca6f21287cee.png")?.into_rgba8();
+    let author = face_image(ctx.author()).await?.resize(256, 256, CatmullRom);
+    let agent = blend_image(base, &author, 364, 120);
+    let opaque : image::RgbImage  = match user {
+        Some(u) => {
+            let t = face_image(&u).await?.resize(256, 256, CatmullRom);
+            blend_image(agent, &t, 110, 20)
+        },
+        None => agent,
+    }.convert();
+
+    let encoder = webp::Encoder::from_rgb(&opaque, opaque.width(), opaque.height());
+
+    ctx.send(|f| f
+        .content(format!("{} fucked {}!",
+            ctx.author().mention(),
+            user.map_or_else(|| String::from("Natsuki"), |u| u.mention().to_string())))
+        .attachment(serenity::model::channel::AttachmentType::Bytes {
+            data: encoder.encode(85.0).to_vec().into(),
+            filename: "fuck.webp".into(),
+        })
+    ).await?;
+    Ok(())
+}
+
+/// Smash someone
+/// 
+/// Smash someone or nothing or Natsuki
+/// 
+/// **Usage**: /smash [user]
+#[poise::command(category = "Fun", slash_command)]
+pub async fn smash(ctx: Context<'_>,
+    #[description = "User to smash"]
+    user: Option<serenity::User>,
+) -> anyhow::Result<()> {
+    if ctx.channel_id().to_channel(&ctx).await?.is_nsfw() {
+        return fuck(ctx, user.as_ref()).await;
+    }
+
+    let author = ctx.author().mention();
+    ctx.send(|f| f.embed(|e| e
+        .description(match user {
+            Some(u) => format!("{} smashed {}!", author, u.mention()),
+            None => format!("{} smashed!", author),
+        })
+        .image("https://raw.githubusercontent.com/jdh8/natsuki/master/assets/smash.png"))
+    ).await?;
     Ok(())
 }
