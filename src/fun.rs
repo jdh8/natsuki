@@ -4,6 +4,7 @@ use image::buffer::ConvertBuffer;
 use image::imageops::FilterType::CatmullRom;
 use poise::serenity_prelude as serenity;
 use serenity::Mentionable;
+use tokio::time::{Duration, sleep};
 
 async fn face_image(user: &serenity::User) -> anyhow::Result<image::DynamicImage> {
     let uri = user.face();
@@ -89,6 +90,39 @@ pub async fn cupcake(ctx: Context<'_>,
             filename: "cupcake.webp".into(),
         })
     ).await?;
+    Ok(())
+}
+
+/// Say that Natsuki is cute
+///
+/// Say that Natsuki is cute!
+///
+/// **Usage**: /cute
+#[poise::command(category = "Fun", slash_command)]
+pub async fn cute(ctx: Context<'_>) -> anyhow::Result<()> {
+    let http = &ctx.serenity_context().http;
+    let channel = ctx.channel_id();
+    let _writing = http.start_typing(channel.into());
+    let mut content = "Don't say this embarassing thing, dummy!".to_owned();
+    let reply = ctx.say(&content).await?;
+    let _editing = http.start_typing(channel.into());
+    //FIXME: I don't know why we need both typings alive to make it work
+
+    content.push_str("\nY-You t-too....");
+    sleep(Duration::from_secs(3)).await;
+    reply.edit(ctx, |m| m.content(&content)).await?;
+
+    content.push_str("\nI'M NOT CUUUUUUUUUUUTE!");
+    sleep(Duration::from_secs(2)).await;
+    reply.edit(ctx, |m| m.content(&content)).await?;
+
+    content.push_str("\nDon't think you can make me say this embarrassing thing just because we're not at school!");
+    sleep(Duration::from_secs(2)).await;
+    reply.edit(ctx, |m| m.content(&content)).await?;
+
+    content.push_str("\nI-I have to go to the bathroom.");
+    sleep(Duration::from_secs(4)).await;
+    reply.edit(ctx, |m| m.content(&content)).await?;
     Ok(())
 }
 

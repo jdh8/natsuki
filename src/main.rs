@@ -25,6 +25,7 @@ async fn main() -> anyhow::Result<()> {
                 fun::beat(),
                 fun::bunny(),
                 fun::cupcake(),
+                fun::cute(),
                 fun::smash(),
             ],
             ..Default::default()
