@@ -126,6 +126,24 @@ pub async fn cute(ctx: Context<'_>) -> anyhow::Result<()> {
     Ok(())
 }
 
+/// Nut on something
+///
+/// Nut on someone or something
+///
+/// **Usage**: /nut [user|text]
+#[poise::command(category = "Fun", slash_command)]
+pub async fn nut(ctx: Context<'_>,
+    #[description = "Something to nut on"]
+    text: Option<String>,
+) -> anyhow::Result<()> {
+    ctx.say(ctx.author().mention().to_string()
+        + " nuts on "
+        + text.as_deref().unwrap_or("the floor")
+        + ".\n<:pukesuki:405984820674428928> **You guys are so gross!**"
+    ).await?;
+    Ok(())
+}
+
 async fn fuck(ctx: Context<'_>, user: Option<&serenity::User>) -> anyhow::Result<()> {
     let base = image::open("assets/566424ede431200e3985ca6f21287cee.png")?.into_rgba8();
     let author = face_image(ctx.author()).await?.resize(256, 256, CatmullRom);
