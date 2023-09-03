@@ -22,6 +22,7 @@ async fn main() -> anyhow::Result<()> {
                 core::support(),
                 core::vote(),
                 // Fun
+                fun::beat(),
                 fun::cupcake(),
                 fun::smash(),
             ],

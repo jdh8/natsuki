@@ -33,6 +33,23 @@ fn blend_image<P : Pixel, Container : core::ops::DerefMut<Target = [P::Subpixel]
     base
 }
 
+/// Beat someone
+///
+/// Ask Buffsuki to beat someone
+///
+/// **Usage**: /beat [user|text]
+#[poise::command(category = "Fun", slash_command)]
+pub async fn beat(ctx: Context<'_>,
+    #[description = "Someone/something to beat"]
+    text: Option<String>,
+) -> anyhow::Result<()> {
+    ctx.say("<:buffsuki:436562981875089428> **I'll beat the shit out of ".to_owned()
+        + text.as_deref().unwrap_or("my dad")
+        + ".**"
+    ).await?;
+    Ok(())
+}
+
 /// Bake a cupcake
 ///
 /// Bake a cupcake out of someone
