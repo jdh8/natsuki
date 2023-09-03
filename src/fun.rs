@@ -50,6 +50,22 @@ pub async fn beat(ctx: Context<'_>,
     Ok(())
 }
 
+/// Have a bunny say something
+///
+/// Have a bunny say or hold something
+///
+/// **Usage**: /bunny [text]
+#[poise::command(category = "Fun", slash_command)]
+pub async fn bunny(ctx: Context<'_>,
+    #[description = "Something to say"]
+    text: Option<String>,
+) -> anyhow::Result<()> {
+    ctx.say(r#"(\\\_\_/)
+( • - •)
+/つ "#.to_owned() + text.as_deref().unwrap_or(" つ")).await?;
+    Ok(())
+}
+
 /// Bake a cupcake
 ///
 /// Bake a cupcake out of someone
@@ -93,7 +109,7 @@ async fn fuck(ctx: Context<'_>, user: Option<&serenity::User>) -> anyhow::Result
     ctx.send(|f| f
         .content(format!("{} fucked {}!",
             ctx.author().mention(),
-            user.map_or_else(|| String::from("Natsuki"), |u| u.mention().to_string())))
+            user.map_or_else(|| "Natsuki".to_owned(), |u| u.mention().to_string())))
         .attachment(serenity::model::channel::AttachmentType::Bytes {
             data: encoder.encode(85.0).to_vec().into(),
             filename: "fuck.webp".into(),
