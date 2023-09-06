@@ -101,13 +101,9 @@ pub async fn cupcake(ctx: Context<'_>,
 /// **Usage**: /cute
 #[poise::command(category = "Fun", slash_command)]
 pub async fn cute(ctx: Context<'_>) -> anyhow::Result<()> {
-    let http = &ctx.serenity_context().http;
-    let channel = ctx.channel_id();
-    let _writing = http.start_typing(channel.into());
     let mut content = "Don't say this embarassing thing, dummy!".to_owned();
     let reply = ctx.say(&content).await?;
-    let _editing = http.start_typing(channel.into());
-    //FIXME: I don't know why we need both typings alive to make it work
+    let typing = ctx.serenity_context().http.start_typing(ctx.channel_id().into());
 
     content.push_str("\nY-You t-too....");
     sleep(Duration::from_secs(3)).await;
@@ -121,6 +117,7 @@ pub async fn cute(ctx: Context<'_>) -> anyhow::Result<()> {
     sleep(Duration::from_secs(2)).await;
     reply.edit(ctx, |m| m.content(&content)).await?;
 
+    let _ = typing.map(|t| t.stop());
     content.push_str("\nI-I have to go to the bathroom.");
     sleep(Duration::from_secs(4)).await;
     reply.edit(ctx, |m| m.content(&content)).await?;
