@@ -13,7 +13,7 @@ bitflags! {
     }
 }
 
-const DICTIONARY: &[(&str, Preference)] = &[
+const DICTIONARY: [(&str, Preference); 228] = [
     ("adventure", Preference::Sayori),
     ("afterimage", Preference::Yuri),
     ("agonizing", Preference::Yuri),
