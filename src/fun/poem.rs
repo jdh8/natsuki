@@ -1,5 +1,6 @@
 use crate::Context;
 use bitflags::bitflags;
+use futures::try_join;
 use rand::seq::SliceRandom;
 use poise::serenity_prelude as serenity;
 use serenity::ButtonStyle::{Secondary, Success, Danger};
@@ -289,13 +290,13 @@ async fn game(ctx: Context<'_>, word: &str, answer: Doki, buttons: &[(EmojiId, D
             let wrong = format!("Sorry, it's **{}**.", answer);
             let selected = interaction.data.custom_id.parse::<Doki>()?;
 
-            interaction.create_interaction_response(ctx, |r| r
+            let response = interaction.create_interaction_response(ctx, |r| r
                 .kind(serenity::InteractionResponseType::ChannelMessageWithSource)
                 .interaction_response_data(|x| x
                     .content(if selected == answer { right } else { wrong }))
-            ).await?;
+            );
 
-            question.edit(ctx, |m| m
+            let edit = question.edit(ctx, |m| m
                 //XXX Try to deduplicate these
                 .components(|c| c.create_action_row(|a| {
                     for (emoji, doki) in buttons {
@@ -309,7 +310,9 @@ async fn game(ctx: Context<'_>, word: &str, answer: Doki, buttons: &[(EmojiId, D
                         );
                     }
                     a
-                }))).await?;
+                })));
+
+            try_join!(response, edit)?;
         },
         None => {
             question.edit(ctx, |m| m
