@@ -2,7 +2,7 @@ mod core;
 mod fun;
 use poise::serenity_prelude as serenity;
 
-#[derive(Debug)]
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub struct Data;
 
 type Context<'a> = poise::Context<'a, Data, anyhow::Error>;
@@ -27,6 +27,7 @@ async fn main() -> anyhow::Result<()> {
                 fun::cupcake(),
                 fun::cute(),
                 fun::nut(),
+                fun::poem::poem(),
                 fun::smash(),
             ],
             ..Default::default()

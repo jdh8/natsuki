@@ -1,3 +1,4 @@
+pub mod poem;
 use crate::Context;
 use image::{GenericImageView, Pixel};
 use image::buffer::ConvertBuffer;
