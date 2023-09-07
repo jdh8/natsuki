@@ -142,6 +142,26 @@ pub async fn nut(ctx: Context<'_>,
     Ok(())
 }
 
+/// Rate a character
+///
+/// Rate a character, defaulting to yourself
+///
+/// **Usage**: /rate [text]
+#[poise::command(category = "Fun", slash_command)]
+pub async fn rate(ctx: Context<'_>,
+    #[description = "Character to rate"]
+    text: Option<String>,
+) -> anyhow::Result<()> {
+    let character = text.unwrap_or_else(|| ctx.author().to_string());
+    let trimmed = character.trim();
+    let lower = trimmed.to_lowercase();
+    let canonical = regex::Regex::new(r#"<@!(\d+)>"#)?.replace_all(&lower, "<@$1>");
+    let digest: [u64; 2] = unsafe { core::mem::transmute(md5::compute(canonical.as_bytes())) };
+    let percentage = digest[0].wrapping_add(14) % 101;
+    ctx.say(format!("<:natsuki:424991419329937428> I'd give {} {}%.", trimmed, percentage)).await?;
+    Ok(())
+}
+
 async fn fuck(ctx: Context<'_>, user: Option<&serenity::User>) -> anyhow::Result<()> {
     let base = image::open("assets/566424ede431200e3985ca6f21287cee.png")?.into_rgba8();
     let author = face_image(ctx.author()).await?.resize(256, 256, CatmullRom);
