@@ -1,5 +1,6 @@
 mod core;
 mod fun;
+mod information;
 use poise::serenity_prelude as serenity;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
@@ -31,6 +32,7 @@ async fn main() -> anyhow::Result<()> {
                 fun::ship(),
                 fun::smash(),
                 fun::word(),
+                information::avatar(),
             ],
             ..Default::default()
         })
