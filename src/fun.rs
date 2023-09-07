@@ -180,6 +180,34 @@ pub async fn shelf(ctx: Context<'_>,
     Ok(())
 }
 
+/// Ship characters
+///
+/// Ship specified characters
+///
+/// **Usage**: /ship [text separated by & or ×]
+///
+/// Note that × is multiplication sign (U+00D7)
+#[poise::command(category = "Fun", slash_command)]
+pub async fn ship(ctx: Context<'_>,
+    #[description = "Characters to ship, separated by & or × (multiplication sign, U+00D7)"]
+    text: Option<String>,
+) -> anyhow::Result<()> {
+    let slices = match text.as_deref() {
+        Some(t) => t.split(['&', '×']).map(str::trim).collect(),
+        None => vec![],
+    };
+    let ship = match slices.len() {
+        0 => ctx.author().to_string() + " × <@410315411695992833>",
+        1 => ctx.author().to_string() + " × " + slices[0],
+        _ => slices.join(" × "),
+    };
+    ctx.say("Look at them, a lovey dovey couple!  I ship it!\n".to_owned()
+        + &ship
+        + "\nN-not that I c-care..."
+    ).await?;
+    Ok(())
+}
+
 async fn fuck(ctx: Context<'_>, user: Option<&serenity::User>) -> anyhow::Result<()> {
     let base = image::open("assets/566424ede431200e3985ca6f21287cee.png")?.into_rgba8();
     let author = face_image(ctx.author()).await?.resize(256, 256, CatmullRom);
