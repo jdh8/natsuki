@@ -39,7 +39,7 @@ pub async fn snowflake(ctx: Context<'_>,
                     date.to_rfc3339_opts(SecondsFormat::Millis, true),
                     worker, process, increment)
             },
-            Err(_) => "Found an invalid snowflake!".to_owned(),
+            Err(_) => "Found an invalid snowflake: ".to_owned() + mat.as_str(),
         },
         None => "No snowflake is found.".to_owned(),
     }).await?;
