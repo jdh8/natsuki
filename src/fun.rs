@@ -63,9 +63,9 @@ pub async fn bunny(ctx: Context<'_>,
     #[description = "Something to say"]
     text: Option<String>,
 ) -> anyhow::Result<()> {
-    ctx.say(r#"(\\\_\_/)
+    ctx.say(r"(\\\_\_/)
 ( • - •)
-/つ "#.to_owned() + text.as_deref().unwrap_or(" つ")).await?;
+/つ ".to_owned() + text.as_deref().unwrap_or(" つ")).await?;
     Ok(())
 }
 
@@ -156,7 +156,7 @@ pub async fn rate(ctx: Context<'_>,
     let character = text.unwrap_or_else(|| ctx.author().to_string());
     let trimmed = character.trim();
     let lower = trimmed.to_lowercase();
-    let canonical = regex::Regex::new(r#"<@!(\d+)>"#)?.replace_all(&lower, "<@$1>");
+    let canonical = regex::Regex::new(r"<@!(\d+)>")?.replace_all(&lower, "<@$1>");
     let digest: [u64; 2] = unsafe { core::mem::transmute(md5::compute(canonical.as_bytes())) };
     let percentage = digest[0].wrapping_add(14) % 101;
     ctx.say(format!("<:natsuki:424991419329937428> I'd give {} {}%.", trimmed, percentage)).await?;
