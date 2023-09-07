@@ -14,14 +14,12 @@ async fn main() -> anyhow::Result<()> {
         .intents(serenity::GatewayIntents::non_privileged())
         .options(poise::FrameworkOptions {
             commands: vec![
-                // Core
                 core::git(),
                 core::help(),
                 core::invite(),
                 core::ping(),
                 core::support(),
                 core::vote(),
-                // Fun
                 fun::beat(),
                 fun::bunny(),
                 fun::cupcake(),
@@ -32,6 +30,7 @@ async fn main() -> anyhow::Result<()> {
                 fun::shelf(),
                 fun::ship(),
                 fun::smash(),
+                fun::word(),
             ],
             ..Default::default()
         })

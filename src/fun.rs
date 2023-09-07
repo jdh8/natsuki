@@ -258,3 +258,16 @@ pub async fn smash(ctx: Context<'_>,
     ).await?;
     Ok(())
 }
+
+/// List Natsuki's preferred words
+///
+/// Link to the list of Natsuki's preferred words
+///
+/// **Usage**: /word
+#[poise::command(category = "Fun", slash_command)]
+pub async fn word(ctx: Context<'_>) -> anyhow::Result<()> {
+    ctx.say("Here are my preferred words.\n\
+        http://doki-doki-literature-club.wikia.com/wiki/Natsuki#Preferred_Words"
+    ).await?;
+    Ok(())
+}
