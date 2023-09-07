@@ -3,6 +3,7 @@ use crate::Context;
 use image::{GenericImageView, Pixel};
 use image::buffer::ConvertBuffer;
 use image::imageops::FilterType::CatmullRom;
+use rand::Rng;
 use poise::serenity_prelude as serenity;
 use serenity::Mentionable;
 use tokio::time::{Duration, sleep};
@@ -159,6 +160,23 @@ pub async fn rate(ctx: Context<'_>,
     let digest: [u64; 2] = unsafe { core::mem::transmute(md5::compute(canonical.as_bytes())) };
     let percentage = digest[0].wrapping_add(14) % 101;
     ctx.say(format!("<:natsuki:424991419329937428> I'd give {} {}%.", trimmed, percentage)).await?;
+    Ok(())
+}
+
+/// Help Natsuki get the book on the shelf
+///
+/// Help Natsuki access the book on the shelf
+///
+/// **Usage**: /shelf [user]
+#[poise::command(category = "Fun", slash_command)]
+pub async fn shelf(ctx: Context<'_>,
+    #[description = "User who helps Natsuki"]
+    user: Option<serenity::User>,
+) -> anyhow::Result<()> {
+    let helper = user.as_ref().unwrap_or_else(|| ctx.author());
+    let initial = helper.name.get(0..1).unwrap_or("");
+    let repeat = rand::thread_rng().gen_range(5..13);
+    ctx.say(format!("**Fucking {}{}**", helper, initial.repeat(repeat))).await?;
     Ok(())
 }
 

@@ -29,6 +29,7 @@ async fn main() -> anyhow::Result<()> {
                 fun::nut(),
                 fun::poem::poem(),
                 fun::rate(),
+                fun::shelf(),
                 fun::smash(),
             ],
             ..Default::default()
