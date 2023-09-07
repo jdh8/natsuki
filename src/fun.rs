@@ -84,7 +84,7 @@ pub async fn cupcake(ctx: Context<'_>,
     let opaque: image::RgbImage = blend_image(cake, &face, 80, 80).convert();
     let encoder = webp::Encoder::from_rgb(&opaque, opaque.width(), opaque.height());
 
-    ctx.send(|f| f
+    ctx.send(|m| m
         .content(format!("{} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!", target.mention()))
         .attachment(serenity::model::channel::AttachmentType::Bytes {
             data: encoder.encode(85.0).to_vec().into(),
@@ -156,7 +156,7 @@ async fn fuck(ctx: Context<'_>, user: Option<&serenity::User>) -> anyhow::Result
 
     let encoder = webp::Encoder::from_rgb(&opaque, opaque.width(), opaque.height());
 
-    ctx.send(|f| f
+    ctx.send(|m| m
         .content(format!("{} fucked {}!",
             ctx.author().mention(),
             user.map_or_else(|| "Natsuki".to_owned(), |u| u.mention().to_string())))
@@ -183,7 +183,7 @@ pub async fn smash(ctx: Context<'_>,
     }
 
     let author = ctx.author().mention();
-    ctx.send(|f| f.embed(|e| e
+    ctx.send(|m| m.embed(|e| e
         .description(match user {
             Some(u) => format!("{} smashed {}!", author, u.mention()),
             None => format!("{} smashed!", author),

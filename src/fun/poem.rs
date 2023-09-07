@@ -261,7 +261,7 @@ enum Doki {
 }
 
 async fn game(ctx: Context<'_>, word: &str, answer: Doki, buttons: &[(EmojiId, Doki)]) -> anyhow::Result<()> {
-    let mut question = ctx.send(|r| r
+    let mut question = ctx.send(|m| m
         .content("Whose word is **".to_owned() + word + "**?  Please answer in 15 seconds.")
         //XXX Try to deduplicate these
         .components(|c| c.create_action_row(|a| {
@@ -290,9 +290,9 @@ async fn game(ctx: Context<'_>, word: &str, answer: Doki, buttons: &[(EmojiId, D
             let wrong = format!("Sorry, it's **{}**.", answer);
             let selected = interaction.data.custom_id.parse::<Doki>()?;
 
-            let response = interaction.create_interaction_response(ctx, |r| r
+            let response = interaction.create_interaction_response(ctx, |m| m
                 .kind(serenity::InteractionResponseType::ChannelMessageWithSource)
-                .interaction_response_data(|x| x
+                .interaction_response_data(|r| r
                     .content(if selected == answer { right } else { wrong }))
             );
 
