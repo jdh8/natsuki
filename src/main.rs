@@ -33,6 +33,7 @@ async fn main() -> anyhow::Result<()> {
                 fun::smash(),
                 fun::word(),
                 information::avatar(),
+                information::snowflake(),
             ],
             ..Default::default()
         })
