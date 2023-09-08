@@ -41,6 +41,7 @@ async fn main() -> anyhow::Result<()> {
                 weeb::kiss(),
                 weeb::lewd(),
                 weeb::lick(),
+                weeb::neko(),
             ],
             ..Default::default()
         })

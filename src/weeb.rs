@@ -99,3 +99,19 @@ pub async fn lick(ctx: Context<'_>,
     )).await?;
     Ok(())
 }
+
+/// Show a random neko
+///
+/// Show a random neko from nekos.life
+///
+/// **Usage:** /neko
+#[poise::command(category = "Weeb", slash_command)]
+pub async fn neko(ctx: Context<'_>) -> anyhow::Result<()> {
+    let endpoint = "https://nekos.life/api/v2/img/neko";
+    let json = reqwest::get(endpoint).await?.json::<serde_json::Value>().await?;
+    ctx.send(|m| m.embed(|e| e
+        .description("Here comes your random neko.")
+        .image(json["url"].as_str().expect("Invalid image URL"))
+    )).await?;
+    Ok(())
+}
