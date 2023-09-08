@@ -104,7 +104,7 @@ pub async fn cupcake(ctx: Context<'_>,
 pub async fn cute(ctx: Context<'_>) -> anyhow::Result<()> {
     let mut content = "Don't say this embarassing thing, dummy!".to_owned();
     let reply = ctx.say(&content).await?;
-    let typing = ctx.serenity_context().http.start_typing(ctx.channel_id().into());
+    let typing = ctx.serenity_context().http.start_typing(ctx.channel_id().0);
 
     content.push_str("\nY-You t-too....");
     sleep(Duration::from_secs(3)).await;
