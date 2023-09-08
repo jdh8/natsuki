@@ -35,6 +35,16 @@ fn format_rfc3339(time: time::SystemTime) -> String {
     time.to_rfc3339_opts(SecondsFormat::Millis, true)
 }
 
+fn format_snowflake(flake: Snowflake) -> String {
+    format!(
+        "**Time:** {}\n**Worker:** {}\n**Process:** {}\n**Increment:** {}",
+        format_rfc3339(flake.time()),
+        flake.worker(),
+        flake.process(),
+        flake.increment(),
+    )
+}
+
 /// Show avatar
 ///
 /// Show the avatar of a user
@@ -49,6 +59,12 @@ pub async fn avatar(ctx: Context<'_>,
     Ok(())
 }
 
+#[poise::command(context_menu_command = "Avatar")]
+pub async fn avatar_user(ctx: Context<'_>, user: serenity::User) -> anyhow::Result<()> {
+    ctx.say(user.face()).await?;
+    Ok(())
+}
+
 /// Decode a Discord snowflake
 ///
 /// Extract information from a snowflake
@@ -60,18 +76,24 @@ pub async fn snowflake(ctx: Context<'_>,
     snowflake: String,
 ) -> anyhow::Result<()> {
     ctx.say(match regex::Regex::new(r"\d+")?.find(&snowflake) {
-        Some(mat) => match mat.as_str().parse::<u64>().map(Snowflake) {
-            Ok(flake) => format!(
-                "**Time:** {}\n**Worker:** {}\n**Process:** {}\n**Increment:** {}",
-                format_rfc3339(flake.time()),
-                flake.worker(),
-                flake.process(),
-                flake.increment(),
-            ),
+        Some(mat) => match mat.as_str().parse::<u64>() {
+            Ok(flake) => format_snowflake(flake.into()),
             Err(_) => "Found an invalid snowflake: ".to_owned() + mat.as_str(),
         },
         None => "No snowflake is found.".to_owned(),
     }).await?;
+    Ok(())
+}
+
+#[poise::command(context_menu_command = "Snowflake (user)")]
+pub async fn snowflake_user(ctx: Context<'_>, user: serenity::User) -> anyhow::Result<()> {
+    ctx.say(format_snowflake(user.id.0.into())).await?;
+    Ok(())
+}
+
+#[poise::command(context_menu_command = "Snowflake (message)")]
+pub async fn snowflake_message(ctx: Context<'_>, message: serenity::Message) -> anyhow::Result<()> {
+    ctx.say(format_snowflake(message.id.0.into())).await?;
     Ok(())
 }
 
