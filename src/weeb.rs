@@ -81,3 +81,21 @@ pub async fn lewd(ctx: Context<'_>) -> anyhow::Result<()> {
     ctx.say("https://youtu.be/qr89xoZyE1g").await?;
     Ok(())
 }
+
+/// Lick someone
+///
+/// Lick someone or the air
+///
+/// **Usage:** /lick [user|text]
+#[poise::command(category = "Weeb", slash_command)]
+pub async fn lick(ctx: Context<'_>,
+    #[description = "Someone to lick"]
+    text: Option<String>,
+) -> anyhow::Result<()> {
+    let text = text.as_deref().unwrap_or("the air");
+    ctx.send(|m| m.embed(|e| e
+        .description(ctx.author().to_string() + " licked " + text + "!")
+        .image("https://cdn.discordapp.com/attachments/421196261132075009/421920949277818891/LickTemplate.gif")
+    )).await?;
+    Ok(())
+}
