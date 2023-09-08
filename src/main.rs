@@ -34,6 +34,7 @@ async fn main() -> anyhow::Result<()> {
                 fun::word(),
                 information::avatar(),
                 information::snowflake(),
+                information::role(),
             ],
             ..Default::default()
         })
