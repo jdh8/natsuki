@@ -1,6 +1,7 @@
 mod core;
 mod fun;
 mod information;
+mod weeb;
 use poise::serenity_prelude as serenity;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
@@ -35,6 +36,7 @@ async fn main() -> anyhow::Result<()> {
                 information::avatar(),
                 information::snowflake(),
                 information::role(),
+                weeb::feed(),
             ],
             ..Default::default()
         })
