@@ -1,6 +1,5 @@
-use rand::seq::SliceRandom;
-
 use crate::Context;
+use rand::seq::SliceRandom;
 
 /// Feed someone
 ///
@@ -69,5 +68,16 @@ pub async fn kiss(ctx: Context<'_>,
         .description(ctx.author().to_string() + " kissed " + text + "!")
         .image(KISSES.choose(&mut rand::thread_rng()).expect("Invalid image URL"))
     )).await?;
+    Ok(())
+}
+
+/// Display a video
+///
+/// Display a lewd video
+///
+/// **Usage:** /lewd
+#[poise::command(category = "Weeb", slash_command)]
+pub async fn lewd(ctx: Context<'_>) -> anyhow::Result<()> {
+    ctx.say("https://youtu.be/qr89xoZyE1g").await?;
     Ok(())
 }

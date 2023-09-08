@@ -39,6 +39,7 @@ async fn main() -> anyhow::Result<()> {
                 weeb::feed(),
                 weeb::hug(),
                 weeb::kiss(),
+                weeb::lewd(),
             ],
             ..Default::default()
         })
