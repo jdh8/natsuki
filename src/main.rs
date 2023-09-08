@@ -38,6 +38,7 @@ async fn main() -> anyhow::Result<()> {
                 information::role(),
                 weeb::feed(),
                 weeb::hug(),
+                weeb::kiss(),
             ],
             ..Default::default()
         })

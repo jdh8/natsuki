@@ -43,3 +43,31 @@ pub async fn hug(ctx: Context<'_>,
     )).await?;
     Ok(())
 }
+
+/// Kiss someone
+///
+/// Kiss someone or Natsuki
+///
+/// **Usage:** /kiss [user|text]
+#[poise::command(category = "Weeb", slash_command)]
+pub async fn kiss(ctx: Context<'_>,
+    #[description = "Someone to hug"]
+    text: Option<String>,
+) -> anyhow::Result<()> {
+    const KISSES: [&str; 8] = [
+        "https://cdn.discordapp.com/attachments/403299886352695297/428494387341688833/hJ6DcXJUurOfHcyG5Sv3wSzZafNqhSGbKTnpF6fFzV4.png",
+        "https://cdn.discordapp.com/attachments/403299886352695297/428483005389078528/WfvNDEnq_HoNHwr5-o9fIf0W7x2Rw5Q0tXbLNJy-a8Q.png",
+        "https://cdn.discordapp.com/attachments/409037934470234113/429673201614848004/qzZgXh-ZBV2674hpTt0gKy6YO85Nack3CbZdHqlxLy8.jpg",
+        "https://cdn.discordapp.com/attachments/409037934470234113/429673204282294282/w6wubjO6iugro-v6N8iX69-R3FK41ZXJ4Com1zSzi2Y.jpg",
+        "https://cdn.discordapp.com/attachments/409037934470234113/429673205846900736/kiss1.jpg",
+        "https://cdn.discordapp.com/attachments/409037934470234113/429673205876260864/Copy_of_x3j03ojjwsg01.jpg",
+        "https://cdn.discordapp.com/attachments/403697175948820481/444355145124544513/11b4bc2.png",
+        "https://cdn.discordapp.com/attachments/409037934470234113/449736165290016782/8qlcohr5c1011.png",
+    ];
+    let text = text.as_deref().unwrap_or("Natsuki");
+    ctx.send(|m| m.embed(|e| e
+        .description(ctx.author().to_string() + " kissed " + text + "!")
+        .image(KISSES.choose(&mut rand::thread_rng()).expect("Invalid image URL"))
+    )).await?;
+    Ok(())
+}
