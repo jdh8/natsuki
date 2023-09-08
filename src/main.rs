@@ -37,6 +37,7 @@ async fn main() -> anyhow::Result<()> {
                 information::snowflake(),
                 information::role(),
                 weeb::feed(),
+                weeb::hug(),
             ],
             ..Default::default()
         })
