@@ -82,13 +82,13 @@ pub async fn cupcake(ctx: Context<'_>,
     let target = user.as_ref().unwrap_or_else(|| ctx.author());
     let face = face_image(target).await?.resize(128, 128, CatmullRom);
     let cake = image::open("assets/290px-Hostess-Cupcake-Whole.jpg")?.into_rgba8();
-    let opaque: image::RgbImage = blend_image(cake, &face, 80, 80).convert();
-    let encoder = webp::Encoder::from_rgb(&opaque, opaque.width(), opaque.height());
+    let cake: image::RgbImage = blend_image(cake, &face, 80, 80).convert();
+    let cake = webp::Encoder::from_rgb(&cake, cake.width(), cake.height());
 
     ctx.send(|m| m
         .content(format!("{} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!", target.mention()))
         .attachment(serenity::model::channel::AttachmentType::Bytes {
-            data: encoder.encode(85.0).to_vec().into(),
+            data: cake.encode(85.0).to_vec().into(),
             filename: "cupcake.webp".into(),
         })
     ).await?;
@@ -173,10 +173,10 @@ pub async fn shelf(ctx: Context<'_>,
     #[description = "User who helps Natsuki"]
     user: Option<serenity::User>,
 ) -> anyhow::Result<()> {
-    let helper = user.as_ref().unwrap_or_else(|| ctx.author());
-    let initial = helper.name.get(0..1).unwrap_or("");
+    let user = user.as_ref().unwrap_or_else(|| ctx.author());
+    let initial = user.name.get(0..1).unwrap_or("");
     let repeat = rand::thread_rng().gen_range(5..13);
-    ctx.say(format!("**Fucking {}{}**", helper, initial.repeat(repeat))).await?;
+    ctx.say(format!("**Fucking {}{}**", user, initial.repeat(repeat))).await?;
     Ok(())
 }
 
@@ -211,23 +211,23 @@ pub async fn ship(ctx: Context<'_>,
 async fn fuck(ctx: Context<'_>, user: Option<&serenity::User>) -> anyhow::Result<()> {
     let base = image::open("assets/566424ede431200e3985ca6f21287cee.png")?.into_rgba8();
     let author = face_image(ctx.author()).await?.resize(256, 256, CatmullRom);
-    let agent = blend_image(base, &author, 364, 120);
-    let opaque: image::RgbImage  = match user {
+    let image = blend_image(base, &author, 364, 120);
+    let image: image::RgbImage  = match user {
         Some(u) => {
             let t = face_image(&u).await?.resize(256, 256, CatmullRom);
-            blend_image(agent, &t, 110, 20)
+            blend_image(image, &t, 110, 20)
         },
-        None => agent,
+        None => image,
     }.convert();
 
-    let encoder = webp::Encoder::from_rgb(&opaque, opaque.width(), opaque.height());
+    let image = webp::Encoder::from_rgb(&image, image.width(), image.height());
 
     ctx.send(|m| m
         .content(format!("{} fucked {}!",
             ctx.author().mention(),
             user.map_or_else(|| "Natsuki".to_owned(), |u| u.mention().to_string())))
         .attachment(serenity::model::channel::AttachmentType::Bytes {
-            data: encoder.encode(85.0).to_vec().into(),
+            data: image.encode(85.0).to_vec().into(),
             filename: "fuck.webp".into(),
         })
     ).await?;
