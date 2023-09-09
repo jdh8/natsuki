@@ -1,6 +1,7 @@
 mod core;
 mod fun;
 mod information;
+mod tools;
 mod weeb;
 use poise::serenity_prelude as serenity;
 
@@ -39,6 +40,9 @@ async fn main() -> anyhow::Result<()> {
                 information::snowflake_message(),
                 information::snowflake_user(),
                 information::role(),
+                tools::base64::base64(),
+                tools::base64::base64_encode(),
+                tools::base64::base64_decode(),
                 weeb::feed(),
                 weeb::hug(),
                 weeb::kiss(),
