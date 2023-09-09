@@ -43,6 +43,7 @@ async fn main() -> anyhow::Result<()> {
                 tools::base64::base64(),
                 tools::base64::base64_encode(),
                 tools::base64::base64_decode(),
+                tools::color(),
                 weeb::feed(),
                 weeb::hug(),
                 weeb::kiss(),
