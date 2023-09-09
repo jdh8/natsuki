@@ -1,5 +1,5 @@
 use crate::Context;
-use rand::seq::SliceRandom;
+use rand::seq::SliceRandom as _;
 
 /// Feed someone
 ///

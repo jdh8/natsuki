@@ -1,11 +1,11 @@
 pub mod poem;
 use crate::Context;
 use image::{GenericImageView, Pixel};
-use image::buffer::ConvertBuffer;
+use image::buffer::ConvertBuffer as _;
 use image::imageops::FilterType::CatmullRom;
-use rand::Rng;
+use rand::Rng as _;
 use poise::serenity_prelude as serenity;
-use serenity::Mentionable;
+use serenity::Mentionable as _;
 use tokio::time::{Duration, sleep};
 
 async fn face_image(user: &serenity::User) -> anyhow::Result<image::DynamicImage> {

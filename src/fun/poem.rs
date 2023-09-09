@@ -1,7 +1,7 @@
 use crate::Context;
 use bitflags::bitflags;
 use futures::try_join;
-use rand::seq::SliceRandom;
+use rand::seq::SliceRandom as _;
 use poise::serenity_prelude as serenity;
 use serenity::ButtonStyle::{Secondary, Success, Danger};
 use serenity::EmojiId;
