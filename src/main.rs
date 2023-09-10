@@ -70,6 +70,6 @@ async fn main() -> anyhow::Result<()> {
             })
         });
 
-    framework.run().await?;
+    framework.run_autosharded().await?;
     Ok(())
 }
