@@ -41,6 +41,50 @@ pub async fn color(ctx: Context<'_>,
     Ok(())
 }
 
+/// Create a poll
+///
+/// Create a yes-no poll or up to 20 options.  Options must be separated by a
+/// pipe (|) surrounded by spaces.
+///
+/// **Usage**: /poll <question|options...>
+///
+/// **Examples**:
+/// /poll Is Miyuki Sone best waifu
+/// /poll Sayori | Natsuki | Yuri | Monika"
+#[poise::command(category = "Tools", slash_command)]
+pub async fn poll(ctx: Context<'_>,
+    #[description = "Question or options"]
+    text: String,
+) -> anyhow::Result<()> {
+    let options: Vec<_> = Regex::new(r"\s+\|\s+").unwrap().splitn(&text, 20).collect();
+
+    if options.len() == 1 {
+        let question = options[0];
+        let message = ctx.say(question).await?.into_message().await?;
+        message.react(ctx, '👍').await?;
+        message.react(ctx, '👎').await?;
+        return Ok(());
+    }
+
+    let mut question = String::new();
+
+    for (i, option) in options.iter().enumerate() {
+        question.push(unsafe { char::from_u32_unchecked(i as u32 + 0x1F1E6) });
+        question.push(' ');
+        question.push_str(option);
+        question.push('\n');
+    }
+
+    let message = ctx.say(question).await?.into_message().await?;
+
+    for i in 0..options.len() {
+        let emoji = unsafe { char::from_u32_unchecked(i as u32 + 0x1F1E6) };
+        message.react(ctx, emoji).await?;
+    }
+
+    Ok(())
+}
+
 /// Wrap text in keycaps
 ///
 /// Replace text with keycap emojis
