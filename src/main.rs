@@ -10,10 +10,9 @@ pub struct Data;
 
 type Context<'a> = poise::Context<'a, Data, anyhow::Error>;
 
-#[tokio::main]
-async fn main() -> anyhow::Result<()> {
-    let framework = poise::Framework::builder()
-        .token(dotenv::var("TOKEN")?)
+fn build_framework(token: &str) -> poise::FrameworkBuilder<Data, anyhow::Error> {
+    poise::Framework::builder()
+        .token(token)
         .intents(serenity::GatewayIntents::non_privileged())
         .options(poise::FrameworkOptions {
             commands: vec![
@@ -68,8 +67,20 @@ async fn main() -> anyhow::Result<()> {
                 };
                 Ok(Data)
             })
-        });
+        })
+}
 
-    framework.run_autosharded().await?;
+#[cfg(not(feature="shuttle"))] #[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    build_framework(&dotenv::var("TOKEN")?).run_autosharded().await?;
     Ok(())
+}
+
+#[cfg(feature="shuttle")] use shuttle_secrets::SecretStore;
+#[cfg(feature="shuttle")] use shuttle_poise::ShuttlePoise;
+
+#[cfg(feature="shuttle")] #[shuttle_runtime::main]
+async fn poise(#[shuttle_secrets::Secrets] secret_store: SecretStore) -> ShuttlePoise<Data, anyhow::Error> {
+    let token = secret_store.get("TOKEN").expect("Discord token not found");
+    Ok(build_framework(&token).build().await.map_err(shuttle_runtime::CustomError::new)?.into())
 }
