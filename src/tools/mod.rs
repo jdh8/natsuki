@@ -2,6 +2,7 @@ pub mod base64;
 use crate::Context;
 use csscolorparser::Color;
 use rand::seq::IteratorRandom as _;
+use regex::{Captures, Regex};
 use poise::serenity_prelude as serenity;
 
 fn to_hsl_string(color: &Color) -> String {
@@ -51,8 +52,8 @@ pub async fn keycaps(ctx: Context<'_>,
     text: String,
 ) -> anyhow::Result<()> {
     let text = text.to_uppercase().replace(' ', "\u{2002}");
-    let text = regex::Regex::new(r"\d").unwrap().replace_all(&text, "$0\u{20E3}");
-    let text = regex::Regex::new("[[:upper:]]").unwrap().replace_all(&text, |c: &regex::Captures<'_>| {
+    let text = Regex::new(r"\d").unwrap().replace_all(&text, "$0\u{20E3}");
+    let text = Regex::new("[[:upper:]]").unwrap().replace_all(&text, |c: &Captures<'_>| {
         let c = c[0].as_bytes()[0];
         let c = 0x1F1E6 - b'A' as u32 + c as u32;
         let c = unsafe { char::from_u32_unchecked(c as u32) };
