@@ -14,3 +14,4 @@ Cargo.lock
 
 # dotenv environment variables file
 .env
+Secrets.toml
