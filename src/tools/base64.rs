@@ -114,7 +114,7 @@ fn guess_extension_from_mime<'a>(main: &'_ str, subtype: &'a str) -> &'a str {
 
 fn guess_extension(bytes: &[u8]) -> &'static str {
     let pattern = regex::Regex::new(r"^([-.\w]+)/([-.\w]+)").unwrap();
-    let captures: Option<regex::Captures<'static>> = pattern.captures(tree_magic::from_u8(bytes));
+    let captures = pattern.captures(tree_magic_mini::from_u8(bytes));
 
     match captures {
         Some(captures) => {
