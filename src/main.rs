@@ -44,6 +44,7 @@ async fn main() -> anyhow::Result<()> {
                 tools::base64::base64_encode(),
                 tools::base64::base64_decode(),
                 tools::color(),
+                tools::keycaps(),
                 tools::someone(),
                 weeb::feed(),
                 weeb::hug(),

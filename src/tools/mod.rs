@@ -40,6 +40,28 @@ pub async fn color(ctx: Context<'_>,
     Ok(())
 }
 
+/// Wrap text in keycaps
+///
+/// Replace text with keycap emojis
+///
+/// **Usage**: /keycaps <text>
+#[poise::command(category = "Tools", slash_command)]
+pub async fn keycaps(ctx: Context<'_>,
+    #[description = "Text to wrap in keycaps"]
+    text: String,
+) -> anyhow::Result<()> {
+    let text = text.to_uppercase().replace(' ', "\u{2002}");
+    let text = regex::Regex::new(r"\d").unwrap().replace_all(&text, "$0\u{20E3}");
+    let text = regex::Regex::new("[[:upper:]]").unwrap().replace_all(&text, |c: &regex::Captures<'_>| {
+        let c = c[0].as_bytes()[0];
+        let c = 0x1F1E6 - b'A' as u32 + c as u32;
+        let c = unsafe { char::from_u32_unchecked(c as u32) };
+        [c, '\u{AD}'].into_iter().collect::<String>()
+    });
+    ctx.say(text).await?;
+    Ok(())
+}
+
 /// Randomly pick someone
 ///
 /// Randomly pick someone in the channel
