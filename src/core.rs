@@ -58,8 +58,7 @@ pub async fn git(ctx: Context<'_>) -> anyhow::Result<()> {
 /// **Usage**: /invite
 #[poise::command(category = "Core", slash_command)]
 pub async fn invite(ctx: Context<'_>) -> anyhow::Result<()> {
-    ctx.say(concat!("https://discordapp.com/oauth2/authorize?&client_id=",
-        bot_id!(), "&scope=bot")).await?;
+    ctx.say(concat!("https://discord.com/application-directory/", bot_id!())).await?;
     Ok(())
 }
 
