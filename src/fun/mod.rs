@@ -214,7 +214,7 @@ async fn fuck(ctx: Context<'_>, user: Option<&serenity::User>) -> anyhow::Result
     let image = blend_image(base, &author, 364, 120);
     let image: image::RgbImage  = match user {
         Some(u) => {
-            let t = face_image(&u).await?.resize(256, 256, CatmullRom);
+            let t = face_image(u).await?.resize(256, 256, CatmullRom);
             blend_image(image, &t, 110, 20)
         },
         None => image,

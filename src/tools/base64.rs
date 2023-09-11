@@ -56,13 +56,11 @@ pub async fn base64_encode(ctx: Context<'_>, message: serenity::Message) -> anyh
     let code: Vec<_> = FuturesOrdered::from_iter(code).collect().await;
 
     ctx.send(|m| {
-        for c in code {
-            if let Ok(c) = c {
-                m.attachment(serenity::AttachmentType::Bytes {
-                    data: c.data.into(),
-                    filename: c.filename.clone(),
-                });
-            }
+        for c in code.into_iter().flatten() {
+            m.attachment(serenity::AttachmentType::Bytes {
+                data: c.data.into(),
+                filename: c.filename.clone(),
+            });
         }
         m.content(ENGINE.encode(message.content))
     }).await?;
@@ -150,13 +148,11 @@ pub async fn base64_decode(ctx: Context<'_>, message: serenity::Message) -> anyh
     let files: Vec<_> = FuturesOrdered::from_iter(files).collect().await;
     
     ctx.send(|m| {
-        for a in files {
-            if let Ok(a) = a {
-                m.attachment(serenity::AttachmentType::Bytes {
-                    data: a.data.into(),
-                    filename: a.filename.clone(),
-                });
-            }
+        for a in files.into_iter().flatten() {
+            m.attachment(serenity::AttachmentType::Bytes {
+                data: a.data.into(),
+                filename: a.filename.clone(),
+            });
         }
         m.content(text)
     }).await?;

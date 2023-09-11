@@ -99,9 +99,8 @@ pub async fn keycaps(ctx: Context<'_>,
     let text = Regex::new(r"\d").unwrap().replace_all(&text, "$0\u{20E3}");
     let text = Regex::new("[[:upper:]]").unwrap().replace_all(&text, |c: &Captures<'_>| {
         let c = c[0].as_bytes()[0];
-        let c = 0x1F1E6 - b'A' as u32 + c as u32;
-        let c = unsafe { char::from_u32_unchecked(c as u32) };
-        [c, '\u{AD}'].into_iter().collect::<String>()
+        let c = char::from_u32(0x1F1E6 - b'A' as u32 + c as u32);
+        c.into_iter().chain(Some('\u{AD}')).collect::<String>()
     });
     ctx.say(text).await?;
     Ok(())
