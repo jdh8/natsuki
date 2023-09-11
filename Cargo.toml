@@ -10,6 +10,7 @@ edition = "2021"
 description = "Discord bot named after Natsuki from Doki Doki Literature Club"
 repository = "https://github.com/jdh8/natsuki"
 license = "MIT"
+category = "games"
 keywords = ["discord", "ddlc"]
 
 [dependencies]

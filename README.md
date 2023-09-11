@@ -10,12 +10,11 @@ expect bugs and breaking changes.
 
 Usage
 -----
-[Invite her to your Discord server][invite] and test her out.  Her prefix is
-`n.`.
+[Invite her to your Discord server][invite] and test her out.
 
-* `n.help` prints info about commands
-* `n.ping` checks if Natsuki is working
-* Other commands mentioned in `n.help`
+* `/help` prints info about commands
+* `/ping` checks if Natsuki is working
+* Other commands mentioned in `/help`
 
 [invite]: https://discordapp.com/oauth2/authorize?&client_id=410315411695992833&scope=bot&permissions=0
 
