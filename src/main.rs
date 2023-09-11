@@ -13,6 +13,47 @@ pub struct Data {
 
 type Context<'a> = poise::Context<'a, Data, anyhow::Error>;
 
+fn get_commands() -> Vec<poise::Command<Data, anyhow::Error>> {
+    vec![
+        core::git(),
+        core::help(),
+        core::invite(),
+        core::ping(),
+        core::support(),
+        core::vote(),
+        fun::beat(),
+        fun::bunny(),
+        fun::cupcake(),
+        fun::cute(),
+        fun::nut(),
+        fun::poem::poem(),
+        fun::rate(),
+        fun::shelf(),
+        fun::ship(),
+        fun::smash(),
+        fun::word(),
+        information::avatar(),
+        information::avatar_user(),
+        information::snowflake(),
+        information::snowflake_message(),
+        information::snowflake_user(),
+        information::role(),
+        tools::base64::base64(),
+        tools::base64::base64_encode(),
+        tools::base64::base64_decode(),
+        tools::color(),
+        tools::keycaps(),
+        tools::poll(),
+        tools::someone(),
+        weeb::feed(),
+        weeb::hug(),
+        weeb::kiss(),
+        weeb::lewd(),
+        weeb::lick(),
+        weeb::neko(),
+    ]
+}
+
 #[shuttle_runtime::main]
 async fn main(
     #[shuttle_static_folder::StaticFolder(folder = "assets")] path: PathBuf,
@@ -22,44 +63,10 @@ async fn main(
         .token(secrets.get("TOKEN").expect("Discord token not found"))
         .intents(serenity::GatewayIntents::non_privileged())
         .options(poise::FrameworkOptions {
-            commands: vec![
-                core::git(),
-                core::help(),
-                core::invite(),
-                core::ping(),
-                core::support(),
-                core::vote(),
-                fun::beat(),
-                fun::bunny(),
-                fun::cupcake(),
-                fun::cute(),
-                fun::nut(),
-                fun::poem::poem(),
-                fun::rate(),
-                fun::shelf(),
-                fun::ship(),
-                fun::smash(),
-                fun::word(),
-                information::avatar(),
-                information::avatar_user(),
-                information::snowflake(),
-                information::snowflake_message(),
-                information::snowflake_user(),
-                information::role(),
-                tools::base64::base64(),
-                tools::base64::base64_encode(),
-                tools::base64::base64_decode(),
-                tools::color(),
-                tools::keycaps(),
-                tools::poll(),
-                tools::someone(),
-                weeb::feed(),
-                weeb::hug(),
-                weeb::kiss(),
-                weeb::lewd(),
-                weeb::lick(),
-                weeb::neko(),
-            ],
+            commands: match secrets.get("CLEAR") {
+                Some(_) => vec![],
+                None => get_commands(),
+            },
             ..Default::default()
         })
         .setup(|ctx, _ready, framework| {
