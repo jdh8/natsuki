@@ -59,6 +59,25 @@ fn get_commands() -> Vec<poise::Command<Data, anyhow::Error>> {
     ]
 }
 
+async fn update_top_gg(token: &str, ready: &serenity::Ready) -> anyhow::Result<()> {
+    let json = match ready.shard {
+        Some([_, s]) => serde_json::json!({
+            "server_count": s as usize * ready.guilds.len(),
+            "shard_count": s,
+        }),
+        None => serde_json::json!({
+            "server_count": ready.guilds.len(),
+        }),
+    };
+
+    reqwest::Client::new()
+        .post(concat!("https://top.gg/api/bots/", bot_id!(), "/stats"))
+        .header("Authorization", token)
+        .json(&json).send().await?;
+
+    Ok(())
+}
+
 #[shuttle_runtime::main]
 async fn main(
     #[shuttle_static_folder::StaticFolder(folder = "assets")] path: PathBuf,
@@ -74,7 +93,7 @@ async fn main(
             },
             ..Default::default()
         })
-        .setup(|ctx, _ready, framework| {
+        .setup(|ctx, ready, framework| {
             Box::pin(async move {
                 let commands = &framework.options().commands;
                 match secrets.get("GUILD") {
@@ -84,6 +103,9 @@ async fn main(
                     },
                     None => poise::builtins::register_globally(ctx, commands).await?,
                 };
+                if let Some(token) = secrets.get("TOP_GG_TOKEN") {
+                    let _ = update_top_gg(&token, ready);
+                }
                 Ok(Data { assets: path })
             })
         });
