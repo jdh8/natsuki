@@ -1,4 +1,4 @@
-use crate::Context;
+use crate::{Context, bot_id};
 
 /// Show this help message
 ///
@@ -58,7 +58,8 @@ pub async fn git(ctx: Context<'_>) -> anyhow::Result<()> {
 /// **Usage**: /invite
 #[poise::command(category = "Core", slash_command)]
 pub async fn invite(ctx: Context<'_>) -> anyhow::Result<()> {
-    ctx.say("https://discordapp.com/oauth2/authorize?&client_id=410315411695992833&scope=bot").await?;
+    ctx.say(concat!("https://discordapp.com/oauth2/authorize?&client_id=",
+        bot_id!(), "&scope=bot")).await?;
     Ok(())
 }
 
@@ -80,6 +81,6 @@ pub async fn support(ctx: Context<'_>) -> anyhow::Result<()> {
 /// **Usage**: /vote
 #[poise::command(category = "Core", slash_command)]
 pub async fn vote(ctx: Context<'_>) -> anyhow::Result<()> {
-    ctx.say("https://top.gg/bot/410315411695992833/vote").await?;
+    ctx.say(concat!("https://top.gg/bot/", bot_id!(), "/vote")).await?;
     Ok(())
 }

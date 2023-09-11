@@ -1,5 +1,5 @@
 pub mod poem;
-use crate::Context;
+use crate::{Context, bot_id};
 use image::{GenericImageView, Pixel};
 use image::buffer::ConvertBuffer as _;
 use image::imageops::FilterType::CatmullRom;
@@ -198,7 +198,7 @@ pub async fn ship(ctx: Context<'_>,
         None => vec![],
     };
     let ship = match slices.len() {
-        0 => ctx.author().to_string() + " × <@410315411695992833>",
+        0 => ctx.author().to_string() + concat!(" × <@", bot_id!(), ">"),
         1 => ctx.author().to_string() + " × " + slices[0],
         _ => slices.join(" × "),
     };

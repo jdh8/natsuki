@@ -6,6 +6,11 @@ mod weeb;
 use poise::serenity_prelude as serenity;
 use std::path::PathBuf;
 
+#[macro_export]
+macro_rules! bot_id {
+    () => { 410315411695992833 };
+}
+
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct Data {
     assets: PathBuf,
