@@ -4,15 +4,22 @@ mod information;
 mod tools;
 mod weeb;
 use poise::serenity_prelude as serenity;
+use std::path::PathBuf;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq)]
-pub struct Data;
+#[derive(Debug, Default, Clone, PartialEq)]
+pub struct Data {
+    assets: PathBuf,
+}
 
 type Context<'a> = poise::Context<'a, Data, anyhow::Error>;
 
-fn build_framework(token: &str) -> poise::FrameworkBuilder<Data, anyhow::Error> {
-    poise::Framework::builder()
-        .token(token)
+#[shuttle_runtime::main]
+async fn main(
+    #[shuttle_static_folder::StaticFolder(folder = "assets")] path: PathBuf,
+    #[shuttle_secrets::Secrets] secret_store: shuttle_secrets::SecretStore,
+) -> shuttle_poise::ShuttlePoise<Data, anyhow::Error> {
+    let builder = poise::Framework::builder()
+        .token(secret_store.get("TOKEN").expect("Discord token not found"))
         .intents(serenity::GatewayIntents::non_privileged())
         .options(poise::FrameworkOptions {
             commands: vec![
@@ -65,22 +72,9 @@ fn build_framework(token: &str) -> poise::FrameworkBuilder<Data, anyhow::Error> 
                     },
                     Err(_) => poise::builtins::register_globally(ctx, commands).await?,
                 };
-                Ok(Data)
+                Ok(Data { assets: path })
             })
-        })
-}
+        });
 
-#[cfg(not(feature="shuttle"))] #[tokio::main]
-async fn main() -> anyhow::Result<()> {
-    build_framework(&dotenv::var("TOKEN")?).run_autosharded().await?;
-    Ok(())
-}
-
-#[cfg(feature="shuttle")] use shuttle_secrets::SecretStore;
-#[cfg(feature="shuttle")] use shuttle_poise::ShuttlePoise;
-
-#[cfg(feature="shuttle")] #[shuttle_runtime::main]
-async fn poise(#[shuttle_secrets::Secrets] secret_store: SecretStore) -> ShuttlePoise<Data, anyhow::Error> {
-    let token = secret_store.get("TOKEN").expect("Discord token not found");
-    Ok(build_framework(&token).build().await.map_err(shuttle_runtime::CustomError::new)?.into())
+    Ok(builder.build().await.map_err(shuttle_runtime::CustomError::new)?.into())
 }
