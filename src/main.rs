@@ -16,10 +16,10 @@ type Context<'a> = poise::Context<'a, Data, anyhow::Error>;
 #[shuttle_runtime::main]
 async fn main(
     #[shuttle_static_folder::StaticFolder(folder = "assets")] path: PathBuf,
-    #[shuttle_secrets::Secrets] secret_store: shuttle_secrets::SecretStore,
+    #[shuttle_secrets::Secrets] secrets: shuttle_secrets::SecretStore,
 ) -> shuttle_poise::ShuttlePoise<Data, anyhow::Error> {
     let builder = poise::Framework::builder()
-        .token(secret_store.get("TOKEN").expect("Discord token not found"))
+        .token(secrets.get("TOKEN").expect("Discord token not found"))
         .intents(serenity::GatewayIntents::non_privileged())
         .options(poise::FrameworkOptions {
             commands: vec![
@@ -65,12 +65,12 @@ async fn main(
         .setup(|ctx, _ready, framework| {
             Box::pin(async move {
                 let commands = &framework.options().commands;
-                match dotenv::var("GUILD") {
-                    Ok(id) => {
+                match secrets.get("GUILD") {
+                    Some(id) => {
                         let guild = serenity::GuildId(id.parse::<u64>()?);
                         poise::builtins::register_in_guild(ctx, commands, guild).await?
                     },
-                    Err(_) => poise::builtins::register_globally(ctx, commands).await?,
+                    None => poise::builtins::register_globally(ctx, commands).await?,
                 };
                 Ok(Data { assets: path })
             })

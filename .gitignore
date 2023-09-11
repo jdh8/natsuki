@@ -12,6 +12,6 @@ Cargo.lock
 # VS Code config
 /.vscode/
 
-# dotenv environment variables file
-.env
+# Shuttle.rs secrets
 Secrets.toml
+Secrets.dev.toml
