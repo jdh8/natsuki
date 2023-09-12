@@ -59,23 +59,20 @@ fn get_commands() -> Vec<poise::Command<Data, anyhow::Error>> {
     ]
 }
 
-async fn update_top_gg(token: &str, ready: &serenity::Ready) -> anyhow::Result<()> {
-    let json = match ready.shard {
-        Some([_, s]) => serde_json::json!({
-            "server_count": s * ready.guilds.len() as u64,
-            "shard_count": s,
-        }),
-        None => serde_json::json!({
-            "server_count": ready.guilds.len(),
-        }),
-    };
-
+async fn update_top_gg(token: &str, ready: &serenity::Ready) -> reqwest::Result<reqwest::Response> {
     reqwest::Client::new()
         .post(concat!("https://top.gg/api/bots/", bot_id!(), "/stats"))
         .header("Authorization", token)
-        .json(&json).send().await?;
-
-    Ok(())
+        .json(&ready.shard.map_or_else(
+            || serde_json::json!({
+                "server_count": ready.guilds.len(),
+            }),
+            |[_, s]| serde_json::json!({
+                "server_count": s * ready.guilds.len() as u64,
+                "shard_count": s,
+            })
+        ))
+        .send().await
 }
 
 #[shuttle_runtime::main]
@@ -87,10 +84,7 @@ async fn main(
         .token(secrets.get("TOKEN").expect("Discord token not found"))
         .intents(serenity::GatewayIntents::non_privileged())
         .options(poise::FrameworkOptions {
-            commands: match secrets.get("CLEAR") {
-                Some(_) => vec![],
-                None => get_commands(),
-            },
+            commands: secrets.get("CLEAR").map_or_else(get_commands, |_| vec![]),
             ..Default::default()
         })
         .setup(|ctx, ready, framework| {
