@@ -24,6 +24,7 @@ async fn decode(ctx: Context<'_>, mut text: String) -> anyhow::Result<()> {
 /// Encode or decode Base64 in the standard alphabet with no padding.
 ///
 /// **Usage:** /base64 <encode|decode> [text]
+#[allow(clippy::unused_async)]
 #[poise::command(category = "Tools", slash_command, subcommands("encode", "decode"))]
 pub async fn base64(_: Context<'_>) -> anyhow::Result<()> {
     unimplemented!("Unimplemented prefix command")
@@ -53,7 +54,7 @@ async fn encode_attachment(attachment: &serenity::Attachment) -> anyhow::Result<
 pub async fn base64_encode(ctx: Context<'_>, message: serenity::Message) -> anyhow::Result<()> {
     let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id().0);
     let code = message.attachments.iter().map(encode_attachment);
-    let code: Vec<_> = FuturesOrdered::from_iter(code).collect().await;
+    let code: Vec<_> = code.collect::<FuturesOrdered<_>>().collect().await;
 
     ctx.send(|m| {
         for c in code.into_iter().flatten() {
@@ -111,16 +112,13 @@ fn guess_extension_from_mime<'a>(main: &'_ str, subtype: &'a str) -> &'a str {
 }
 
 fn guess_extension(bytes: &[u8]) -> &'static str {
-    let pattern = regex::Regex::new(r"^([-.\w]+)/([-.\w]+)").unwrap();
+    let pattern = regex::Regex::new(r"^([-.\w]+)/([-.\w]+)").expect("Invalid regex");
     let captures = pattern.captures(tree_magic_mini::from_u8(bytes));
 
-    match captures {
-        Some(captures) => {
-            let (_, [main, subtype]) = captures.extract();
-            guess_extension_from_mime(main, subtype)
-        },
-        None => "bin",
-    }
+    captures.map_or("bin", |captures| {
+        let (_, [main, subtype]) = captures.extract();
+        guess_extension_from_mime(main, subtype)
+    })
 }
 
 async fn decode_attachment(attachment: &serenity::Attachment) -> anyhow::Result<AttachmentData> {
@@ -145,7 +143,7 @@ pub async fn base64_decode(ctx: Context<'_>, message: serenity::Message) -> anyh
     let text = core::str::from_utf8(&text)?;
 
     let files = message.attachments.iter().map(decode_attachment);
-    let files: Vec<_> = FuturesOrdered::from_iter(files).collect().await;
+    let files: Vec<_> = files.collect::<FuturesOrdered<_>>().collect().await;
     
     ctx.send(|m| {
         for a in files.into_iter().flatten() {

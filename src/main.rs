@@ -8,10 +8,10 @@ use std::path::PathBuf;
 
 #[macro_export]
 macro_rules! bot_id {
-    () => { 410315411695992833 };
+    () => { 410_315_411_695_992_833 };
 }
 
-#[derive(Debug, Default, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct Data {
     assets: PathBuf,
 }
@@ -62,7 +62,7 @@ fn get_commands() -> Vec<poise::Command<Data, anyhow::Error>> {
 async fn update_top_gg(token: &str, ready: &serenity::Ready) -> anyhow::Result<()> {
     let json = match ready.shard {
         Some([_, s]) => serde_json::json!({
-            "server_count": s as usize * ready.guilds.len(),
+            "server_count": s * ready.guilds.len() as u64,
             "shard_count": s,
         }),
         None => serde_json::json!({
@@ -99,7 +99,7 @@ async fn main(
                 match secrets.get("GUILD") {
                     Some(id) => {
                         let guild = serenity::GuildId(id.parse::<u64>()?);
-                        poise::builtins::register_in_guild(ctx, commands, guild).await?
+                        poise::builtins::register_in_guild(ctx, commands, guild).await?;
                     },
                     None => poise::builtins::register_globally(ctx, commands).await?,
                 };

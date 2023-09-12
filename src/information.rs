@@ -13,20 +13,21 @@ impl From<u64> for Snowflake {
 }
 
 impl Snowflake {
-    fn time(&self) -> time::SystemTime {
-        time::UNIX_EPOCH + time::Duration::from_millis((self.0 >> 22) + 1420070400000)
+    fn time(self) -> time::SystemTime {
+        const Y2015: u64 = 16436 * 86_400_000;
+        time::UNIX_EPOCH + time::Duration::from_millis((self.0 >> 22) + Y2015)
     }
 
-    fn worker(&self) -> u8 {
+    const fn worker(self) -> u8 {
         (self.0 >> 17 & 0x1F) as u8
     }
 
-    fn process(&self) -> u8 {
+    const fn process(self) -> u8 {
         (self.0 >> 12 & 0x1F) as u8
     }
 
-    fn increment(&self) -> u8 {
-        (self.0 & 0xFFF) as u8
+    const fn increment(self) -> u16 {
+        (self.0 & 0xFFF) as u16
     }
 }
 
@@ -75,13 +76,12 @@ pub async fn snowflake(ctx: Context<'_>,
     #[description = "Snowflake (any Discord entity) to decode"]
     snowflake: String,
 ) -> anyhow::Result<()> {
-    ctx.say(match regex::Regex::new(r"\d+")?.find(&snowflake) {
-        Some(mat) => match mat.as_str().parse::<u64>() {
-            Ok(flake) => format_snowflake(flake.into()),
-            Err(_) => "Found an invalid snowflake: ".to_owned() + mat.as_str(),
-        },
-        None => "No snowflake is found.".to_owned(),
-    }).await?;
+    ctx.say(regex::Regex::new(r"\d+")?.find(&snowflake).map_or_else(
+        || "No snowflake is found.".to_owned(),
+        |mat| mat.as_str().parse::<u64>().map_or_else(
+            |_| "Found an invalid snowflake: ".to_owned() + mat.as_str(),
+            |flake| format_snowflake(flake.into()),
+        ))).await?;
     Ok(())
 }
 

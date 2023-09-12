@@ -11,8 +11,9 @@ use tokio::time::{Duration, sleep};
 async fn face_image(user: &serenity::User) -> anyhow::Result<image::DynamicImage> {
     let uri = user.face();
     let buffer = reqwest::get(&uri).await?.bytes().await?;
+    let extension = std::path::Path::new(&uri).extension();
 
-    if uri.ends_with(".webp") {
+    if extension.map_or(false, |e| e.eq_ignore_ascii_case("webp")) {
         Ok(webp::Decoder::new(&buffer).decode()
             .expect("Failed to decode WebP avatar")
             .to_image())
@@ -119,7 +120,7 @@ pub async fn cute(ctx: Context<'_>) -> anyhow::Result<()> {
     sleep(Duration::from_secs(2)).await;
     reply.edit(ctx, |m| m.content(&content)).await?;
 
-    let _ = typing.map(|t| t.stop());
+    let _ = typing.map(serenity::Typing::stop);
     content.push_str("\nI-I have to go to the bathroom.");
     sleep(Duration::from_secs(4)).await;
     reply.edit(ctx, |m| m.content(&content)).await?;
@@ -160,7 +161,7 @@ pub async fn rate(ctx: Context<'_>,
     let canonical = regex::Regex::new(r"<@!(\d+)>")?.replace_all(&lower, "<@$1>");
     let digest: [u64; 2] = unsafe { core::mem::transmute(md5::compute(canonical.as_bytes())) };
     let percentage = digest[0].wrapping_add(14) % 101;
-    ctx.say(format!("<:natsuki:424991419329937428> I'd give {} {}%.", trimmed, percentage)).await?;
+    ctx.say(format!("<:natsuki:424991419329937428> I'd give {trimmed} {percentage}%.")).await?;
     Ok(())
 }
 
@@ -193,10 +194,9 @@ pub async fn ship(ctx: Context<'_>,
     #[description = "Characters to ship, separated by & or × (multiplication sign, U+00D7)"]
     text: Option<String>,
 ) -> anyhow::Result<()> {
-    let slices = match text.as_deref() {
-        Some(t) => t.split(['&', '×']).map(str::trim).collect(),
-        None => vec![],
-    };
+    let slices = text.as_deref()
+        .map_or_else(Vec::new, |t| t.split(['&', '×']).map(str::trim).collect());
+
     let ship = match slices.len() {
         0 => ctx.author().to_string() + concat!(" × <@", bot_id!(), ">"),
         1 => ctx.author().to_string() + " × " + slices[0],
@@ -252,10 +252,9 @@ pub async fn smash(ctx: Context<'_>,
 
     let author = ctx.author().mention();
     ctx.send(|m| m.embed(|e| e
-        .description(match user {
-            Some(u) => format!("{} smashed {}!", author, u.mention()),
-            None => format!("{} smashed!", author),
-        })
+        .description(user.map_or_else(
+            || format!("{author} smashed!"),
+            |u| format!("{author} smashed {}!", u.mention())))
         .image("https://raw.githubusercontent.com/jdh8/natsuki/master/assets/smash.png"))
     ).await?;
     Ok(())

@@ -8,8 +8,8 @@ use poise::serenity_prelude as serenity;
 fn to_hsl_string(color: &Color) -> String {
     let (h, s, l, a) = color.to_hsla();
     let (s, l) = (100.0 * s, 100.0 * l);
-    if color.a == 1.0 { format!("hsl({:.1}, {:.2}%, {:.2}%)", h, s, l) }
-    else { format!("hsla({:.1}, {:.2}%, {:.2}%, {:.4})", h, s, l, a) }
+    if color.a >= 1.0 { format!("hsl({h:.1}, {s:.2}%, {l:.2}%)") }
+    else { format!("hsla({h:.1}, {s:.2}%, {l:.2}%, {a:.4})") }
 }
 
 /// Display a color
@@ -51,12 +51,13 @@ pub async fn color(ctx: Context<'_>,
 /// **Examples**:
 /// /poll Is Miyuki Sone best waifu
 /// /poll Sayori | Natsuki | Yuri | Monika"
+#[allow(clippy::cast_possible_truncation)] //< The length is <= 20, which fits in u32
 #[poise::command(category = "Tools", slash_command)]
 pub async fn poll(ctx: Context<'_>,
     #[description = "Question or options"]
     text: String,
 ) -> anyhow::Result<()> {
-    let options: Vec<_> = Regex::new(r"\s+\|\s+").unwrap().splitn(&text, 20).collect();
+    let options: Vec<_> = Regex::new(r"\s+\|\s+")?.splitn(&text, 20).collect();
 
     if options.len() == 1 {
         let question = options[0];
@@ -96,10 +97,10 @@ pub async fn keycaps(ctx: Context<'_>,
     text: String,
 ) -> anyhow::Result<()> {
     let text = text.to_uppercase().replace(' ', "\u{2002}");
-    let text = Regex::new(r"\d").unwrap().replace_all(&text, "$0\u{20E3}");
-    let text = Regex::new("[[:upper:]]").unwrap().replace_all(&text, |c: &Captures<'_>| {
+    let text = Regex::new(r"\d")?.replace_all(&text, "$0\u{20E3}");
+    let text = Regex::new("[[:upper:]]")?.replace_all(&text, |c: &Captures<'_>| {
         let c = c[0].as_bytes()[0];
-        let c = char::from_u32(0x1F1E6 - b'A' as u32 + c as u32);
+        let c = char::from_u32(0x1F1E6 - u32::from(b'A') + u32::from(c));
         c.into_iter().chain(Some('\u{AD}')).collect::<String>()
     });
     ctx.say(text).await?;

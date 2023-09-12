@@ -245,7 +245,7 @@ const DICTIONARY: [(&str, Preference); 228] = [
     ("wrath", Preference::Yuri),
 ];
 
-#[derive(poise::ChoiceParameter, Debug, Clone, Copy, PartialEq, PartialOrd)]
+#[derive(poise::ChoiceParameter, Debug, Clone, Copy, PartialEq, Eq, PartialOrd)]
 pub enum Act {
     #[name = "1"] One = 1,
     #[name = "2"] Two,
@@ -287,7 +287,7 @@ async fn game(ctx: Context<'_>, word: &str, answer: Doki, buttons: &[(EmojiId, D
     match collected {
         Some(interaction) => {
             let right = "Congratulations!  That's correct.".to_owned();
-            let wrong = format!("Sorry, it's **{}**.", answer);
+            let wrong = format!("Sorry, it's **{answer}**.");
             let selected = interaction.data.custom_id.parse::<Doki>()?;
 
             let response = interaction.create_interaction_response(ctx, |m| m
@@ -341,9 +341,9 @@ async fn poem1(ctx: Context<'_>) -> anyhow::Result<()> {
         else { Doki::Natsuki };
 
     game(ctx, word, doki, &[
-        (EmojiId(424991418386350081), Doki::Sayori),
-        (EmojiId(424991419329937428), Doki::Natsuki),
-        (EmojiId(424987242986078218), Doki::Yuri),
+        (EmojiId(424_991_418_386_350_081), Doki::Sayori),
+        (EmojiId(424_991_419_329_937_428), Doki::Natsuki),
+        (EmojiId(424_987_242_986_078_218), Doki::Yuri),
     ]).await
 }
 
@@ -352,13 +352,13 @@ async fn poem2(ctx: Context<'_>) -> anyhow::Result<()> {
     let doki = if preference.contains(Preference::Yuri) { Doki::Yuri } else { Doki::Natsuki };
 
     game(ctx, word, doki, &[
-        (EmojiId(424991419329937428), Doki::Natsuki),
-        (EmojiId(424987242986078218), Doki::Yuri),
+        (EmojiId(424_991_419_329_937_428), Doki::Natsuki),
+        (EmojiId(424_987_242_986_078_218), Doki::Yuri),
     ]).await
 }
 
 async fn poem3(ctx: Context<'_>) -> anyhow::Result<()> {
-    game(ctx, "Monika", Doki::Monika, &[(EmojiId(501274687842680832), Doki::Monika)]).await
+    game(ctx, "Monika", Doki::Monika, &[(EmojiId(501_274_687_842_680_832), Doki::Monika)]).await
 }
 
 /// Play a poem game
