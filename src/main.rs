@@ -104,7 +104,7 @@ async fn main(
                     None => poise::builtins::register_globally(ctx, commands).await?,
                 };
                 if let Some(token) = secrets.get("TOP_GG_TOKEN") {
-                    let _ = update_top_gg(&token, ready);
+                    let _ = update_top_gg(&token, ready).await;
                 }
                 Ok(Data { assets: path })
             })
