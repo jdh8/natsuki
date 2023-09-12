@@ -1,0 +1,7 @@
+[alias]
+deploy = "shuttle deploy"
+r = "shuttle run"
+rr = "shuttle run --release"
+
+[build]
+rustflags = ["-C", "target-cpu=native"]
