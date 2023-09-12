@@ -90,7 +90,7 @@ pub async fn cupcake(ctx: Context<'_>,
     ctx.send(|m| m
         .content(format!("{} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!", target.mention()))
         .attachment(serenity::model::channel::AttachmentType::Bytes {
-            data: cake.encode(85.0).to_vec().into(),
+            data: cake.encode(90.0).to_vec().into(),
             filename: "cupcake.webp".into(),
         })
     ).await?;
@@ -229,7 +229,7 @@ async fn fuck(ctx: Context<'_>, user: Option<&serenity::User>) -> anyhow::Result
             ctx.author().mention(),
             user.map_or_else(|| "Natsuki".to_owned(), |u| u.mention().to_string())))
         .attachment(serenity::model::channel::AttachmentType::Bytes {
-            data: image.encode(85.0).to_vec().into(),
+            data: image.encode(90.0).to_vec().into(),
             filename: "fuck.webp".into(),
         })
     ).await?;
