@@ -3,6 +3,7 @@ mod fun;
 mod information;
 mod tools;
 mod weeb;
+mod topgg;
 use poise::serenity_prelude as serenity;
 use std::path::PathBuf;
 
@@ -59,27 +60,13 @@ fn get_commands() -> Vec<poise::Command<Data, anyhow::Error>> {
     ]
 }
 
-async fn update_top_gg(token: &str, ready: &serenity::Ready) -> reqwest::Result<reqwest::Response> {
-    reqwest::Client::new()
-        .post(concat!("https://top.gg/api/bots/", bot_id!(), "/stats"))
-        .header("Authorization", token)
-        .json(&ready.shard.map_or_else(
-            || serde_json::json!({
-                "server_count": ready.guilds.len(),
-            }),
-            |[_, s]| serde_json::json!({
-                "server_count": s * ready.guilds.len() as u64,
-                "shard_count": s,
-            })
-        ))
-        .send().await
-}
-
 #[shuttle_runtime::main]
 async fn main(
     #[shuttle_static_folder::StaticFolder(folder = "assets")] path: PathBuf,
     #[shuttle_secrets::Secrets] secrets: shuttle_secrets::SecretStore,
 ) -> shuttle_poise::ShuttlePoise<Data, anyhow::Error> {
+    let poster = topgg::Poster::new(secrets.get("TOP_GG_TOKEN"));
+
     let builder = poise::Framework::builder()
         .token(secrets.get("TOKEN").expect("Discord token not found"))
         .intents(serenity::GatewayIntents::non_privileged())
@@ -87,7 +74,7 @@ async fn main(
             commands: secrets.get("CLEAR").map_or_else(get_commands, |_| vec![]),
             ..Default::default()
         })
-        .setup(|ctx, ready, framework| {
+        .setup(|ctx, _, framework| {
             Box::pin(async move {
                 let commands = &framework.options().commands;
                 match secrets.get("GUILD") {
@@ -97,12 +84,10 @@ async fn main(
                     },
                     None => poise::builtins::register_globally(ctx, commands).await?,
                 };
-                if let Some(token) = secrets.get("TOP_GG_TOKEN") {
-                    let _ = update_top_gg(&token, ready).await;
-                }
                 Ok(Data { assets: path })
             })
-        });
+        })
+        .client_settings(|client| client.event_handler(poster));
 
     Ok(builder.build().await.map_err(shuttle_runtime::CustomError::new)?.into())
 }
