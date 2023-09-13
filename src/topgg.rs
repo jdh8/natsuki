@@ -51,6 +51,7 @@ impl serenity::EventHandler for Poster {
 
         match ready.shard {
             None => post(token, Stats { guilds, shards: 0 }).await,
+            Some([_, s@0..=1]) => post(token, Stats { guilds, shards: s }).await,
             Some([_, shards]) => {
                 let mut stats = self.stats.lock().await;
                 stats.guilds += guilds;
