@@ -144,7 +144,7 @@ pub async fn base64_decode(ctx: Context<'_>, message: serenity::Message) -> anyh
 
     let files = message.attachments.iter().map(decode_attachment);
     let files: Vec<_> = files.collect::<FuturesOrdered<_>>().collect().await;
-    
+
     ctx.send(|m| {
         for a in files.into_iter().flatten() {
             m.attachment(serenity::AttachmentType::Bytes {

@@ -27,7 +27,7 @@ pub async fn color(ctx: Context<'_>,
     let pixel = image::Rgba(color.to_rgba8());
     let image = image::ImageBuffer::from_pixel(128, 128, pixel);
     let image = webp::Encoder::from_rgba(&image, image.width(), image.height());
-    
+
     ctx.send(|m| m
         .content("**Hex:** ".to_owned() + &color.to_hex_string()
             + "\n**RGB:** " + &color.to_rgb_string()
