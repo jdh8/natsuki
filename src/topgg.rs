@@ -47,13 +47,15 @@ impl Poster {
 impl serenity::EventHandler for Poster {
     async fn ready(&self, _: serenity::Context, ready: serenity::Ready) {
         let Some(token) = self.token.as_deref() else { return };
+        let guilds = ready.guilds.len() as u64;
+
         match ready.shard {
-            None => post(token, Stats { guilds: ready.guilds.len() as u64, shards: 0 }).await,
+            None => post(token, Stats { guilds, shards: 0 }).await,
             Some([_, shards]) => {
                 let mut stats = self.stats.lock().await;
-                stats.guilds += ready.guilds.len() as u64;
+                stats.guilds += guilds;
                 stats.shards += 1;
-                
+
                 if stats.shards == shards {
                     post(token, *stats).await;
                 }
