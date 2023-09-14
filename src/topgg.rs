@@ -14,7 +14,8 @@ impl Stats {
             serde_json::json!({
                 "server_count": self.guilds,
             })
-        } else {
+        }
+        else {
             serde_json::json!({
                 "server_count": self.guilds,
                 "shard_count": self.shards,
