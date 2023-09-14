@@ -9,7 +9,7 @@ struct Stats {
 }
 
 impl Stats {
-    fn serialize(&self) -> serde_json::Value {
+    fn serialize(self) -> serde_json::Value {
         if self.shards == 0 {
             serde_json::json!({
                 "server_count": self.guilds,
