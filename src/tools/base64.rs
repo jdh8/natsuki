@@ -4,7 +4,18 @@ use futures::StreamExt as _;
 use futures::stream::FuturesOrdered;
 use poise::serenity_prelude as serenity;
 
-const ENGINE: engine::GeneralPurpose = engine::general_purpose::STANDARD_NO_PAD;
+const ENGINE: engine::GeneralPurpose = engine::GeneralPurpose::new(
+    &base64::alphabet::STANDARD,
+    engine::general_purpose::NO_PAD
+        .with_decode_allow_trailing_bits(true)
+        .with_decode_padding_mode(engine::DecodePaddingMode::Indifferent),
+);
+
+fn forgiving_decode(s: impl AsRef<[u8]>) -> Result<Vec<u8>, base64::DecodeError> {
+    ENGINE.decode(s.as_ref().iter().copied()
+        .filter(|c| !c.is_ascii_whitespace())
+        .collect::<Vec<_>>())
+}
 
 #[poise::command(slash_command)]
 async fn encode(ctx: Context<'_>, text: String) -> anyhow::Result<()> {
@@ -13,9 +24,8 @@ async fn encode(ctx: Context<'_>, text: String) -> anyhow::Result<()> {
 }
 
 #[poise::command(slash_command)]
-async fn decode(ctx: Context<'_>, mut text: String) -> anyhow::Result<()> {
-    text.retain(|c| !c.is_whitespace());
-    ctx.say(core::str::from_utf8(&ENGINE.decode(text)?)?).await?;
+async fn decode(ctx: Context<'_>, text: String) -> anyhow::Result<()> {
+    ctx.say(String::from_utf8(forgiving_decode(text)?)?).await?;
     Ok(())
 }
 
@@ -122,10 +132,7 @@ fn guess_extension(bytes: &[u8]) -> &'static str {
 }
 
 async fn decode_attachment(attachment: &serenity::Attachment) -> anyhow::Result<AttachmentData> {
-    let mut code = attachment.download().await?;
-    code.retain(|c| !(*c as char).is_whitespace());
-
-    let buffer = ENGINE.decode(code)?;
+    let buffer = forgiving_decode(attachment.download().await?)?;
     let extension = guess_extension(&buffer);
 
     Ok(AttachmentData {
@@ -137,11 +144,7 @@ async fn decode_attachment(attachment: &serenity::Attachment) -> anyhow::Result<
 #[poise::command(context_menu_command = "Base64 decode")]
 pub async fn base64_decode(ctx: Context<'_>, message: serenity::Message) -> anyhow::Result<()> {
     let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id().0);
-    let mut text = message.content;
-    text.retain(|c| !c.is_whitespace());
-    let text = ENGINE.decode(text)?;
-    let text = core::str::from_utf8(&text)?;
-
+    let text = String::from_utf8(forgiving_decode(message.content)?)?;
     let files = message.attachments.iter().map(decode_attachment);
     let files: Vec<_> = files.collect::<FuturesOrdered<_>>().collect().await;
 
