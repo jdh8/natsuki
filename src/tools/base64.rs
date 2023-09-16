@@ -56,7 +56,7 @@ async fn encode_attachment(attachment: &serenity::Attachment) -> anyhow::Result<
 
     Ok(AttachmentData {
         data: code.collect(),
-        filename: attachment.filename.clone() + "b64.txt",
+        filename: attachment.filename.clone() + ".b64.txt",
     })
 }
 
