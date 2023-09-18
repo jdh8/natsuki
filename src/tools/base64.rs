@@ -63,11 +63,11 @@ async fn encode_attachment(attachment: &serenity::Attachment) -> anyhow::Result<
 #[poise::command(context_menu_command = "Base64 encode")]
 pub async fn base64_encode(ctx: Context<'_>, message: serenity::Message) -> anyhow::Result<()> {
     let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id().0);
-    let code = message.attachments.iter().map(encode_attachment);
-    let code: Vec<_> = code.collect::<FuturesOrdered<_>>().collect().await;
+    let attachments = message.attachments.iter().map(encode_attachment);
+    let attachments: Vec<_> = attachments.collect::<FuturesOrdered<_>>().collect().await;
 
     ctx.send(|m| {
-        for c in code.into_iter().flatten() {
+        for c in attachments.into_iter().flatten() {
             m.attachment(serenity::AttachmentType::Bytes {
                 data: c.data.into(),
                 filename: c.filename.clone(),
@@ -145,11 +145,11 @@ async fn decode_attachment(attachment: &serenity::Attachment) -> anyhow::Result<
 pub async fn base64_decode(ctx: Context<'_>, message: serenity::Message) -> anyhow::Result<()> {
     let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id().0);
     let text = String::from_utf8(forgiving_decode(message.content)?)?;
-    let files = message.attachments.iter().map(decode_attachment);
-    let files: Vec<_> = files.collect::<FuturesOrdered<_>>().collect().await;
+    let attachments = message.attachments.iter().map(decode_attachment);
+    let attachments: Vec<_> = attachments.collect::<FuturesOrdered<_>>().collect().await;
 
     ctx.send(|m| {
-        for a in files.into_iter().flatten() {
+        for a in attachments.into_iter().flatten() {
             m.attachment(serenity::AttachmentType::Bytes {
                 data: a.data.into(),
                 filename: a.filename.clone(),
