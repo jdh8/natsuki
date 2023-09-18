@@ -22,15 +22,15 @@ csscolorparser = "0.6.2"
 futures = "0.3.28"
 image = "0.24.7"
 md5 = "0.7.0"
-poise = "0.5.5"
+poise = "0.5.6"
 rand = "0.8.5"
 regex = "1.9.5"
 reqwest = "0.11.20"
 serde_json = "1.0.105"
-shuttle-poise = { git = "https://github.com/jdh8/shuttle", branch = "deploy" }
-shuttle-runtime = { git = "https://github.com/jdh8/shuttle", branch = "deploy" }
-shuttle-secrets = { git = "https://github.com/jdh8/shuttle", branch = "deploy" }
-shuttle-static-folder = { git = "https://github.com/jdh8/shuttle", branch = "deploy" }
+shuttle-poise = "0.26.0"
+shuttle-runtime = "0.26.0"
+shuttle-secrets = "0.26.0"
+shuttle-static-folder = "0.26.0"
 strum = { version = "0.25", features = ["derive"] }
 tokio = { version = "1.32.0", features = ["full"] }
 tree_magic_mini = "3.0.3"
