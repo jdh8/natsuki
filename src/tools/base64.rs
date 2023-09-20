@@ -87,7 +87,7 @@ pub async fn base64_encode(ctx: Context<'_>, message: serenity::Message) -> anyh
     let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id().0);
     let attachments = message.attachments.into_iter().map(encode_attachment);
     let attachments: Vec<_> = attachments.collect::<FuturesOrdered<_>>().collect().await;
-    let embeds = if message.content.is_empty() { vec![] } else { message.embeds };
+    let embeds = if message.content.is_empty() { message.embeds } else { vec![] };
 
     ctx.send(|m| {
         for c in attachments.into_iter().flatten() {
