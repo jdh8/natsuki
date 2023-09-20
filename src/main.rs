@@ -71,7 +71,7 @@ async fn main(
         .token(secrets.get("TOKEN").expect("Discord token not found"))
         .intents(serenity::GatewayIntents::non_privileged())
         .options(poise::FrameworkOptions {
-            commands: secrets.get("CLEAR").map_or_else(get_commands, |_| vec![]),
+            commands: secrets.get("CLEAR").map_or_else(get_commands, |_| Vec::new()),
             ..Default::default()
         })
         .setup(|ctx, _, framework| {
