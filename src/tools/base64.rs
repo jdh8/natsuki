@@ -87,7 +87,6 @@ pub async fn base64_encode(ctx: Context<'_>, message: serenity::Message) -> anyh
     let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id().0);
     let attachments = message.attachments.into_iter().map(encode_attachment);
     let attachments: Vec<_> = attachments.collect::<FuturesOrdered<_>>().collect().await;
-    let embeds = if message.content.is_empty() { message.embeds } else { Vec::new() };
 
     ctx.send(|m| {
         for c in attachments.into_iter().flatten() {
@@ -96,7 +95,10 @@ pub async fn base64_encode(ctx: Context<'_>, message: serenity::Message) -> anyh
                 filename: c.filename,
             });
         }
-        m.embeds = embeds.into_iter().map(encode_embed).collect();
+        m.embeds = message.embeds.into_iter()
+            .filter(|e| matches!(e.kind.as_deref(), Some("rich") | None))
+            .map(encode_embed)
+            .collect();
         m.content(ENGINE.encode(message.content))
     }).await?;
     Ok(())
