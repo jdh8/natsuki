@@ -60,19 +60,43 @@ async fn encode_attachment(attachment: &serenity::Attachment) -> anyhow::Result<
     })
 }
 
+fn encode_embed(mut embed: serenity::Embed) -> serenity::CreateEmbed {
+    fn encode(s: impl AsRef<[u8]>) -> String {
+        ENGINE.encode(s)
+    }
+
+    if let Some(author) = embed.author.as_mut() {
+        author.name = encode(&author.name);
+    }
+
+    if let Some(footer) = embed.footer.as_mut() {
+        footer.text = encode(&footer.text);
+    }
+
+    if let Some(provider) = embed.provider.as_mut() {
+        provider.name = provider.name.as_deref().map(encode);
+    }
+
+    embed.description = embed.description.map(encode);
+    embed.title = embed.title.map(encode);
+    embed.into()
+}
+
 #[poise::command(context_menu_command = "Base64 encode")]
 pub async fn base64_encode(ctx: Context<'_>, message: serenity::Message) -> anyhow::Result<()> {
     let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id().0);
     let attachments = message.attachments.iter().map(encode_attachment);
     let attachments: Vec<_> = attachments.collect::<FuturesOrdered<_>>().collect().await;
+    let embeds = if message.content.is_empty() { vec![] } else { message.embeds };
 
     ctx.send(|m| {
         for c in attachments.into_iter().flatten() {
             m.attachment(serenity::AttachmentType::Bytes {
                 data: c.data.into(),
-                filename: c.filename.clone(),
+                filename: c.filename,
             });
         }
+        m.embeds = embeds.into_iter().map(encode_embed).collect();
         m.content(ENGINE.encode(message.content))
     }).await?;
     Ok(())
@@ -141,6 +165,28 @@ async fn decode_attachment(attachment: &serenity::Attachment) -> anyhow::Result<
     })
 }
 
+fn decode_embed(mut embed: serenity::Embed) -> anyhow::Result<serenity::CreateEmbed> {
+    fn decode(s: impl AsRef<[u8]>) -> anyhow::Result<String> {
+        Ok(String::from_utf8(forgiving_decode(s)?)?)
+    }
+
+    if let Some(author) = embed.author.as_mut() {
+        author.name = decode(&author.name)?;
+    }
+
+    if let Some(footer) = embed.footer.as_mut() {
+        footer.text = decode(&footer.text)?;
+    }
+
+    if let Some(provider) = embed.provider.as_mut() {
+        provider.name = provider.name.as_deref().map(decode).transpose()?;
+    }
+
+    embed.description = embed.description.map(decode).transpose()?;
+    embed.title = embed.title.map(decode).transpose()?;
+    Ok(embed.into())
+}
+
 #[poise::command(context_menu_command = "Base64 decode")]
 pub async fn base64_decode(ctx: Context<'_>, message: serenity::Message) -> anyhow::Result<()> {
     let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id().0);
@@ -152,9 +198,10 @@ pub async fn base64_decode(ctx: Context<'_>, message: serenity::Message) -> anyh
         for a in attachments.into_iter().flatten() {
             m.attachment(serenity::AttachmentType::Bytes {
                 data: a.data.into(),
-                filename: a.filename.clone(),
+                filename: a.filename,
             });
         }
+        m.embeds = message.embeds.into_iter().flat_map(decode_embed).collect();
         m.content(text)
     }).await?;
     Ok(())
