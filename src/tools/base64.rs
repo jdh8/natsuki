@@ -46,7 +46,7 @@ struct AttachmentData {
     filename: String,
 }
 
-async fn encode_attachment(attachment: &serenity::Attachment) -> anyhow::Result<AttachmentData> {
+async fn encode_attachment(attachment: serenity::Attachment) -> anyhow::Result<AttachmentData> {
     let code = ENGINE.encode(attachment.download().await?);
     let code = code.as_bytes().iter().enumerate()
         .flat_map(|(i, c)| {
@@ -56,7 +56,7 @@ async fn encode_attachment(attachment: &serenity::Attachment) -> anyhow::Result<
 
     Ok(AttachmentData {
         data: code.collect(),
-        filename: attachment.filename.clone() + ".b64.txt",
+        filename: attachment.filename + ".b64.txt",
     })
 }
 
@@ -85,7 +85,7 @@ fn encode_embed(mut embed: serenity::Embed) -> serenity::CreateEmbed {
 #[poise::command(context_menu_command = "Base64 encode")]
 pub async fn base64_encode(ctx: Context<'_>, message: serenity::Message) -> anyhow::Result<()> {
     let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id().0);
-    let attachments = message.attachments.iter().map(encode_attachment);
+    let attachments = message.attachments.into_iter().map(encode_attachment);
     let attachments: Vec<_> = attachments.collect::<FuturesOrdered<_>>().collect().await;
     let embeds = if message.content.is_empty() { vec![] } else { message.embeds };
 
@@ -155,13 +155,13 @@ fn guess_extension(bytes: &[u8]) -> &'static str {
     })
 }
 
-async fn decode_attachment(attachment: &serenity::Attachment) -> anyhow::Result<AttachmentData> {
+async fn decode_attachment(attachment: serenity::Attachment) -> anyhow::Result<AttachmentData> {
     let buffer = forgiving_decode(attachment.download().await?)?;
     let extension = guess_extension(&buffer);
 
     Ok(AttachmentData {
         data: buffer,
-        filename: attachment.filename.clone() + "." + extension,
+        filename: attachment.filename + "." + extension,
     })
 }
 
@@ -191,7 +191,7 @@ fn decode_embed(mut embed: serenity::Embed) -> anyhow::Result<serenity::CreateEm
 pub async fn base64_decode(ctx: Context<'_>, message: serenity::Message) -> anyhow::Result<()> {
     let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id().0);
     let text = String::from_utf8(forgiving_decode(message.content)?)?;
-    let attachments = message.attachments.iter().map(decode_attachment);
+    let attachments = message.attachments.into_iter().map(decode_attachment);
     let attachments: Vec<_> = attachments.collect::<FuturesOrdered<_>>().collect().await;
 
     ctx.send(|m| {
