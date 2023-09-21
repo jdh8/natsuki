@@ -14,9 +14,9 @@ async fn face_image(user: &serenity::User) -> anyhow::Result<image::DynamicImage
     let extension = std::path::Path::new(&uri).extension();
 
     if extension.map_or(false, |e| e.eq_ignore_ascii_case("webp")) {
-        Ok(webp::Decoder::new(&buffer).decode()
-            .expect("Failed to decode WebP avatar")
-            .to_image())
+        webp::Decoder::new(&buffer).decode()
+            .map(|i| i.to_image())
+            .ok_or_else(|| anyhow::anyhow!("Failed to decode WebP avatar"))
     }
     else {
         Ok(image::load_from_memory(&buffer)?)

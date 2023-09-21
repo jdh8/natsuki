@@ -14,9 +14,11 @@ pub async fn feed(ctx: Context<'_>,
     let text = text.as_deref().unwrap_or("a random anime character");
     let endpoint = "https://nekos.life/api/v2/img/feed";
     let json = reqwest::get(endpoint).await?.json::<serde_json::Value>().await?;
+    let url = json["url"].as_str().ok_or_else(|| anyhow::anyhow!("Invalid image URL"))?;
+
     ctx.send(|m| m.embed(|e| e
         .description(ctx.author().to_string() + " fed " + text + "!")
-        .image(json["url"].as_str().expect("Invalid image URL"))
+        .image(url)
     )).await?;
     Ok(())
 }
@@ -38,7 +40,7 @@ pub async fn hug(ctx: Context<'_>,
     let text = text.as_deref().unwrap_or("Yuri");
     ctx.send(|m| m.embed(|e| e
         .description(ctx.author().to_string() + " hugged " + text + "!")
-        .image(HUGS.choose(&mut rand::thread_rng()).expect("Invalid image URL"))
+        .image(HUGS.choose(&mut rand::thread_rng()).expect("Choosing from an empty image list!"))
     )).await?;
     Ok(())
 }
@@ -66,7 +68,7 @@ pub async fn kiss(ctx: Context<'_>,
     let text = text.as_deref().unwrap_or("Natsuki");
     ctx.send(|m| m.embed(|e| e
         .description(ctx.author().to_string() + " kissed " + text + "!")
-        .image(KISSES.choose(&mut rand::thread_rng()).expect("Invalid image URL"))
+        .image(KISSES.choose(&mut rand::thread_rng()).expect("Choosing from an empty image list!"))
     )).await?;
     Ok(())
 }
@@ -109,9 +111,11 @@ pub async fn lick(ctx: Context<'_>,
 pub async fn neko(ctx: Context<'_>) -> anyhow::Result<()> {
     let endpoint = "https://nekos.life/api/v2/img/neko";
     let json = reqwest::get(endpoint).await?.json::<serde_json::Value>().await?;
+    let url = json["url"].as_str().ok_or_else(|| anyhow::anyhow!("Invalid image URL"))?;
+
     ctx.send(|m| m.embed(|e| e
         .description("Here comes your random neko.")
-        .image(json["url"].as_str().expect("Invalid image URL"))
+        .image(url)
     )).await?;
     Ok(())
 }
