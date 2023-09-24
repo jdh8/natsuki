@@ -44,6 +44,7 @@ impl Poster {
     }
 }
 
+#[allow(clippy::significant_drop_tightening)]
 #[serenity::async_trait]
 impl serenity::EventHandler for Poster {
     async fn ready(&self, _: serenity::Context, ready: serenity::Ready) {
