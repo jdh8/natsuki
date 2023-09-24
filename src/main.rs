@@ -5,17 +5,14 @@ mod tools;
 mod weeb;
 mod topgg;
 use poise::serenity_prelude as serenity;
-use std::path::PathBuf;
 
 #[macro_export]
 macro_rules! bot_id {
     () => { 410_315_411_695_992_833 };
 }
 
-#[derive(Debug, Default, Clone, PartialEq, Eq)]
-pub struct Data {
-    assets: PathBuf,
-}
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct Data;
 
 type Context<'a> = poise::Context<'a, Data, anyhow::Error>;
 
@@ -62,7 +59,6 @@ fn get_commands() -> Vec<poise::Command<Data, anyhow::Error>> {
 
 #[shuttle_runtime::main]
 async fn main(
-    #[shuttle_static_folder::StaticFolder(folder = "assets")] path: PathBuf,
     #[shuttle_secrets::Secrets] secrets: shuttle_secrets::SecretStore,
 ) -> shuttle_poise::ShuttlePoise<Data, anyhow::Error> {
     let poster = topgg::Poster::new(secrets.get("TOP_GG_TOKEN"));
@@ -84,7 +80,7 @@ async fn main(
                     },
                     None => poise::builtins::register_globally(ctx, commands).await?,
                 };
-                Ok(Data { assets: path })
+                Ok(Data)
             })
         })
         .client_settings(|client| client.event_handler(poster));

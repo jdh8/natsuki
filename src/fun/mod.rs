@@ -82,8 +82,7 @@ pub async fn cupcake(ctx: Context<'_>,
 ) -> anyhow::Result<()> {
     let target = user.as_ref().unwrap_or_else(|| ctx.author());
     let face = face_image(target).await?.resize(128, 128, CatmullRom);
-    let path = ctx.data().assets.as_path().join("290px-Hostess-Cupcake-Whole.jpg");
-    let cake = image::open(path)?.into_rgba8();
+    let cake = image::open("assets/290px-Hostess-Cupcake-Whole.jpg")?.into_rgba8();
     let cake: image::RgbImage = blend_image(cake, &face, 80, 80).convert();
     let cake = webp::Encoder::from_rgb(&cake, cake.width(), cake.height());
 
@@ -210,8 +209,7 @@ pub async fn ship(ctx: Context<'_>,
 }
 
 async fn fuck(ctx: Context<'_>, user: Option<&serenity::User>) -> anyhow::Result<()> {
-    let path = ctx.data().assets.as_path().join("566424ede431200e3985ca6f21287cee.png");
-    let base = image::open(path)?.into_rgba8();
+    let base = image::open("assets/566424ede431200e3985ca6f21287cee.png")?.into_rgba8();
     let author = face_image(ctx.author()).await?.resize(256, 256, CatmullRom);
     let image = blend_image(base, &author, 364, 120);
     let image: image::RgbImage  = match user {
