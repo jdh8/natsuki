@@ -103,7 +103,7 @@ pub async fn cupcake(ctx: Context<'_>,
 /// **Usage**: /cute
 #[poise::command(category = "Fun", slash_command)]
 pub async fn cute(ctx: Context<'_>) -> anyhow::Result<()> {
-    let mut content = "Don't say this embarassing thing, dummy!".to_owned();
+    let mut content = "Don't say this embarrassing thing, dummy!".to_owned();
     let reply = ctx.say(&content).await?;
     let typing = ctx.serenity_context().http.start_typing(ctx.channel_id().0);
 
