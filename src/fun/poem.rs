@@ -306,15 +306,13 @@ async fn game(ctx: Context<'_>, word: &str, answer: Doki, buttons: &[(EmojiId, D
                 else { Secondary }
             };
             let edit = question.edit(ctx, poise::CreateReply {
-                //content,
-                components: Some(vec![make_buttons(buttons, style, false)]),
+                components: Some(vec![make_buttons(buttons, style, true)]),
                 ..Default::default()
             });
             try_join!(response, edit)?;
         },
         None => {
             question.edit(ctx, poise::CreateReply {
-                //content,
                 components: Some(vec![make_buttons(buttons, |_| Secondary, true)]),
                 ..Default::default()
             }).await?;
