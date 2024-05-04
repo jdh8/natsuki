@@ -260,27 +260,33 @@ enum Doki {
     Monika,
 }
 
-async fn game(ctx: Context<'_>, word: &str, answer: Doki, buttons: &[(EmojiId, Doki)]) -> anyhow::Result<()> {
-    let mut question = ctx.send(|m| m
-        .content("Whose word is **".to_owned() + word + "**?  Please answer in 15 seconds.")
-        //XXX Try to deduplicate these
-        .components(|c| c.create_action_row(|a| {
-            for (emoji, doki) in buttons {
-                a.create_button(|b| b
-                    .style(Secondary)
-                    .emoji(*emoji)
-                    .label(doki)
-                    .custom_id(doki)
-                );
-            }
-            a
-        }))
-    ).await?.into_message().await?;
+fn make_buttons(
+    buttons: &[(EmojiId, Doki)],
+    style: impl Fn(Doki) -> serenity::ButtonStyle,
+    disabled: bool,
+) -> serenity::CreateActionRow {
+    serenity::CreateActionRow::Buttons(
+        buttons.iter().copied().map(|(emoji, doki)|
+            serenity::CreateButton::new(doki.to_string())
+                .style(style(doki))
+                .emoji(emoji)
+                .label(doki.to_string())
+                .disabled(disabled)
+        ).collect()
+    )
+}
 
-    let collected = serenity::CollectComponentInteraction::new(ctx)
+async fn game(ctx: Context<'_>, word: &str, answer: Doki, buttons: &[(EmojiId, Doki)]) -> anyhow::Result<()> {
+    let content = Some("Whose word is **".to_owned() + word + "**?  Please answer in 15 seconds.");
+    let question = ctx.send(poise::CreateReply {
+        content,
+        components: Some(vec![make_buttons(buttons, |_| Secondary, false)]),
+        ..Default::default()
+    }).await?;
+
+    let collected = serenity::ComponentInteractionCollector::new(ctx)
         .author_id(ctx.author().id)
-        .message_id(question.id)
-        .collect_limit(1)
+        .message_id(question.message().await?.id)
         .timeout(Duration::from_secs(15))
         .await;
 
@@ -289,46 +295,29 @@ async fn game(ctx: Context<'_>, word: &str, answer: Doki, buttons: &[(EmojiId, D
             let right = "Congratulations!  That's correct.".to_owned();
             let wrong = format!("Sorry, it's **{answer}**.");
             let selected = interaction.data.custom_id.parse::<Doki>()?;
-
-            let response = interaction.create_interaction_response(ctx, |m| m
-                .kind(serenity::InteractionResponseType::ChannelMessageWithSource)
-                .interaction_response_data(|r| r
-                    .content(if selected == answer { right } else { wrong }))
-            );
-
-            let edit = question.edit(ctx, |m| m
-                //XXX Try to deduplicate these
-                .components(|c| c.create_action_row(|a| {
-                    for (emoji, doki) in buttons {
-                        a.create_button(|b| b
-                            .emoji(*emoji)
-                            .label(doki)
-                            .custom_id(doki)
-                            .style(if doki == &answer { Success }
-                                else if doki == &selected { Danger }
-                                else { Secondary })
-                        );
-                    }
-                    a
-                })));
-
+            
+            let response = interaction.create_response(ctx, serenity::CreateInteractionResponse::Message(
+                serenity::CreateInteractionResponseMessage::new()
+                    .content(if selected == answer { right } else { wrong })
+            ));
+            let style = |doki: Doki| {
+                if doki == answer { Success }
+                else if doki == selected { Danger }
+                else { Secondary }
+            };
+            let edit = question.edit(ctx, poise::CreateReply {
+                //content,
+                components: Some(vec![make_buttons(buttons, style, false)]),
+                ..Default::default()
+            });
             try_join!(response, edit)?;
         },
         None => {
-            question.edit(ctx, |m| m
-                //XXX Try to deduplicate these
-                .components(|c| c.create_action_row(|a| {
-                    for (emoji, doki) in buttons {
-                        a.create_button(|b| b
-                            .emoji(*emoji)
-                            .label(doki)
-                            .custom_id(doki)
-                            .disabled(true)
-                            .style(Secondary)
-                        );
-                    }
-                    a
-                }))).await?;
+            question.edit(ctx, poise::CreateReply {
+                //content,
+                components: Some(vec![make_buttons(buttons, |_| Secondary, true)]),
+                ..Default::default()
+            }).await?;
         }
     }
     Ok(())
@@ -341,9 +330,9 @@ async fn poem1(ctx: Context<'_>) -> anyhow::Result<()> {
         else { Doki::Natsuki };
 
     game(ctx, word, doki, &[
-        (EmojiId(424_991_418_386_350_081), Doki::Sayori),
-        (EmojiId(424_991_419_329_937_428), Doki::Natsuki),
-        (EmojiId(424_987_242_986_078_218), Doki::Yuri),
+        (EmojiId::new(424_991_418_386_350_081), Doki::Sayori),
+        (EmojiId::new(424_991_419_329_937_428), Doki::Natsuki),
+        (EmojiId::new(424_987_242_986_078_218), Doki::Yuri),
     ]).await
 }
 
@@ -352,13 +341,13 @@ async fn poem2(ctx: Context<'_>) -> anyhow::Result<()> {
     let doki = if preference.contains(Preference::Yuri) { Doki::Yuri } else { Doki::Natsuki };
 
     game(ctx, word, doki, &[
-        (EmojiId(424_991_419_329_937_428), Doki::Natsuki),
-        (EmojiId(424_987_242_986_078_218), Doki::Yuri),
+        (EmojiId::new(424_991_419_329_937_428), Doki::Natsuki),
+        (EmojiId::new(424_987_242_986_078_218), Doki::Yuri),
     ]).await
 }
 
 async fn poem3(ctx: Context<'_>) -> anyhow::Result<()> {
-    game(ctx, "Monika", Doki::Monika, &[(EmojiId(501_274_687_842_680_832), Doki::Monika)]).await
+    game(ctx, "Monika", Doki::Monika, &[(EmojiId::new(501_274_687_842_680_832), Doki::Monika)]).await
 }
 
 /// Play a poem game

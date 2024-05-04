@@ -1,6 +1,6 @@
 use crate::Context;
 use base64::{Engine as _, engine};
-use futures::StreamExt as _;
+use futures::TryStreamExt as _;
 use futures::stream::FuturesOrdered;
 use poise::serenity_prelude as serenity;
 
@@ -40,24 +40,15 @@ pub async fn base64(_: Context<'_>) -> anyhow::Result<()> {
     unimplemented!("Unimplemented prefix command")
 }
 
-#[derive(Debug, Clone)]
-struct AttachmentData {
-    data: Vec<u8>,
-    filename: String,
-}
-
-async fn encode_attachment(attachment: serenity::Attachment) -> anyhow::Result<AttachmentData> {
+async fn encode_attachment(attachment: serenity::Attachment) -> anyhow::Result<serenity::CreateAttachment> {
     let code = ENGINE.encode(attachment.download().await?);
     let code = code.as_bytes().iter().enumerate()
         .flat_map(|(i, c)| {
             if i != 0 && i % 76 == 0 { Some(b'\n') } else { None }
             .into_iter().chain(Some(*c))
         });
-
-    Ok(AttachmentData {
-        data: code.collect(),
-        filename: attachment.filename + ".b64.txt",
-    })
+    let code: Vec<_> = code.collect();
+    Ok(serenity::CreateAttachment::bytes(code, attachment.filename + ".b64.txt"))
 }
 
 fn encode_embed(mut embed: serenity::Embed) -> serenity::CreateEmbed {
@@ -84,22 +75,18 @@ fn encode_embed(mut embed: serenity::Embed) -> serenity::CreateEmbed {
 
 #[poise::command(context_menu_command = "Base64 encode")]
 pub async fn base64_encode(ctx: Context<'_>, message: serenity::Message) -> anyhow::Result<()> {
-    let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id().0);
+    let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id());
     let attachments = message.attachments.into_iter().map(encode_attachment);
-    let attachments: Vec<_> = attachments.collect::<FuturesOrdered<_>>().collect().await;
+    let attachments: FuturesOrdered<_> = attachments.collect();
 
-    ctx.send(|m| {
-        for c in attachments.into_iter().flatten() {
-            m.attachment(serenity::AttachmentType::Bytes {
-                data: c.data.into(),
-                filename: c.filename,
-            });
-        }
-        m.embeds = message.embeds.into_iter()
-            .filter(|e| matches!(e.kind.as_deref(), Some("rich") | None))
+    ctx.send(poise::CreateReply {
+        attachments: attachments.try_collect().await?,
+        embeds: message.embeds.into_iter()
+            .filter(|e| !matches!(e.kind.as_deref(), Some("rich") | None))
             .map(encode_embed)
-            .collect();
-        m.content(ENGINE.encode(message.content))
+            .collect(),
+        content: Some(ENGINE.encode(message.content)),
+        ..Default::default()
     }).await?;
     Ok(())
 }
@@ -157,14 +144,10 @@ fn guess_extension(bytes: &[u8]) -> &'static str {
     })
 }
 
-async fn decode_attachment(attachment: serenity::Attachment) -> anyhow::Result<AttachmentData> {
+async fn decode_attachment(attachment: serenity::Attachment) -> anyhow::Result<serenity::CreateAttachment> {
     let buffer = forgiving_decode(attachment.download().await?)?;
     let extension = guess_extension(&buffer);
-
-    Ok(AttachmentData {
-        data: buffer,
-        filename: attachment.filename + "." + extension,
-    })
+    Ok(serenity::CreateAttachment::bytes(buffer, attachment.filename + "." + extension))
 }
 
 fn decode_embed(mut embed: serenity::Embed) -> anyhow::Result<serenity::CreateEmbed> {
@@ -191,20 +174,16 @@ fn decode_embed(mut embed: serenity::Embed) -> anyhow::Result<serenity::CreateEm
 
 #[poise::command(context_menu_command = "Base64 decode")]
 pub async fn base64_decode(ctx: Context<'_>, message: serenity::Message) -> anyhow::Result<()> {
-    let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id().0);
+    let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id());
     let text = String::from_utf8(forgiving_decode(message.content)?)?;
     let attachments = message.attachments.into_iter().map(decode_attachment);
-    let attachments: Vec<_> = attachments.collect::<FuturesOrdered<_>>().collect().await;
-
-    ctx.send(|m| {
-        for a in attachments.into_iter().flatten() {
-            m.attachment(serenity::AttachmentType::Bytes {
-                data: a.data.into(),
-                filename: a.filename,
-            });
-        }
-        m.embeds = message.embeds.into_iter().flat_map(decode_embed).collect();
-        m.content(text)
+    let attachments: FuturesOrdered<_> = attachments.collect();
+    
+    ctx.send(poise::CreateReply {
+        attachments: attachments.try_collect().await?,
+        embeds: message.embeds.into_iter().flat_map(decode_embed).collect(),
+        content: Some(text),
+        ..Default::default()
     }).await?;
     Ok(())
 }

@@ -4,8 +4,8 @@ use poise::serenity_prelude as serenity;
 
 #[derive(Debug, Default, Clone, Copy)]
 struct Stats {
-    guilds: u64,
-    shards: u64,
+    guilds: usize,
+    shards: u32,
 }
 
 impl Stats {
@@ -49,12 +49,11 @@ impl Poster {
 impl serenity::EventHandler for Poster {
     async fn ready(&self, _: serenity::Context, ready: serenity::Ready) {
         let Some(token) = self.token.as_deref() else { return };
-        let guilds = ready.guilds.len() as u64;
+        let guilds = ready.guilds.len();
 
-        match ready.shard {
-            None => post(token, Stats { guilds, shards: 0 }).await,
-            Some([_, s@0..=1]) => post(token, Stats { guilds, shards: s }).await,
-            Some([_, shards]) => {
+        match ready.shard.map_or(0, |s| s.total) {
+            s@0..=1 => post(token, Stats { guilds, shards: s }).await,
+            shards => {
                 let mut stats = self.stats.lock().await;
                 stats.guilds += guilds;
                 stats.shards += 1;

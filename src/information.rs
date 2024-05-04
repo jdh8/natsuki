@@ -87,13 +87,13 @@ pub async fn snowflake(ctx: Context<'_>,
 
 #[poise::command(context_menu_command = "Snowflake (user)")]
 pub async fn snowflake_user(ctx: Context<'_>, user: serenity::User) -> anyhow::Result<()> {
-    ctx.say(format_snowflake(user.id.0.into())).await?;
+    ctx.say(format_snowflake(user.id.get().into())).await?;
     Ok(())
 }
 
 #[poise::command(context_menu_command = "Snowflake (message)")]
 pub async fn snowflake_message(ctx: Context<'_>, message: serenity::Message) -> anyhow::Result<()> {
-    ctx.say(format_snowflake(message.id.0.into())).await?;
+    ctx.say(format_snowflake(message.id.get().into())).await?;
     Ok(())
 }
 
@@ -107,20 +107,21 @@ pub async fn role(ctx: Context<'_>,
     #[description = "Role to inspect"]
     role: serenity::Role,
 ) -> anyhow::Result<()> {
-    ctx.send(|m| m
-        .embed(|e| e
+    ctx.send(poise::CreateReply {
+        embeds: vec![serenity::CreateEmbed::new()
             .title("Role ".to_owned() + &role.name)
             .color(role.colour)
             .field("Name", role.name, false)
-            .field("ID", role.id, false)
+            .field("ID", role.id.to_string(), false)
             .field("Color", "#".to_owned() + &role.colour.hex(), false)
-            .field("Hoisted", role.hoist, false)
-            .field("Managed", role.managed, false)
-            .field("Mentionable", role.mentionable, false)
-            .field("Permissions", role.permissions, false)
-            .field("Position", role.position, false)
-            .field("Created at", format_rfc3339(Snowflake(role.id.0).time()), false)
-        )
-    ).await?;
+            .field("Hoisted", role.hoist.to_string(), false)
+            .field("Managed", role.managed.to_string(), false)
+            .field("Mentionable", role.mentionable.to_string(), false)
+            .field("Permissions", role.permissions.to_string(), false)
+            .field("Position", role.position.to_string(), false)
+            .field("Created at", format_rfc3339(Snowflake(role.id.get()).time()), false)
+        ],
+        ..Default::default()
+    }).await?;
     Ok(())
 }

@@ -4,6 +4,7 @@ use csscolorparser::Color;
 use rand::seq::IteratorRandom as _;
 use regex::{Captures, Regex};
 use poise::serenity_prelude as serenity;
+use anyhow::Context as _;
 
 fn to_hsl_string(color: &Color) -> String {
     let (h, s, l, a) = color.to_hsla();
@@ -22,22 +23,24 @@ pub async fn color(ctx: Context<'_>,
     #[description = "Color to display"]
     color: String,
 ) -> anyhow::Result<()> {
-    let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id().0);
+    let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id());
     let color = csscolorparser::parse(&color)?;
     let pixel = image::Rgba(color.to_rgba8());
     let image = image::ImageBuffer::from_pixel(128, 128, pixel);
     let image = webp::Encoder::from_rgba(&image, image.width(), image.height());
+    let image = image.encode_lossless().to_vec();
 
-    ctx.send(|m| m
-        .content("**Hex:** ".to_owned() + &color.to_hex_string()
+    ctx.send(poise::CreateReply {
+        content: Some("**Hex:** ".to_owned() + &color.to_hex_string()
             + "\n**RGB:** " + &color.to_rgb_string()
             + "\n**HSL:** " + &to_hsl_string(&color)
-        )
-        .attachment(serenity::model::channel::AttachmentType::Bytes {
-            data: image.encode_lossless().to_vec().into(),
-            filename: "color.webp".into(),
-        })
-    ).await?;
+        ),
+        attachments: vec![serenity::CreateAttachment::bytes(
+            image,
+            "color.webp",
+        )],
+        ..Default::default()
+    }).await?;
     Ok(())
 }
 
@@ -115,9 +118,8 @@ pub async fn keycaps(ctx: Context<'_>,
 #[poise::command(category = "Tools", slash_command, guild_only)]
 pub async fn someone(ctx: Context<'_>) -> anyhow::Result<()> {
     let channel = ctx.channel_id().to_channel(ctx).await?.guild();
-    let channel = channel.expect("/someone only works in guilds");
-    let member = channel.members(ctx).await?.into_iter().choose(&mut rand::thread_rng());
-    let user = member.ok_or_else(|| anyhow::anyhow!("No members in this channel"))?.user;
-    ctx.say(if user.discriminator == 0 { user.name } else { user.tag() }).await?;
+    let channel = channel.context("/someone only works in guilds")?;
+    let member = channel.members(ctx)?.into_iter().choose(&mut rand::thread_rng());
+    ctx.say(member.context("No members in this channel")?.user.tag()).await?;
     Ok(())
 }

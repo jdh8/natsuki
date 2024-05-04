@@ -1,4 +1,5 @@
 use crate::Context;
+use poise::serenity_prelude as serenity;
 use rand::seq::SliceRandom as _;
 
 /// Feed someone
@@ -16,10 +17,13 @@ pub async fn feed(ctx: Context<'_>,
     let json = reqwest::get(endpoint).await?.json::<serde_json::Value>().await?;
     let url = json["url"].as_str().ok_or_else(|| anyhow::anyhow!("Invalid image URL"))?;
 
-    ctx.send(|m| m.embed(|e| e
-        .description(ctx.author().to_string() + " fed " + text + "!")
-        .image(url)
-    )).await?;
+    ctx.send(poise::CreateReply {
+        embeds: vec![serenity::CreateEmbed::new()
+            .description(ctx.author().to_string() + " fed " + text + "!")
+            .image(url)
+        ],
+        ..Default::default()
+    }).await?;
     Ok(())
 }
 
@@ -37,11 +41,16 @@ pub async fn hug(ctx: Context<'_>,
         "https://cdn.discordapp.com/attachments/403697175948820481/413015715273113601/Nxdr0qO_1.jpg",
         "https://cdn.discordapp.com/attachments/403697175948820481/444226349121404960/hug.jpg",
     ];
+    let hug = *HUGS.choose(&mut rand::thread_rng()).expect("Choosing from an empty image list!");
     let text = text.as_deref().unwrap_or("Yuri");
-    ctx.send(|m| m.embed(|e| e
-        .description(ctx.author().to_string() + " hugged " + text + "!")
-        .image(HUGS.choose(&mut rand::thread_rng()).expect("Choosing from an empty image list!"))
-    )).await?;
+
+    ctx.send(poise::CreateReply {
+        embeds: vec![serenity::CreateEmbed::new()
+            .description(ctx.author().to_string() + " hugged " + text + "!")
+            .image(hug)
+        ],
+        ..Default::default()
+    }).await?;
     Ok(())
 }
 
@@ -65,11 +74,16 @@ pub async fn kiss(ctx: Context<'_>,
         "https://cdn.discordapp.com/attachments/403697175948820481/444355145124544513/11b4bc2.png",
         "https://cdn.discordapp.com/attachments/409037934470234113/449736165290016782/8qlcohr5c1011.png",
     ];
+    let kiss = *KISSES.choose(&mut rand::thread_rng()).expect("Choosing from an empty image list!");
     let text = text.as_deref().unwrap_or("Natsuki");
-    ctx.send(|m| m.embed(|e| e
-        .description(ctx.author().to_string() + " kissed " + text + "!")
-        .image(KISSES.choose(&mut rand::thread_rng()).expect("Choosing from an empty image list!"))
-    )).await?;
+
+    ctx.send(poise::CreateReply {
+        embeds: vec![serenity::CreateEmbed::new()
+            .description(ctx.author().to_string() + " kissed " + text + "!")
+            .image(kiss)
+        ],
+        ..Default::default()
+    }).await?;
     Ok(())
 }
 
@@ -95,10 +109,13 @@ pub async fn lick(ctx: Context<'_>,
     text: Option<String>,
 ) -> anyhow::Result<()> {
     let text = text.as_deref().unwrap_or("the air");
-    ctx.send(|m| m.embed(|e| e
-        .description(ctx.author().to_string() + " licked " + text + "!")
-        .image("https://cdn.discordapp.com/attachments/421196261132075009/421920949277818891/LickTemplate.gif")
-    )).await?;
+    ctx.send(poise::CreateReply {
+        embeds: vec![serenity::CreateEmbed::new()
+            .description(ctx.author().to_string() + " licked " + text + "!")
+            .image("https://cdn.discordapp.com/attachments/421196261132075009/421920949277818891/LickTemplate.gif")
+        ],
+        ..Default::default()
+    }).await?;
     Ok(())
 }
 
@@ -113,9 +130,12 @@ pub async fn neko(ctx: Context<'_>) -> anyhow::Result<()> {
     let json = reqwest::get(endpoint).await?.json::<serde_json::Value>().await?;
     let url = json["url"].as_str().ok_or_else(|| anyhow::anyhow!("Invalid image URL"))?;
 
-    ctx.send(|m| m.embed(|e| e
-        .description("Here comes your random neko.")
-        .image(url)
-    )).await?;
+    ctx.send(poise::CreateReply {
+        embeds: vec![serenity::CreateEmbed::new()
+            .description("Here comes your random neko.")
+            .image(url)
+        ],
+        ..Default::default()
+    }).await?;
     Ok(())
 }

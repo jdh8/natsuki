@@ -85,14 +85,16 @@ pub async fn cupcake(ctx: Context<'_>,
     let cake = image::open("assets/290px-Hostess-Cupcake-Whole.jpg")?.into_rgba8();
     let cake: image::RgbImage = blend_image(cake, &face, 80, 80).convert();
     let cake = webp::Encoder::from_rgb(&cake, cake.width(), cake.height());
+    let cake = cake.encode(90.0).to_vec();
 
-    ctx.send(|m| m
-        .content(format!("{} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!", target.mention()))
-        .attachment(serenity::model::channel::AttachmentType::Bytes {
-            data: cake.encode(90.0).to_vec().into(),
-            filename: "cupcake.webp".into(),
-        })
-    ).await?;
+    ctx.send(poise::CreateReply {
+        content: Some(format!("{} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!", target.mention())),
+        attachments: vec![serenity::CreateAttachment::bytes(
+            cake,
+            "cupcake.webp",
+        )],
+        ..Default::default()
+    }).await?;
     Ok(())
 }
 
@@ -105,24 +107,24 @@ pub async fn cupcake(ctx: Context<'_>,
 pub async fn cute(ctx: Context<'_>) -> anyhow::Result<()> {
     let mut content = "Don't say this embarrassing thing, dummy!".to_owned();
     let reply = ctx.say(&content).await?;
-    let typing = ctx.serenity_context().http.start_typing(ctx.channel_id().0);
+    let typing = ctx.serenity_context().http.start_typing(ctx.channel_id());
 
     content.push_str("\nY-You t-too....");
     sleep(Duration::from_secs(3)).await;
-    reply.edit(ctx, |m| m.content(&content)).await?;
+    reply.edit(ctx, poise::CreateReply { content: Some(content.clone()), ..Default::default() }).await?;
 
     content.push_str("\nI'M NOT CUUUUUUUUUUUTE!");
     sleep(Duration::from_secs(2)).await;
-    reply.edit(ctx, |m| m.content(&content)).await?;
+    reply.edit(ctx, poise::CreateReply { content: Some(content.clone()), ..Default::default() }).await?;
 
     content.push_str("\nDon't think you can make me say this embarrassing thing just because we're not at school!");
     sleep(Duration::from_secs(2)).await;
-    reply.edit(ctx, |m| m.content(&content)).await?;
+    reply.edit(ctx, poise::CreateReply { content: Some(content.clone()), ..Default::default() }).await?;
 
-    let _ = typing.map(serenity::Typing::stop);
+    typing.stop();
     content.push_str("\nI-I have to go to the bathroom.");
     sleep(Duration::from_secs(4)).await;
-    reply.edit(ctx, |m| m.content(&content)).await?;
+    reply.edit(ctx, poise::CreateReply { content: Some(content.clone()), ..Default::default() }).await?;
     Ok(())
 }
 
@@ -221,16 +223,19 @@ async fn fuck(ctx: Context<'_>, user: Option<&serenity::User>) -> anyhow::Result
     }.convert();
 
     let image = webp::Encoder::from_rgb(&image, image.width(), image.height());
+    let image = image.encode(90.0).to_vec();
 
-    ctx.send(|m| m
-        .content(format!("{} fucked {}!",
+    ctx.send(poise::CreateReply {
+        content: Some(format!("{} fucked {}!",
             ctx.author().mention(),
-            user.map_or_else(|| "Natsuki".to_owned(), |u| u.mention().to_string())))
-        .attachment(serenity::model::channel::AttachmentType::Bytes {
-            data: image.encode(90.0).to_vec().into(),
-            filename: "fuck.webp".into(),
-        })
-    ).await?;
+            user.map_or_else(|| "Natsuki".to_owned(), |u| u.mention().to_string()))
+        ),
+        attachments: vec![serenity::CreateAttachment::bytes(
+            image,
+            "fuck.webp",
+        )],
+        ..Default::default()
+    }).await?;
     Ok(())
 }
 
@@ -247,14 +252,16 @@ pub async fn smash(ctx: Context<'_>,
     if ctx.channel_id().to_channel(&ctx).await?.is_nsfw() {
         return fuck(ctx, user.as_ref()).await;
     }
-
     let author = ctx.author().mention();
-    ctx.send(|m| m.embed(|e| e
-        .description(user.map_or_else(
-            || format!("{author} smashed!"),
-            |u| format!("{author} smashed {}!", u.mention())))
-        .image("https://raw.githubusercontent.com/jdh8/natsuki/master/assets/smash.png"))
-    ).await?;
+    ctx.send(poise::CreateReply {
+        embeds: vec![serenity::CreateEmbed::new()
+            .description(user.map_or_else(
+                || format!("{author} smashed!"),
+                |u| format!("{author} smashed {}!", u.mention())))
+            .image("https://raw.githubusercontent.com/jdh8/natsuki/master/assets/smash.png")
+        ],
+        ..Default::default()
+    }).await?;
     Ok(())
 }
 

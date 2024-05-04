@@ -5,11 +5,7 @@ mod tools;
 mod weeb;
 mod topgg;
 use poise::serenity_prelude as serenity;
-
-#[macro_export]
-macro_rules! bot_id {
-    () => { 410_315_411_695_992_833 };
-}
+use anyhow::Context as _;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct Data;
@@ -59,13 +55,12 @@ fn get_commands() -> Vec<poise::Command<Data, anyhow::Error>> {
 
 #[shuttle_runtime::main]
 async fn main(
-    #[shuttle_secrets::Secrets] secrets: shuttle_secrets::SecretStore,
-) -> shuttle_poise::ShuttlePoise<Data, anyhow::Error> {
+    #[shuttle_runtime::Secrets] secrets: shuttle_runtime::SecretStore,
+) -> shuttle_serenity::ShuttleSerenity {
     let poster = topgg::Poster::new(secrets.get("TOP_GG_TOKEN"));
+    let token = secrets.get("TOKEN").context("Discord token not found")?;
 
-    let builder = poise::Framework::builder()
-        .token(secrets.get("TOKEN").expect("Discord token not found"))
-        .intents(serenity::GatewayIntents::non_privileged())
+    let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
             commands: secrets.get("CLEAR").map_or_else(get_commands, |_| Vec::new()),
             ..Default::default()
@@ -75,7 +70,7 @@ async fn main(
                 let commands = &framework.options().commands;
                 match secrets.get("GUILD") {
                     Some(id) => {
-                        let guild = serenity::GuildId(id.parse::<u64>()?);
+                        let guild = serenity::GuildId::new(id.parse::<u64>()?);
                         poise::builtins::register_in_guild(ctx, commands, guild).await?;
                     },
                     None => poise::builtins::register_globally(ctx, commands).await?,
@@ -83,7 +78,18 @@ async fn main(
                 Ok(Data)
             })
         })
-        .client_settings(|client| client.event_handler(poster));
+        //.client_settings(|client| client.event_handler(poster))
+        .build();
 
-    Ok(builder.build().await.map_err(shuttle_runtime::CustomError::new)?.into())
+    Ok(serenity::ClientBuilder::new(token, serenity::GatewayIntents::non_privileged())
+        .framework(framework)
+        .event_handler(poster)
+        .await
+        .map_err(shuttle_runtime::CustomError::new)?
+        .into())
+}
+
+#[macro_export]
+macro_rules! bot_id {
+    () => { 410_315_411_695_992_833 };
 }

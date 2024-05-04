@@ -29,14 +29,16 @@ pub async fn ping(ctx: Context<'_>) -> anyhow::Result<()> {
     let reply = ctx.say("Pong!").await?;
     let duration = tick.elapsed();
 
-    reply.edit(ctx, |m| m.content(
-        if duration < std::time::Duration::from_secs(1) {
-            format!("Pong! {} ms", duration.as_millis())
-        } else {
-            format!("Pong! {:.3} s", duration.as_secs_f32())
-        }
-    )).await?;
+    let message = if duration < std::time::Duration::from_secs(1) {
+        format!("Pong! {} ms", duration.as_millis())
+    } else {
+        format!("Pong! {:.3} s", duration.as_secs_f32())
+    };
 
+    reply.edit(ctx, poise::CreateReply {
+        content: Some(message),
+        ..Default::default()
+    }).await?;
     Ok(())
 }
 
