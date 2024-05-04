@@ -78,7 +78,6 @@ async fn main(
                 Ok(Data)
             })
         })
-        //.client_settings(|client| client.event_handler(poster))
         .build();
 
     Ok(serenity::ClientBuilder::new(token, serenity::GatewayIntents::non_privileged())
