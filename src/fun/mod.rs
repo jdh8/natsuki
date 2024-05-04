@@ -106,25 +106,26 @@ pub async fn cupcake(ctx: Context<'_>,
 #[poise::command(category = "Fun", slash_command)]
 pub async fn cute(ctx: Context<'_>) -> anyhow::Result<()> {
     let mut content = "Don't say this embarrassing thing, dummy!".to_owned();
-    let reply = ctx.say(&content).await?;
+    let reply = ctx.say(content.clone()).await?;
+    let edit = |s| reply.edit(ctx, poise::CreateReply { content: Some(s), ..Default::default() });
     let typing = ctx.serenity_context().http.start_typing(ctx.channel_id());
 
     content.push_str("\nY-You t-too....");
     sleep(Duration::from_secs(3)).await;
-    reply.edit(ctx, poise::CreateReply { content: Some(content.clone()), ..Default::default() }).await?;
+    edit(content.clone()).await?;
 
     content.push_str("\nI'M NOT CUUUUUUUUUUUTE!");
     sleep(Duration::from_secs(2)).await;
-    reply.edit(ctx, poise::CreateReply { content: Some(content.clone()), ..Default::default() }).await?;
+    edit(content.clone()).await?;
 
     content.push_str("\nDon't think you can make me say this embarrassing thing just because we're not at school!");
     sleep(Duration::from_secs(2)).await;
-    reply.edit(ctx, poise::CreateReply { content: Some(content.clone()), ..Default::default() }).await?;
+    edit(content.clone()).await?;
 
     typing.stop();
     content.push_str("\nI-I have to go to the bathroom.");
     sleep(Duration::from_secs(4)).await;
-    reply.edit(ctx, poise::CreateReply { content: Some(content.clone()), ..Default::default() }).await?;
+    edit(content).await?;
     Ok(())
 }
 
