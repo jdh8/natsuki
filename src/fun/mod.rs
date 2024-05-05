@@ -1,10 +1,11 @@
 pub mod poem;
 use crate::{Context, bot_id};
+use anyhow::Context as _;
 use image::{GenericImageView, Pixel};
 use image::buffer::ConvertBuffer as _;
 use image::imageops::FilterType::CatmullRom;
-use rand::Rng as _;
 use poise::serenity_prelude as serenity;
+use rand::Rng as _;
 use serenity::Mentionable as _;
 use tokio::time::{Duration, sleep};
 
@@ -16,7 +17,7 @@ async fn face_image(user: &serenity::User) -> anyhow::Result<image::DynamicImage
     if extension.map_or(false, |e| e.eq_ignore_ascii_case("webp")) {
         webp::Decoder::new(&buffer).decode()
             .map(|i| i.to_image())
-            .ok_or_else(|| anyhow::anyhow!("Failed to decode WebP avatar"))
+            .context("Failed to decode WebP avatar")
     }
     else {
         Ok(image::load_from_memory(&buffer)?)

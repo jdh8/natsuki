@@ -1,4 +1,5 @@
 use crate::Context;
+use anyhow::Context as _;
 use poise::serenity_prelude as serenity;
 use rand::seq::SliceRandom as _;
 
@@ -15,7 +16,7 @@ pub async fn feed(ctx: Context<'_>,
     let text = text.as_deref().unwrap_or("a random anime character");
     let endpoint = "https://nekos.life/api/v2/img/feed";
     let json = reqwest::get(endpoint).await?.json::<serde_json::Value>().await?;
-    let url = json["url"].as_str().ok_or_else(|| anyhow::anyhow!("Invalid image URL"))?;
+    let url = json["url"].as_str().context("Invalid image URL")?;
 
     ctx.send(poise::CreateReply {
         embeds: vec![serenity::CreateEmbed::new()
@@ -128,7 +129,7 @@ pub async fn lick(ctx: Context<'_>,
 pub async fn neko(ctx: Context<'_>) -> anyhow::Result<()> {
     let endpoint = "https://nekos.life/api/v2/img/neko";
     let json = reqwest::get(endpoint).await?.json::<serde_json::Value>().await?;
-    let url = json["url"].as_str().ok_or_else(|| anyhow::anyhow!("Invalid image URL"))?;
+    let url = json["url"].as_str().context("Invalid image URL")?;
 
     ctx.send(poise::CreateReply {
         embeds: vec![serenity::CreateEmbed::new()
