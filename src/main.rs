@@ -3,7 +3,6 @@ mod fun;
 mod information;
 mod tools;
 mod weeb;
-mod topgg;
 use anyhow::Context as _;
 use poise::serenity_prelude as serenity;
 
@@ -57,8 +56,12 @@ fn get_commands() -> Vec<poise::Command<Data, anyhow::Error>> {
 async fn main(
     #[shuttle_runtime::Secrets] secrets: shuttle_runtime::SecretStore,
 ) -> shuttle_serenity::ShuttleSerenity {
-    let poster = topgg::Poster::new(secrets.get("TOP_GG_TOKEN"));
     let token = secrets.get("TOKEN").context("Discord token not found")?;
+
+    let poster = secrets.get("TOP_GG_TOKEN").map(|token| {
+        let client = topgg::Client::new(token);
+        topgg::Autoposter::serenity(&client, std::time::Duration::from_secs(10800)).handler()
+    });
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
@@ -80,12 +83,15 @@ async fn main(
         })
         .build();
 
-    Ok(serenity::ClientBuilder::new(token, serenity::GatewayIntents::non_privileged())
-        .framework(framework)
-        .event_handler(poster)
-        .await
-        .map_err(shuttle_runtime::CustomError::new)?
-        .into())
+    let client = serenity::ClientBuilder
+        ::new(token, serenity::GatewayIntents::non_privileged())
+        .framework(framework);
+
+    let client = match poster {
+        Some(p) => client.event_handler_arc(p),
+        None => client,
+    };
+    Ok(client.await.map_err(shuttle_runtime::CustomError::new)?.into())
 }
 
 #[macro_export]

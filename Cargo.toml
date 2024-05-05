@@ -1,6 +1,6 @@
 [package]
 name = "natsuki"
-version = "3.0.3"
+version = "3.0.4"
 authors = [
     "Chen-Pang He (https://jdh8.org)",
     "u/YourWrstNightmare (https://www.reddit.com/user/YourWrstNightmare)",
@@ -18,6 +18,7 @@ anyhow = "1.0.75"
 base64 = "0.22.1"
 bitflags = "2.4.0"
 chrono = "0.4.30"
+command_attr = "0.5.1"
 csscolorparser = "0.6.2"
 futures = "0.3.28"
 image = "0.25.0"
@@ -31,5 +32,6 @@ shuttle-runtime = "0.44.0"
 shuttle-serenity = "0.44.0"
 strum = { version = "0.26", features = ["derive"] }
 tokio = { version = "1.32.0", features = ["full"] }
+topgg = { version = "1.4.1", features = ["autoposter", "serenity-cached"] }
 tree_magic_mini = "3.0.3"
 webp = "0.3.0"
