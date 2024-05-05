@@ -1,10 +1,10 @@
 pub mod base64;
+use anyhow::Context as _;
 use crate::Context;
 use csscolorparser::Color;
+use poise::serenity_prelude as serenity;
 use rand::seq::IteratorRandom as _;
 use regex::{Captures, Regex};
-use poise::serenity_prelude as serenity;
-use anyhow::Context as _;
 
 fn to_hsl_string(color: &Color) -> String {
     let (h, s, l, a) = color.to_hsla();

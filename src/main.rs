@@ -4,8 +4,8 @@ mod information;
 mod tools;
 mod weeb;
 mod topgg;
-use poise::serenity_prelude as serenity;
 use anyhow::Context as _;
+use poise::serenity_prelude as serenity;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct Data;

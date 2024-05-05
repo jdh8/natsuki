@@ -1,6 +1,6 @@
 use crate::bot_id;
-use tokio::sync::Mutex;
 use poise::serenity_prelude as serenity;
+use tokio::sync::Mutex;
 
 #[derive(Debug, Default, Clone, Copy)]
 struct Stats {
