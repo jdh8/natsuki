@@ -1,8 +1,2 @@
-[alias]
-deploy = "shuttle deploy"
-r = "shuttle run"
-rr = "shuttle run --release"
-restart = "shuttle project restart --idle-minutes 0"
-
 [build]
 rustflags = ["-Ctarget-cpu=native"]
