@@ -65,7 +65,9 @@ async fn main(
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: secrets.get("CLEAR").map_or_else(get_commands, |_| Vec::new()),
+            commands: secrets
+                .get("CLEAR")
+                .map_or_else(get_commands, |_| Vec::new()),
             ..Default::default()
         })
         .setup(|ctx, _, framework| {
@@ -75,7 +77,7 @@ async fn main(
                     Some(id) => {
                         let guild = serenity::GuildId::new(id.parse::<u64>()?);
                         poise::builtins::register_in_guild(ctx, commands, guild).await?;
-                    },
+                    }
                     None => poise::builtins::register_globally(ctx, commands).await?,
                 };
                 Ok(Data)
@@ -83,18 +85,22 @@ async fn main(
         })
         .build();
 
-    let client = serenity::ClientBuilder
-        ::new(token, serenity::GatewayIntents::non_privileged())
+    let client = serenity::ClientBuilder::new(token, serenity::GatewayIntents::non_privileged())
         .framework(framework);
 
     let client = match poster {
         Some(p) => client.event_handler_arc(p),
         None => client,
     };
-    Ok(client.await.map_err(shuttle_runtime::CustomError::new)?.into())
+    Ok(client
+        .await
+        .map_err(shuttle_runtime::CustomError::new)?
+        .into())
 }
 
 #[macro_export]
 macro_rules! bot_id {
-    () => { 410_315_411_695_992_833 };
+    () => {
+        410_315_411_695_992_833
+    };
 }

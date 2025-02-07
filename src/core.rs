@@ -1,4 +1,4 @@
-use crate::{Context, bot_id};
+use crate::{bot_id, Context};
 
 /// Show this help message
 ///
@@ -6,15 +6,16 @@ use crate::{Context, bot_id};
 ///
 /// **Usage**: /help [command]
 #[poise::command(category = "Core", slash_command)]
-pub async fn help(ctx: Context<'_>,
-    #[description = "Specific command to show help about"]
-    command: Option<String>,
+pub async fn help(
+    ctx: Context<'_>,
+    #[description = "Specific command to show help about"] command: Option<String>,
 ) -> anyhow::Result<()> {
     poise::builtins::help(
         ctx,
         command.as_deref(),
         poise::builtins::HelpConfiguration::default(),
-    ).await?;
+    )
+    .await?;
     Ok(())
 }
 
@@ -35,10 +36,15 @@ pub async fn ping(ctx: Context<'_>) -> anyhow::Result<()> {
         format!("Pong! {:.3} s", duration.as_secs_f32())
     };
 
-    reply.edit(ctx, poise::CreateReply {
-        content: Some(message),
-        ..Default::default()
-    }).await?;
+    reply
+        .edit(
+            ctx,
+            poise::CreateReply {
+                content: Some(message),
+                ..Default::default()
+            },
+        )
+        .await?;
     Ok(())
 }
 
@@ -60,7 +66,11 @@ pub async fn git(ctx: Context<'_>) -> anyhow::Result<()> {
 /// **Usage**: /invite
 #[poise::command(category = "Core", slash_command)]
 pub async fn invite(ctx: Context<'_>) -> anyhow::Result<()> {
-    ctx.say(concat!("https://discord.com/application-directory/", bot_id!())).await?;
+    ctx.say(concat!(
+        "https://discord.com/application-directory/",
+        bot_id!()
+    ))
+    .await?;
     Ok(())
 }
 
@@ -82,6 +92,7 @@ pub async fn support(ctx: Context<'_>) -> anyhow::Result<()> {
 /// **Usage**: /vote
 #[poise::command(category = "Core", slash_command)]
 pub async fn vote(ctx: Context<'_>) -> anyhow::Result<()> {
-    ctx.say(concat!("https://top.gg/bot/", bot_id!(), "/vote")).await?;
+    ctx.say(concat!("https://top.gg/bot/", bot_id!(), "/vote"))
+        .await?;
     Ok(())
 }

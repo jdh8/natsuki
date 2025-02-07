@@ -5,4 +5,4 @@ rr = "shuttle run --release"
 restart = "shuttle project restart --idle-minutes 0"
 
 [build]
-rustflags = ["-C", "target-cpu=native"]
+rustflags = ["-Ctarget-cpu=native"]

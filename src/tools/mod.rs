@@ -1,16 +1,19 @@
 pub mod base64;
-use anyhow::Context as _;
 use crate::Context;
+use anyhow::Context as _;
 use csscolorparser::Color;
 use poise::serenity_prelude as serenity;
 use rand::seq::IteratorRandom as _;
 use regex::{Captures, Regex};
 
 fn to_hsl_string(color: &Color) -> String {
-    let (h, s, l, a) = color.to_hsla();
+    let [h, s, l, a] = color.to_hsla();
     let (s, l) = (100.0 * s, 100.0 * l);
-    if color.a >= 1.0 { format!("hsl({h:.1}, {s:.2}%, {l:.2}%)") }
-    else { format!("hsla({h:.1}, {s:.2}%, {l:.2}%, {a:.4})") }
+    if color.a >= 1.0 {
+        format!("hsl({h:.1}, {s:.2}%, {l:.2}%)")
+    } else {
+        format!("hsla({h:.1}, {s:.2}%, {l:.2}%, {a:.4})")
+    }
 }
 
 /// Display a color
@@ -19,9 +22,9 @@ fn to_hsl_string(color: &Color) -> String {
 ///
 /// **Usage**: /color <color>
 #[poise::command(category = "Tools", slash_command)]
-pub async fn color(ctx: Context<'_>,
-    #[description = "Color to display"]
-    color: String,
+pub async fn color(
+    ctx: Context<'_>,
+    #[description = "Color to display"] color: String,
 ) -> anyhow::Result<()> {
     let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id());
     let color = csscolorparser::parse(&color)?;
@@ -31,16 +34,18 @@ pub async fn color(ctx: Context<'_>,
     let image = image.encode_lossless().to_vec();
 
     ctx.send(poise::CreateReply {
-        content: Some("**Hex:** ".to_owned() + &color.to_hex_string()
-            + "\n**RGB:** " + &color.to_rgb_string()
-            + "\n**HSL:** " + &to_hsl_string(&color)
+        content: Some(
+            "**Hex:** ".to_owned()
+                + &color.to_hex_string()
+                + "\n**RGB:** "
+                + &color.to_rgb_string()
+                + "\n**HSL:** "
+                + &to_hsl_string(&color),
         ),
-        attachments: vec![serenity::CreateAttachment::bytes(
-            image,
-            "color.webp",
-        )],
+        attachments: vec![serenity::CreateAttachment::bytes(image, "color.webp")],
         ..Default::default()
-    }).await?;
+    })
+    .await?;
     Ok(())
 }
 
@@ -56,9 +61,9 @@ pub async fn color(ctx: Context<'_>,
 /// /poll Sayori | Natsuki | Yuri | Monika"
 #[allow(clippy::cast_possible_truncation)] //< The length is <= 20, which fits in u32
 #[poise::command(category = "Tools", slash_command)]
-pub async fn poll(ctx: Context<'_>,
-    #[description = "Question or options"]
-    text: String,
+pub async fn poll(
+    ctx: Context<'_>,
+    #[description = "Question or options"] text: String,
 ) -> anyhow::Result<()> {
     let options: Vec<_> = Regex::new(r"\s+\|\s+")?.splitn(&text, 20).collect();
 
@@ -95,9 +100,9 @@ pub async fn poll(ctx: Context<'_>,
 ///
 /// **Usage**: /keycaps <text>
 #[poise::command(category = "Tools", slash_command)]
-pub async fn keycaps(ctx: Context<'_>,
-    #[description = "Text to wrap in keycaps"]
-    text: String,
+pub async fn keycaps(
+    ctx: Context<'_>,
+    #[description = "Text to wrap in keycaps"] text: String,
 ) -> anyhow::Result<()> {
     let text = text.to_uppercase().replace(' ', "\u{2002}");
     let text = Regex::new(r"\d")?.replace_all(&text, "$0\u{20E3}");
@@ -119,7 +124,8 @@ pub async fn keycaps(ctx: Context<'_>,
 pub async fn someone(ctx: Context<'_>) -> anyhow::Result<()> {
     let channel = ctx.channel_id().to_channel(ctx).await?.guild();
     let channel = channel.context("/someone only works in guilds")?;
-    let member = channel.members(ctx)?.into_iter().choose(&mut rand::thread_rng());
-    ctx.say(member.context("No members in this channel")?.user.tag()).await?;
+    let member = channel.members(ctx)?.into_iter().choose(&mut rand::rng());
+    ctx.say(member.context("No members in this channel")?.user.tag())
+        .await?;
     Ok(())
 }

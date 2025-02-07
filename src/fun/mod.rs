@@ -1,25 +1,25 @@
 pub mod poem;
-use crate::{Context, bot_id};
+use crate::{bot_id, Context};
 use anyhow::Context as _;
-use image::{GenericImageView, Pixel};
 use image::buffer::ConvertBuffer as _;
 use image::imageops::FilterType::CatmullRom;
+use image::{GenericImageView, Pixel};
 use poise::serenity_prelude as serenity;
 use rand::Rng as _;
 use serenity::Mentionable as _;
-use tokio::time::{Duration, sleep};
+use tokio::time::{sleep, Duration};
 
 async fn face_image(user: &serenity::User) -> anyhow::Result<image::DynamicImage> {
     let uri = user.face();
     let buffer = reqwest::get(&uri).await?.bytes().await?;
     let extension = std::path::Path::new(&uri).extension();
 
-    if extension.map_or(false, |e| e.eq_ignore_ascii_case("webp")) {
-        webp::Decoder::new(&buffer).decode()
+    if extension.is_some_and(|s| s.eq_ignore_ascii_case("webp")) {
+        webp::Decoder::new(&buffer)
+            .decode()
             .map(|i| i.to_image())
             .context("Failed to decode WebP avatar")
-    }
-    else {
+    } else {
         Ok(image::load_from_memory(&buffer)?)
     }
 }
@@ -44,14 +44,16 @@ fn blend_image<P: Pixel, Container: core::ops::DerefMut<Target = [P::Subpixel]>>
 ///
 /// **Usage**: /beat [user|text]
 #[poise::command(category = "Fun", slash_command)]
-pub async fn beat(ctx: Context<'_>,
-    #[description = "Someone/something to beat"]
-    text: Option<String>,
+pub async fn beat(
+    ctx: Context<'_>,
+    #[description = "Someone/something to beat"] text: Option<String>,
 ) -> anyhow::Result<()> {
-    ctx.say("<:buffsuki:436562981875089428> **I'll beat the shit out of ".to_owned()
-        + text.as_deref().unwrap_or("my dad")
-        + ".**"
-    ).await?;
+    ctx.say(
+        "<:buffsuki:436562981875089428> **I'll beat the shit out of ".to_owned()
+            + text.as_deref().unwrap_or("my dad")
+            + ".**",
+    )
+    .await?;
     Ok(())
 }
 
@@ -61,13 +63,18 @@ pub async fn beat(ctx: Context<'_>,
 ///
 /// **Usage**: /bunny [text]
 #[poise::command(category = "Fun", slash_command)]
-pub async fn bunny(ctx: Context<'_>,
-    #[description = "Something to say"]
-    text: Option<String>,
+pub async fn bunny(
+    ctx: Context<'_>,
+    #[description = "Something to say"] text: Option<String>,
 ) -> anyhow::Result<()> {
-    ctx.say(r"(\\\_\_/)
+    ctx.say(
+        r"(\\\_\_/)
 ( • - •)
-/つ ".to_owned() + text.as_deref().unwrap_or(" つ")).await?;
+/つ "
+            .to_owned()
+            + text.as_deref().unwrap_or(" つ"),
+    )
+    .await?;
     Ok(())
 }
 
@@ -77,9 +84,9 @@ pub async fn bunny(ctx: Context<'_>,
 ///
 /// **Usage**: /bake [user]
 #[poise::command(category = "Fun", slash_command)]
-pub async fn cupcake(ctx: Context<'_>,
-    #[description = "User to bake a cupcake out of"]
-    user: Option<serenity::User>,
+pub async fn cupcake(
+    ctx: Context<'_>,
+    #[description = "User to bake a cupcake out of"] user: Option<serenity::User>,
 ) -> anyhow::Result<()> {
     let target = user.as_ref().unwrap_or_else(|| ctx.author());
     let face = face_image(target).await?.resize(128, 128, CatmullRom);
@@ -89,13 +96,14 @@ pub async fn cupcake(ctx: Context<'_>,
     let cake = cake.encode(90.0).to_vec();
 
     ctx.send(poise::CreateReply {
-        content: Some(format!("{} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!", target.mention())),
-        attachments: vec![serenity::CreateAttachment::bytes(
-            cake,
-            "cupcake.webp",
-        )],
+        content: Some(format!(
+            "{} has been turned into a cupcake.  IT LOOKS SO CUUUUTE!",
+            target.mention()
+        )),
+        attachments: vec![serenity::CreateAttachment::bytes(cake, "cupcake.webp")],
         ..Default::default()
-    }).await?;
+    })
+    .await?;
     Ok(())
 }
 
@@ -108,7 +116,15 @@ pub async fn cupcake(ctx: Context<'_>,
 pub async fn cute(ctx: Context<'_>) -> anyhow::Result<()> {
     let mut content = "Don't say this embarrassing thing, dummy!".to_owned();
     let reply = ctx.say(content.clone()).await?;
-    let edit = |s| reply.edit(ctx, poise::CreateReply { content: Some(s), ..Default::default() });
+    let edit = |s| {
+        reply.edit(
+            ctx,
+            poise::CreateReply {
+                content: Some(s),
+                ..Default::default()
+            },
+        )
+    };
     let typing = ctx.serenity_context().http.start_typing(ctx.channel_id());
 
     content.push_str("\nY-You t-too....");
@@ -136,15 +152,17 @@ pub async fn cute(ctx: Context<'_>) -> anyhow::Result<()> {
 ///
 /// **Usage**: /nut [user|text]
 #[poise::command(category = "Fun", slash_command)]
-pub async fn nut(ctx: Context<'_>,
-    #[description = "Something to nut on"]
-    text: Option<String>,
+pub async fn nut(
+    ctx: Context<'_>,
+    #[description = "Something to nut on"] text: Option<String>,
 ) -> anyhow::Result<()> {
-    ctx.say(ctx.author().mention().to_string()
-        + " nuts on "
-        + text.as_deref().unwrap_or("the floor")
-        + ".\n<:pukesuki:405984820674428928> **You guys are so gross!**"
-    ).await?;
+    ctx.say(
+        ctx.author().mention().to_string()
+            + " nuts on "
+            + text.as_deref().unwrap_or("the floor")
+            + ".\n<:pukesuki:405984820674428928> **You guys are so gross!**",
+    )
+    .await?;
     Ok(())
 }
 
@@ -154,9 +172,9 @@ pub async fn nut(ctx: Context<'_>,
 ///
 /// **Usage**: /rate [text]
 #[poise::command(category = "Fun", slash_command)]
-pub async fn rate(ctx: Context<'_>,
-    #[description = "Character to rate"]
-    text: Option<String>,
+pub async fn rate(
+    ctx: Context<'_>,
+    #[description = "Character to rate"] text: Option<String>,
 ) -> anyhow::Result<()> {
     let character = text.unwrap_or_else(|| ctx.author().to_string());
     let trimmed = character.trim();
@@ -164,7 +182,10 @@ pub async fn rate(ctx: Context<'_>,
     let canonical = regex::Regex::new(r"<@!(\d+)>")?.replace_all(&lower, "<@$1>");
     let digest: [u64; 2] = unsafe { core::mem::transmute(md5::compute(canonical.as_bytes())) };
     let percentage = digest[0].wrapping_add(14) % 101;
-    ctx.say(format!("<:natsuki:424991419329937428> I'd give {trimmed} {percentage}%.")).await?;
+    ctx.say(format!(
+        "<:natsuki:424991419329937428> I'd give {trimmed} {percentage}%."
+    ))
+    .await?;
     Ok(())
 }
 
@@ -174,14 +195,15 @@ pub async fn rate(ctx: Context<'_>,
 ///
 /// **Usage**: /shelf [user]
 #[poise::command(category = "Fun", slash_command)]
-pub async fn shelf(ctx: Context<'_>,
-    #[description = "User who helps Natsuki"]
-    user: Option<serenity::User>,
+pub async fn shelf(
+    ctx: Context<'_>,
+    #[description = "User who helps Natsuki"] user: Option<serenity::User>,
 ) -> anyhow::Result<()> {
     let user = user.as_ref().unwrap_or_else(|| ctx.author());
     let initial = user.name.get(0..1).unwrap_or("");
-    let repeat = rand::thread_rng().gen_range(5..13);
-    ctx.say(format!("**Fucking {}{}**", user, initial.repeat(repeat))).await?;
+    let repeat = rand::rng().random_range(5..13);
+    ctx.say(format!("**Fucking {}{}**", user, initial.repeat(repeat)))
+        .await?;
     Ok(())
 }
 
@@ -193,11 +215,13 @@ pub async fn shelf(ctx: Context<'_>,
 ///
 /// Note that × is multiplication sign (U+00D7)
 #[poise::command(category = "Fun", slash_command)]
-pub async fn ship(ctx: Context<'_>,
+pub async fn ship(
+    ctx: Context<'_>,
     #[description = "Characters to ship, separated by & or × (multiplication sign, U+00D7)"]
     text: Option<String>,
 ) -> anyhow::Result<()> {
-    let slices = text.as_deref()
+    let slices = text
+        .as_deref()
         .map_or_else(Vec::new, |t| t.split(['&', '×']).map(str::trim).collect());
 
     let ship = match slices.len() {
@@ -205,10 +229,12 @@ pub async fn ship(ctx: Context<'_>,
         1 => ctx.author().to_string() + " × " + slices[0],
         _ => slices.join(" × "),
     };
-    ctx.say("Look at them, a lovey dovey couple!  I ship it!\n".to_owned()
-        + &ship
-        + "\nN-not that I c-care..."
-    ).await?;
+    ctx.say(
+        "Look at them, a lovey dovey couple!  I ship it!\n".to_owned()
+            + &ship
+            + "\nN-not that I c-care...",
+    )
+    .await?;
     Ok(())
 }
 
@@ -216,28 +242,28 @@ async fn fuck(ctx: Context<'_>, user: Option<&serenity::User>) -> anyhow::Result
     let base = image::open("assets/566424ede431200e3985ca6f21287cee.png")?.into_rgba8();
     let author = face_image(ctx.author()).await?.resize(256, 256, CatmullRom);
     let image = blend_image(base, &author, 364, 120);
-    let image: image::RgbImage  = match user {
+    let image: image::RgbImage = match user {
         Some(u) => {
             let t = face_image(u).await?.resize(256, 256, CatmullRom);
             blend_image(image, &t, 110, 20)
-        },
+        }
         None => image,
-    }.convert();
+    }
+    .convert();
 
     let image = webp::Encoder::from_rgb(&image, image.width(), image.height());
     let image = image.encode(90.0).to_vec();
 
     ctx.send(poise::CreateReply {
-        content: Some(format!("{} fucked {}!",
+        content: Some(format!(
+            "{} fucked {}!",
             ctx.author().mention(),
-            user.map_or_else(|| "Natsuki".to_owned(), |u| u.mention().to_string()))
-        ),
-        attachments: vec![serenity::CreateAttachment::bytes(
-            image,
-            "fuck.webp",
-        )],
+            user.map_or_else(|| "Natsuki".to_owned(), |u| u.mention().to_string())
+        )),
+        attachments: vec![serenity::CreateAttachment::bytes(image, "fuck.webp")],
         ..Default::default()
-    }).await?;
+    })
+    .await?;
     Ok(())
 }
 
@@ -247,23 +273,32 @@ async fn fuck(ctx: Context<'_>, user: Option<&serenity::User>) -> anyhow::Result
 ///
 /// **Usage**: /smash [user]
 #[poise::command(category = "Fun", slash_command)]
-pub async fn smash(ctx: Context<'_>,
-    #[description = "User to smash"]
-    user: Option<serenity::User>,
+pub async fn smash(
+    ctx: Context<'_>,
+    #[description = "User to smash"] user: Option<serenity::User>,
 ) -> anyhow::Result<()> {
-    if ctx.channel_id().to_channel(&ctx).await?.is_nsfw() {
+    let nsfw = match ctx.channel_id().to_channel(&ctx).await? {
+        serenity::Channel::Guild(ch) => ch.nsfw,
+        _ => false,
+    };
+
+    if nsfw {
         return fuck(ctx, user.as_ref()).await;
     }
+
     let author = ctx.author().mention();
+
     ctx.send(poise::CreateReply {
         embeds: vec![serenity::CreateEmbed::new()
             .description(user.map_or_else(
                 || format!("{author} smashed!"),
-                |u| format!("{author} smashed {}!", u.mention())))
-            .image("https://raw.githubusercontent.com/jdh8/natsuki/master/assets/smash.png")
-        ],
+                |u| format!("{author} smashed {}!", u.mention()),
+            ))
+            .image("https://raw.githubusercontent.com/jdh8/natsuki/master/assets/smash.png")],
         ..Default::default()
-    }).await?;
+    })
+    .await?;
+
     Ok(())
 }
 
@@ -274,8 +309,10 @@ pub async fn smash(ctx: Context<'_>,
 /// **Usage**: /word
 #[poise::command(category = "Fun", slash_command)]
 pub async fn word(ctx: Context<'_>) -> anyhow::Result<()> {
-    ctx.say("Here are my preferred words.\n\
-        http://doki-doki-literature-club.wikia.com/wiki/Natsuki#Preferred_Words"
-    ).await?;
+    ctx.say(
+        "Here are my preferred words.\n\
+        http://doki-doki-literature-club.wikia.com/wiki/Natsuki#Preferred_Words",
+    )
+    .await?;
     Ok(())
 }

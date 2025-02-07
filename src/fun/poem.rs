@@ -1,11 +1,11 @@
 use crate::Context;
 use bitflags::bitflags;
-use futures::try_join;
-use rand::seq::SliceRandom as _;
-use poise::serenity_prelude as serenity;
-use serenity::ButtonStyle::{Secondary, Success, Danger};
-use serenity::EmojiId;
 use core::time::Duration;
+use futures::try_join;
+use poise::serenity_prelude as serenity;
+use rand::seq::IndexedRandom as _;
+use serenity::ButtonStyle::{Danger, Secondary, Success};
+use serenity::EmojiId;
 
 bitflags! {
     struct Preference : u8 {
@@ -247,9 +247,12 @@ const DICTIONARY: [(&str, Preference); 228] = [
 
 #[derive(poise::ChoiceParameter, Debug, Clone, Copy, PartialEq, Eq, PartialOrd)]
 pub enum Act {
-    #[name = "1"] One = 1,
-    #[name = "2"] Two,
-    #[name = "3"] Three,
+    #[name = "1"]
+    One = 1,
+    #[name = "2"]
+    Two,
+    #[name = "3"]
+    Three,
 }
 
 #[derive(strum::EnumString, strum::Display, Debug, Clone, Copy, PartialEq)]
@@ -266,23 +269,34 @@ fn make_buttons(
     disabled: bool,
 ) -> serenity::CreateActionRow {
     serenity::CreateActionRow::Buttons(
-        buttons.iter().copied().map(|(emoji, doki)|
-            serenity::CreateButton::new(doki.to_string())
-                .style(style(doki))
-                .emoji(emoji)
-                .label(doki.to_string())
-                .disabled(disabled)
-        ).collect()
+        buttons
+            .iter()
+            .copied()
+            .map(|(emoji, doki)| {
+                serenity::CreateButton::new(doki.to_string())
+                    .style(style(doki))
+                    .emoji(emoji)
+                    .label(doki.to_string())
+                    .disabled(disabled)
+            })
+            .collect(),
     )
 }
 
-async fn game(ctx: Context<'_>, word: &str, answer: Doki, buttons: &[(EmojiId, Doki)]) -> anyhow::Result<()> {
+async fn game(
+    ctx: Context<'_>,
+    word: &str,
+    answer: Doki,
+    buttons: &[(EmojiId, Doki)],
+) -> anyhow::Result<()> {
     let content = Some("Whose word is **".to_owned() + word + "**?  Please answer in 15 seconds.");
-    let question = ctx.send(poise::CreateReply {
-        content,
-        components: Some(vec![make_buttons(buttons, |_| Secondary, false)]),
-        ..Default::default()
-    }).await?;
+    let question = ctx
+        .send(poise::CreateReply {
+            content,
+            components: Some(vec![make_buttons(buttons, |_| Secondary, false)]),
+            ..Default::default()
+        })
+        .await?;
 
     let collected = serenity::ComponentInteractionCollector::new(ctx)
         .author_id(ctx.author().id)
@@ -295,57 +309,102 @@ async fn game(ctx: Context<'_>, word: &str, answer: Doki, buttons: &[(EmojiId, D
             let right = "Congratulations!  That's correct.".to_owned();
             let wrong = format!("Sorry, it's **{answer}**.");
             let selected = interaction.data.custom_id.parse::<Doki>()?;
-            
-            let response = interaction.create_response(ctx, serenity::CreateInteractionResponse::Message(
-                serenity::CreateInteractionResponseMessage::new()
-                    .content(if selected == answer { right } else { wrong })
-            ));
+
+            let response = interaction.create_response(
+                ctx,
+                serenity::CreateInteractionResponse::Message(
+                    serenity::CreateInteractionResponseMessage::new()
+                        .content(if selected == answer { right } else { wrong }),
+                ),
+            );
             let style = |doki: Doki| {
-                if doki == answer { Success }
-                else if doki == selected { Danger }
-                else { Secondary }
+                if doki == answer {
+                    Success
+                } else if doki == selected {
+                    Danger
+                } else {
+                    Secondary
+                }
             };
-            let edit = question.edit(ctx, poise::CreateReply {
-                components: Some(vec![make_buttons(buttons, style, true)]),
-                ..Default::default()
-            });
+            let edit = question.edit(
+                ctx,
+                poise::CreateReply {
+                    components: Some(vec![make_buttons(buttons, style, true)]),
+                    ..Default::default()
+                },
+            );
             try_join!(response, edit)?;
-        },
+        }
         None => {
-            question.edit(ctx, poise::CreateReply {
-                components: Some(vec![make_buttons(buttons, |_| Secondary, true)]),
-                ..Default::default()
-            }).await?;
+            question
+                .edit(
+                    ctx,
+                    poise::CreateReply {
+                        components: Some(vec![make_buttons(buttons, |_| Secondary, true)]),
+                        ..Default::default()
+                    },
+                )
+                .await?;
         }
     }
     Ok(())
 }
 
 async fn poem1(ctx: Context<'_>) -> anyhow::Result<()> {
-    let (word, preference) = DICTIONARY.choose(&mut rand::thread_rng()).expect("The dictionary is empty!");
-    let doki = if preference.contains(Preference::Sayori) { Doki::Sayori }
-        else if preference.contains(Preference::Yuri) { Doki::Yuri }
-        else { Doki::Natsuki };
+    let (word, preference) = DICTIONARY
+        .choose(&mut rand::rng())
+        .expect("The dictionary is empty!");
+    let doki = if preference.contains(Preference::Sayori) {
+        Doki::Sayori
+    } else if preference.contains(Preference::Yuri) {
+        Doki::Yuri
+    } else {
+        Doki::Natsuki
+    };
 
-    game(ctx, word, doki, &[
-        (EmojiId::new(424_991_418_386_350_081), Doki::Sayori),
-        (EmojiId::new(424_991_419_329_937_428), Doki::Natsuki),
-        (EmojiId::new(424_987_242_986_078_218), Doki::Yuri),
-    ]).await
+    game(
+        ctx,
+        word,
+        doki,
+        &[
+            (EmojiId::new(424_991_418_386_350_081), Doki::Sayori),
+            (EmojiId::new(424_991_419_329_937_428), Doki::Natsuki),
+            (EmojiId::new(424_987_242_986_078_218), Doki::Yuri),
+        ],
+    )
+    .await
 }
 
 async fn poem2(ctx: Context<'_>) -> anyhow::Result<()> {
-    let (word, preference) = DICTIONARY.choose(&mut rand::thread_rng()).expect("The dictionary is empty!");
-    let doki = if preference.contains(Preference::Yuri) { Doki::Yuri } else { Doki::Natsuki };
+    let (word, preference) = DICTIONARY
+        .choose(&mut rand::rng())
+        .expect("The dictionary is empty!");
+    let doki = if preference.contains(Preference::Yuri) {
+        Doki::Yuri
+    } else {
+        Doki::Natsuki
+    };
 
-    game(ctx, word, doki, &[
-        (EmojiId::new(424_991_419_329_937_428), Doki::Natsuki),
-        (EmojiId::new(424_987_242_986_078_218), Doki::Yuri),
-    ]).await
+    game(
+        ctx,
+        word,
+        doki,
+        &[
+            (EmojiId::new(424_991_419_329_937_428), Doki::Natsuki),
+            (EmojiId::new(424_987_242_986_078_218), Doki::Yuri),
+        ],
+    )
+    .await
 }
 
 async fn poem3(ctx: Context<'_>) -> anyhow::Result<()> {
-    game(ctx, "Monika", Doki::Monika, &[(EmojiId::new(501_274_687_842_680_832), Doki::Monika)]).await
+    game(
+        ctx,
+        "Monika",
+        Doki::Monika,
+        &[(EmojiId::new(501_274_687_842_680_832), Doki::Monika)],
+    )
+    .await
 }
 
 /// Play a poem game
@@ -354,9 +413,9 @@ async fn poem3(ctx: Context<'_>) -> anyhow::Result<()> {
 ///
 /// **Usage**: /poem <act>
 #[poise::command(category = "Fun", slash_command)]
-pub async fn poem(ctx: Context<'_>,
-    #[description = "Act of the poem game"]
-    act: Act,
+pub async fn poem(
+    ctx: Context<'_>,
+    #[description = "Act of the poem game"] act: Act,
 ) -> anyhow::Result<()> {
     match act {
         Act::One => poem1(ctx).await,

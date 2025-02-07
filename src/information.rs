@@ -1,5 +1,5 @@
 use crate::Context;
-use chrono::{DateTime, Utc, SecondsFormat};
+use chrono::{DateTime, SecondsFormat, Utc};
 use poise::serenity_prelude as serenity;
 use std::time;
 
@@ -52,11 +52,12 @@ fn format_snowflake(flake: Snowflake) -> String {
 ///
 /// **Usage**: /avatar [user]
 #[poise::command(category = "Information", slash_command)]
-pub async fn avatar(ctx: Context<'_>,
-    #[description = "User whose avatar to show"]
-    user: Option<serenity::User>,
+pub async fn avatar(
+    ctx: Context<'_>,
+    #[description = "User whose avatar to show"] user: Option<serenity::User>,
 ) -> anyhow::Result<()> {
-    ctx.say(user.as_ref().unwrap_or_else(|| ctx.author()).face()).await?;
+    ctx.say(user.as_ref().unwrap_or_else(|| ctx.author()).face())
+        .await?;
     Ok(())
 }
 
@@ -72,16 +73,20 @@ pub async fn avatar_user(ctx: Context<'_>, user: serenity::User) -> anyhow::Resu
 ///
 /// **Usage**: /snowflake <snowflake|user|role|channel|text|...>
 #[poise::command(category = "Information", slash_command)]
-pub async fn snowflake(ctx: Context<'_>,
-    #[description = "Snowflake (any Discord entity) to decode"]
-    snowflake: String,
+pub async fn snowflake(
+    ctx: Context<'_>,
+    #[description = "Snowflake (any Discord entity) to decode"] snowflake: String,
 ) -> anyhow::Result<()> {
     ctx.say(regex::Regex::new(r"\d+")?.find(&snowflake).map_or_else(
         || "No snowflake is found.".to_owned(),
-        |mat| mat.as_str().parse::<u64>().map_or_else(
-            |_| "Found an invalid snowflake: ".to_owned() + mat.as_str(),
-            |flake| format_snowflake(flake.into()),
-        ))).await?;
+        |mat| {
+            mat.as_str().parse::<u64>().map_or_else(
+                |_| "Found an invalid snowflake: ".to_owned() + mat.as_str(),
+                |flake| format_snowflake(flake.into()),
+            )
+        },
+    ))
+    .await?;
     Ok(())
 }
 
@@ -103,9 +108,9 @@ pub async fn snowflake_message(ctx: Context<'_>, message: serenity::Message) -> 
 ///
 /// **Usage**: /role <role>
 #[poise::command(category = "Information", slash_command)]
-pub async fn role(ctx: Context<'_>,
-    #[description = "Role to inspect"]
-    role: serenity::Role,
+pub async fn role(
+    ctx: Context<'_>,
+    #[description = "Role to inspect"] role: serenity::Role,
 ) -> anyhow::Result<()> {
     ctx.send(poise::CreateReply {
         embeds: vec![serenity::CreateEmbed::new()
@@ -119,9 +124,13 @@ pub async fn role(ctx: Context<'_>,
             .field("Mentionable", role.mentionable.to_string(), false)
             .field("Permissions", role.permissions.to_string(), false)
             .field("Position", role.position.to_string(), false)
-            .field("Created at", format_rfc3339(Snowflake(role.id.get()).time()), false)
-        ],
+            .field(
+                "Created at",
+                format_rfc3339(Snowflake(role.id.get()).time()),
+                false,
+            )],
         ..Default::default()
-    }).await?;
+    })
+    .await?;
     Ok(())
 }

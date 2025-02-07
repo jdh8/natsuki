@@ -1,7 +1,7 @@
 use crate::Context;
-use base64::{Engine as _, engine};
-use futures::TryStreamExt as _;
+use base64::{engine, Engine as _};
 use futures::stream::FuturesOrdered;
+use futures::TryStreamExt as _;
 use poise::serenity_prelude as serenity;
 
 const ENGINE: engine::GeneralPurpose = engine::GeneralPurpose::new(
@@ -12,9 +12,13 @@ const ENGINE: engine::GeneralPurpose = engine::GeneralPurpose::new(
 );
 
 fn forgiving_decode(s: impl AsRef<[u8]>) -> Result<Vec<u8>, base64::DecodeError> {
-    ENGINE.decode(s.as_ref().iter().copied()
-        .filter(|c| !c.is_ascii_whitespace())
-        .collect::<Vec<_>>())
+    ENGINE.decode(
+        s.as_ref()
+            .iter()
+            .copied()
+            .filter(|c| !c.is_ascii_whitespace())
+            .collect::<Vec<_>>(),
+    )
 }
 
 #[poise::command(slash_command)]
@@ -40,15 +44,24 @@ pub async fn base64(_: Context<'_>) -> anyhow::Result<()> {
     unimplemented!("Unimplemented prefix command")
 }
 
-async fn encode_attachment(attachment: serenity::Attachment) -> anyhow::Result<serenity::CreateAttachment> {
+async fn encode_attachment(
+    attachment: serenity::Attachment,
+) -> anyhow::Result<serenity::CreateAttachment> {
     let code = ENGINE.encode(attachment.download().await?);
-    let code = code.as_bytes().iter().enumerate()
-        .flat_map(|(i, c)| {
-            if i != 0 && i % 76 == 0 { Some(b'\n') } else { None }
-            .into_iter().chain(Some(*c))
-        });
+    let code = code.as_bytes().iter().enumerate().flat_map(|(i, c)| {
+        if i != 0 && i % 76 == 0 {
+            Some(b'\n')
+        } else {
+            None
+        }
+        .into_iter()
+        .chain(Some(*c))
+    });
     let code: Vec<_> = code.collect();
-    Ok(serenity::CreateAttachment::bytes(code, attachment.filename + ".b64.txt"))
+    Ok(serenity::CreateAttachment::bytes(
+        code,
+        attachment.filename + ".b64.txt",
+    ))
 }
 
 fn encode_embed(mut embed: serenity::Embed) -> serenity::CreateEmbed {
@@ -81,13 +94,16 @@ pub async fn base64_encode(ctx: Context<'_>, message: serenity::Message) -> anyh
 
     ctx.send(poise::CreateReply {
         attachments: attachments.try_collect().await?,
-        embeds: message.embeds.into_iter()
+        embeds: message
+            .embeds
+            .into_iter()
             .filter(|e| !matches!(e.kind.as_deref(), Some("rich") | None))
             .map(encode_embed)
             .collect(),
         content: Some(ENGINE.encode(message.content)),
         ..Default::default()
-    }).await?;
+    })
+    .await?;
     Ok(())
 }
 
@@ -129,7 +145,13 @@ fn guess_extension_from_mime<'a>(main: &'_ str, subtype: &'a str) -> &'a str {
 
         other => match other.len() {
             2..=4 => other,
-            _ => if main == "text" { "txt" } else { "bin" },
+            _ => {
+                if main == "text" {
+                    "txt"
+                } else {
+                    "bin"
+                }
+            }
         },
     }
 }
@@ -144,10 +166,15 @@ fn guess_extension(bytes: &[u8]) -> &'static str {
     })
 }
 
-async fn decode_attachment(attachment: serenity::Attachment) -> anyhow::Result<serenity::CreateAttachment> {
+async fn decode_attachment(
+    attachment: serenity::Attachment,
+) -> anyhow::Result<serenity::CreateAttachment> {
     let buffer = forgiving_decode(attachment.download().await?)?;
     let extension = guess_extension(&buffer);
-    Ok(serenity::CreateAttachment::bytes(buffer, attachment.filename + "." + extension))
+    Ok(serenity::CreateAttachment::bytes(
+        buffer,
+        attachment.filename + "." + extension,
+    ))
 }
 
 fn decode_embed(mut embed: serenity::Embed) -> anyhow::Result<serenity::CreateEmbed> {
@@ -178,12 +205,13 @@ pub async fn base64_decode(ctx: Context<'_>, message: serenity::Message) -> anyh
     let text = String::from_utf8(forgiving_decode(message.content)?)?;
     let attachments = message.attachments.into_iter().map(decode_attachment);
     let attachments: FuturesOrdered<_> = attachments.collect();
-    
+
     ctx.send(poise::CreateReply {
         attachments: attachments.try_collect().await?,
         embeds: message.embeds.into_iter().flat_map(decode_embed).collect(),
         content: Some(text),
         ..Default::default()
-    }).await?;
+    })
+    .await?;
     Ok(())
 }
