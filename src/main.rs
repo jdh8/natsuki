@@ -5,6 +5,7 @@ mod tools;
 mod weeb;
 use anyhow::Context as _;
 use poise::serenity_prelude as serenity;
+use shuttle_runtime::{Error, SecretStore, Secrets, Service};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct Data;
@@ -52,10 +53,7 @@ fn get_commands() -> Vec<poise::Command<Data, anyhow::Error>> {
     ]
 }
 
-#[shuttle_runtime::main]
-async fn main(
-    #[shuttle_runtime::Secrets] secrets: shuttle_runtime::SecretStore,
-) -> shuttle_serenity::ShuttleSerenity {
+async fn build_serenity(secrets: SecretStore) -> shuttle_serenity::ShuttleSerenity {
     let token = secrets.get("TOKEN").context("Discord token not found")?;
 
     let poster = secrets.get("TOP_GG_TOKEN").map(|token| {
@@ -92,10 +90,35 @@ async fn main(
         Some(p) => client.event_handler_arc(p),
         None => client,
     };
+
     Ok(client
         .await
         .map_err(shuttle_runtime::CustomError::new)?
         .into())
+}
+
+struct NatsukiService {
+    serenity: shuttle_serenity::SerenityService,
+    axum: shuttle_axum::AxumService,
+}
+
+#[shuttle_runtime::async_trait]
+impl Service for NatsukiService {
+    async fn bind(mut self, addr: std::net::SocketAddr) -> Result<(), Error> {
+        let (serenity, axum) = futures::join!(self.serenity.bind(addr), self.axum.bind(addr));
+        serenity?;
+        axum
+    }
+}
+
+#[shuttle_runtime::main]
+async fn main(#[Secrets] secrets: SecretStore) -> Result<NatsukiService, Error> {
+    use axum::{response::NoContent, routing::get, Router};
+
+    Ok(NatsukiService {
+        serenity: build_serenity(secrets).await?,
+        axum: Router::new().route("/", get(|| async { NoContent })).into(),
+    })
 }
 
 #[macro_export]

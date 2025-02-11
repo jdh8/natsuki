@@ -1,6 +1,6 @@
 [package]
 name = "natsuki"
-version = "3.0.5"
+version = "3.0.6"
 authors = [
     "Chen-Pang He (https://jdh8.org)",
     "u/YourWrstNightmare (https://www.reddit.com/user/YourWrstNightmare)",
@@ -15,6 +15,7 @@ keywords = ["discord", "ddlc"]
 
 [dependencies]
 anyhow = "1.0.75"
+axum = "0.8.1"
 base64 = "0.22.1"
 bitflags = "2.8.0"
 chrono = "0.4.30"
@@ -28,9 +29,10 @@ rand = "0.9.0"
 regex = "1.9.5"
 reqwest = { version = "0.12.12", features = ["json"] }
 serde_json = "1.0.105"
+shuttle-axum = "0.52.0"
 shuttle-runtime = "0.52.0"
 shuttle-serenity = "0.52.0"
-strum = { version = "0.26", features = ["derive"] }
+strum = { version = "0.27.0", features = ["derive"] }
 tokio = "1.32.0"
 topgg = { version = "1.4.1", features = ["autoposter", "serenity-cached"] }
 tree_magic_mini = "3.0.3"
