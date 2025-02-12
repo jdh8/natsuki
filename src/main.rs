@@ -5,7 +5,24 @@ mod tools;
 mod weeb;
 use anyhow::Context as _;
 use poise::serenity_prelude as serenity;
-use shuttle_runtime::{Error, SecretStore, Secrets, Service};
+use shuttle_runtime::{CustomError, Error, SecretStore, Secrets, Service};
+
+struct Natsuki(serenity::Client);
+
+#[shuttle_runtime::async_trait]
+impl Service for Natsuki {
+    async fn bind(mut self, addr: std::net::SocketAddr) -> Result<(), Error> {
+        use axum::{response::NoContent, routing::get, Router};
+        let router = Router::new().route("/", get(|| async { NoContent }));
+
+        let (axum, serenity) = futures::join!(
+            shuttle_axum::AxumService(router).bind(addr),
+            self.0.start_autosharded(),
+        );
+        serenity.map_err(CustomError::new)?;
+        axum
+    }
+}
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct Data;
@@ -53,7 +70,10 @@ fn get_commands() -> Vec<poise::Command<Data, anyhow::Error>> {
     ]
 }
 
-async fn build_serenity(secrets: SecretStore) -> shuttle_serenity::ShuttleSerenity {
+#[shuttle_runtime::main]
+async fn main(#[Secrets] secrets: SecretStore) -> Result<Natsuki, Error> {
+    use serenity::{ClientBuilder, GatewayIntents, GuildId};
+    const INTENTS: GatewayIntents = GatewayIntents::non_privileged();
     let token = secrets.get("TOKEN").context("Discord token not found")?;
 
     let poster = secrets.get("TOP_GG_TOKEN").map(|token| {
@@ -73,7 +93,7 @@ async fn build_serenity(secrets: SecretStore) -> shuttle_serenity::ShuttleSereni
                 let commands = &framework.options().commands;
                 match secrets.get("GUILD") {
                     Some(id) => {
-                        let guild = serenity::GuildId::new(id.parse::<u64>()?);
+                        let guild = GuildId::new(id.parse::<u64>()?);
                         poise::builtins::register_in_guild(ctx, commands, guild).await?;
                     }
                     None => poise::builtins::register_globally(ctx, commands).await?,
@@ -83,42 +103,12 @@ async fn build_serenity(secrets: SecretStore) -> shuttle_serenity::ShuttleSereni
         })
         .build();
 
-    let client = serenity::ClientBuilder::new(token, serenity::GatewayIntents::non_privileged())
-        .framework(framework);
-
+    let client = ClientBuilder::new(token, INTENTS).framework(framework);
     let client = match poster {
         Some(p) => client.event_handler_arc(p),
         None => client,
     };
-
-    Ok(client
-        .await
-        .map_err(shuttle_runtime::CustomError::new)?
-        .into())
-}
-
-struct NatsukiService {
-    serenity: shuttle_serenity::SerenityService,
-    axum: shuttle_axum::AxumService,
-}
-
-#[shuttle_runtime::async_trait]
-impl Service for NatsukiService {
-    async fn bind(mut self, addr: std::net::SocketAddr) -> Result<(), Error> {
-        let (serenity, axum) = futures::join!(self.serenity.bind(addr), self.axum.bind(addr));
-        serenity?;
-        axum
-    }
-}
-
-#[shuttle_runtime::main]
-async fn main(#[Secrets] secrets: SecretStore) -> Result<NatsukiService, Error> {
-    use axum::{response::NoContent, routing::get, Router};
-
-    Ok(NatsukiService {
-        serenity: build_serenity(secrets).await?,
-        axum: Router::new().route("/", get(|| async { NoContent })).into(),
-    })
+    Ok(Natsuki(client.await.map_err(CustomError::new)?))
 }
 
 #[macro_export]
