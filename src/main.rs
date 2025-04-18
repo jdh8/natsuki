@@ -97,7 +97,7 @@ async fn main(#[Secrets] secrets: SecretStore) -> Result<Natsuki, Error> {
                         poise::builtins::register_in_guild(ctx, commands, guild).await?;
                     }
                     None => poise::builtins::register_globally(ctx, commands).await?,
-                };
+                }
                 Ok(Data)
             })
         })
