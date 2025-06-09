@@ -1,20 +1,9 @@
 pub mod base64;
 use crate::Context;
 use anyhow::Context as _;
-use csscolorparser::Color;
 use poise::serenity_prelude as serenity;
 use rand::seq::IteratorRandom as _;
 use regex::{Captures, Regex};
-
-fn to_hsl_string(color: &Color) -> String {
-    let [h, s, l, a] = color.to_hsla();
-    let (s, l) = (100.0 * s, 100.0 * l);
-    if color.a >= 1.0 {
-        format!("hsl({h:.1}, {s:.2}%, {l:.2}%)")
-    } else {
-        format!("hsla({h:.1}, {s:.2}%, {l:.2}%, {a:.4})")
-    }
-}
 
 /// Display a color
 ///
@@ -36,11 +25,11 @@ pub async fn color(
     ctx.send(poise::CreateReply {
         content: Some(
             "**Hex:** ".to_owned()
-                + &color.to_hex_string()
+                + &color.to_css_hex()
                 + "\n**RGB:** "
-                + &color.to_rgb_string()
+                + &color.to_css_rgb()
                 + "\n**HSL:** "
-                + &to_hsl_string(&color),
+                + &color.to_css_hsl(),
         ),
         attachments: vec![serenity::CreateAttachment::bytes(image, "color.webp")],
         ..Default::default()
