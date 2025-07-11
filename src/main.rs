@@ -3,26 +3,8 @@ mod fun;
 mod information;
 mod tools;
 mod weeb;
-use anyhow::Context as _;
 use poise::serenity_prelude as serenity;
-use shuttle_runtime::{CustomError, Error, SecretStore, Secrets, Service};
-
-struct Natsuki(serenity::Client);
-
-#[shuttle_runtime::async_trait]
-impl Service for Natsuki {
-    async fn bind(mut self, addr: std::net::SocketAddr) -> Result<(), Error> {
-        use axum::{response::NoContent, routing::get, Router};
-        let router = Router::new().route("/", get(|| async { NoContent }));
-
-        let (axum, serenity) = futures::join!(
-            shuttle_axum::AxumService(router).bind(addr),
-            self.0.start_autosharded(),
-        );
-        serenity.map_err(CustomError::new)?;
-        axum
-    }
-}
+use std::env;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct Data;
@@ -70,33 +52,34 @@ fn get_commands() -> Vec<poise::Command<Data, anyhow::Error>> {
     ]
 }
 
-#[shuttle_runtime::main]
-async fn main(#[Secrets] secrets: SecretStore) -> Result<Natsuki, Error> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     use serenity::{ClientBuilder, GatewayIntents, GuildId};
     const INTENTS: GatewayIntents = GatewayIntents::non_privileged();
-    let token = secrets.get("TOKEN").context("Discord token not found")?;
+    let token = env::var("TOKEN")?;
 
-    let poster = secrets.get("TOP_GG_TOKEN").map(|token| {
+    let poster = env::var("TOP_GG_TOKEN").map(|token| {
         let client = topgg::Client::new(token);
         topgg::Autoposter::serenity(&client, std::time::Duration::from_secs(10800)).handler()
     });
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: secrets
-                .get("CLEAR")
-                .map_or_else(get_commands, |_| Vec::new()),
+            commands: env::var_os("CLEAR").map_or_else(get_commands, |_| Vec::new()),
             ..Default::default()
         })
         .setup(|ctx, _, framework| {
             Box::pin(async move {
                 let commands = &framework.options().commands;
-                match secrets.get("GUILD") {
-                    Some(id) => {
+                match env::var("GUILD") {
+                    Ok(id) => {
                         let guild = GuildId::new(id.parse::<u64>()?);
                         poise::builtins::register_in_guild(ctx, commands, guild).await?;
                     }
-                    None => poise::builtins::register_globally(ctx, commands).await?,
+                    Err(env::VarError::NotPresent) => {
+                        poise::builtins::register_globally(ctx, commands).await?;
+                    }
+                    Err(e) => return Err(e.into()),
                 }
                 Ok(Data)
             })
@@ -105,10 +88,12 @@ async fn main(#[Secrets] secrets: SecretStore) -> Result<Natsuki, Error> {
 
     let client = ClientBuilder::new(token, INTENTS).framework(framework);
     let client = match poster {
-        Some(p) => client.event_handler_arc(p),
-        None => client,
+        Ok(p) => client.event_handler_arc(p),
+        _ => client,
     };
-    Ok(Natsuki(client.await.map_err(CustomError::new)?))
+
+    client.await?.start_autosharded().await?;
+    Ok(())
 }
 
 #[macro_export]

@@ -12,3 +12,7 @@ Cargo.lock
 /target
 .shuttle*
 Secrets*.toml
+
+# Environment files
+.env
+.env.*
