@@ -81,7 +81,7 @@ pub async fn invite(ctx: Context<'_>) -> anyhow::Result<()> {
 /// **Usage**: /support
 #[poise::command(category = "Core", slash_command)]
 pub async fn support(ctx: Context<'_>) -> anyhow::Result<()> {
-    ctx.say("https://discord.gg/gvXAy63dNR").await?;
+    ctx.say("https://discord.gg/vGWwP5yETZ").await?;
     Ok(())
 }
 
