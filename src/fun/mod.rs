@@ -5,7 +5,7 @@ use image::buffer::ConvertBuffer as _;
 use image::imageops::FilterType::CatmullRom;
 use image::{GenericImageView, Pixel};
 use poise::serenity_prelude as serenity;
-use rand::Rng as _;
+use rand::RngExt as _;
 use serenity::Mentionable as _;
 use tokio::time::{sleep, Duration};
 
