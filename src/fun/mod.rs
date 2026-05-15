@@ -13,12 +13,30 @@ use tokio::time::{sleep, Duration};
 
 static MENTION: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"<@!(\d+)>").unwrap());
 
+const AVATAR_MAX_BYTES: usize = 4 * 1024 * 1024;
+
+async fn read_capped(mut resp: reqwest::Response, max: usize) -> anyhow::Result<Vec<u8>> {
+    if let Some(len) = resp.content_length() {
+        anyhow::ensure!(len <= max as u64, "response advertises {len} bytes (>{max})");
+    }
+    let mut out = Vec::new();
+    while let Some(chunk) = resp.chunk().await? {
+        anyhow::ensure!(
+            out.len() + chunk.len() <= max,
+            "response body exceeds {max} bytes"
+        );
+        out.extend_from_slice(&chunk);
+    }
+    Ok(out)
+}
+
 async fn face_image(
     client: &reqwest::Client,
     user: &serenity::User,
 ) -> anyhow::Result<image::DynamicImage> {
     let uri = user.face();
-    let buffer = client.get(&uri).send().await?.bytes().await?;
+    let resp = client.get(&uri).send().await?.error_for_status()?;
+    let buffer = read_capped(resp, AVATAR_MAX_BYTES).await?;
     let extension = std::path::Path::new(&uri).extension();
 
     if extension.is_some_and(|s| s.eq_ignore_ascii_case("webp")) {
