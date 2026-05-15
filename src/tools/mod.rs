@@ -23,9 +23,13 @@ pub async fn color(
     let _typing = ctx.serenity_context().http.start_typing(ctx.channel_id());
     let color = csscolorparser::parse(&color)?;
     let pixel = image::Rgba(color.to_rgba8());
-    let image = image::ImageBuffer::from_pixel(128, 128, pixel);
-    let image = webp::Encoder::from_rgba(&image, image.width(), image.height());
-    let image = image.encode_lossless().to_vec();
+    let image = tokio::task::spawn_blocking(move || {
+        let image = image::ImageBuffer::from_pixel(128, 128, pixel);
+        webp::Encoder::from_rgba(&image, image.width(), image.height())
+            .encode_lossless()
+            .to_vec()
+    })
+    .await?;
 
     ctx.send(poise::CreateReply {
         content: Some(

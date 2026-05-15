@@ -96,13 +96,16 @@ pub async fn cupcake(
     #[description = "User to bake a cupcake out of"] user: Option<serenity::User>,
 ) -> anyhow::Result<()> {
     let target = user.as_ref().unwrap_or_else(|| ctx.author());
-    let face = face_image(&ctx.data().http, target)
-        .await?
-        .resize(128, 128, CatmullRom);
-    let cake = image::open("assets/290px-Hostess-Cupcake-Whole.jpg")?.into_rgba8();
-    let cake: image::RgbImage = blend_image(cake, &face, 80, 80).convert();
-    let cake = webp::Encoder::from_rgb(&cake, cake.width(), cake.height());
-    let cake = cake.encode(90.0).to_vec();
+    let face = face_image(&ctx.data().http, target).await?;
+    let cake = ctx.data().cupcake_base.clone();
+    let cake = tokio::task::spawn_blocking(move || {
+        let face = face.resize(128, 128, CatmullRom);
+        let cake: image::RgbImage = blend_image(cake, &face, 80, 80).convert();
+        webp::Encoder::from_rgb(&cake, cake.width(), cake.height())
+            .encode(90.0)
+            .to_vec()
+    })
+    .await?;
 
     ctx.send(poise::CreateReply {
         content: Some(format!(
@@ -250,22 +253,28 @@ pub async fn ship(
 
 async fn fuck(ctx: Context<'_>, user: Option<&serenity::User>) -> anyhow::Result<()> {
     let http = &ctx.data().http;
-    let base = image::open("assets/566424ede431200e3985ca6f21287cee.png")?.into_rgba8();
-    let author = face_image(http, ctx.author())
-        .await?
-        .resize(256, 256, CatmullRom);
-    let image = blend_image(base, &author, 364, 120);
-    let image: image::RgbImage = match user {
-        Some(u) => {
-            let t = face_image(http, u).await?.resize(256, 256, CatmullRom);
-            blend_image(image, &t, 110, 20)
+    let author = face_image(http, ctx.author()).await?;
+    let target = match user {
+        Some(u) => Some(face_image(http, u).await?),
+        None => None,
+    };
+    let base = ctx.data().smash_base.clone();
+    let image = tokio::task::spawn_blocking(move || {
+        let author = author.resize(256, 256, CatmullRom);
+        let image = blend_image(base, &author, 364, 120);
+        let image: image::RgbImage = match target {
+            Some(t) => {
+                let t = t.resize(256, 256, CatmullRom);
+                blend_image(image, &t, 110, 20)
+            }
+            None => image,
         }
-        None => image,
-    }
-    .convert();
-
-    let image = webp::Encoder::from_rgb(&image, image.width(), image.height());
-    let image = image.encode(90.0).to_vec();
+        .convert();
+        webp::Encoder::from_rgb(&image, image.width(), image.height())
+            .encode(90.0)
+            .to_vec()
+    })
+    .await?;
 
     ctx.send(poise::CreateReply {
         content: Some(format!(

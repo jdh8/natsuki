@@ -9,6 +9,8 @@ use std::env;
 #[derive(Debug)]
 pub struct Data {
     pub http: reqwest::Client,
+    pub cupcake_base: image::RgbaImage,
+    pub smash_base: image::RgbaImage,
 }
 
 type Context<'a> = poise::Context<'a, Data, anyhow::Error>;
@@ -87,7 +89,15 @@ async fn main() -> anyhow::Result<()> {
                     .timeout(std::time::Duration::from_secs(10))
                     .user_agent(concat!("natsuki/", env!("CARGO_PKG_VERSION")))
                     .build()?;
-                Ok(Data { http })
+                let cupcake_base =
+                    image::open("assets/290px-Hostess-Cupcake-Whole.jpg")?.into_rgba8();
+                let smash_base =
+                    image::open("assets/566424ede431200e3985ca6f21287cee.png")?.into_rgba8();
+                Ok(Data {
+                    http,
+                    cupcake_base,
+                    smash_base,
+                })
             })
         })
         .build();
