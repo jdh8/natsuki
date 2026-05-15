@@ -1,20 +1,14 @@
 use crate::Context;
 use anyhow::Context as _;
 use poise::serenity_prelude as serenity;
-use rand::seq::IndexedRandom as _;
 
-/// Feed someone
-///
-/// Feed someone or a random anime character
-///
-/// **Usage:** /feed [user|text]
-#[poise::command(category = "Weeb", slash_command)]
-pub async fn feed(
+/// Fetch an image URL from an API that responds with `{"url": "..."}`
+/// (e.g. nekos.life, otakugifs.xyz) and send it as an embed.
+async fn send_image_embed(
     ctx: Context<'_>,
-    #[description = "Someone to feed"] text: Option<String>,
+    endpoint: &str,
+    description: String,
 ) -> anyhow::Result<()> {
-    let text = text.as_deref().unwrap_or("a random anime character");
-    let endpoint = "https://nekos.life/api/v2/img/feed";
     let json = ctx
         .data()
         .http
@@ -27,12 +21,27 @@ pub async fn feed(
 
     ctx.send(poise::CreateReply {
         embeds: vec![serenity::CreateEmbed::new()
-            .description(ctx.author().to_string() + " fed " + text + "!")
+            .description(description)
             .image(url)],
         ..Default::default()
     })
     .await?;
     Ok(())
+}
+
+/// Feed someone
+///
+/// Feed someone or a random anime character
+///
+/// **Usage:** /feed [user|text]
+#[poise::command(category = "Weeb", slash_command)]
+pub async fn feed(
+    ctx: Context<'_>,
+    #[description = "Someone to feed"] text: Option<String>,
+) -> anyhow::Result<()> {
+    let text = text.as_deref().unwrap_or("a random anime character");
+    let description = ctx.author().to_string() + " fed " + text + "!";
+    send_image_embed(ctx, "https://nekos.life/api/v2/img/feed", description).await
 }
 
 /// Hug someone
@@ -45,23 +54,9 @@ pub async fn hug(
     ctx: Context<'_>,
     #[description = "Someone to hug"] text: Option<String>,
 ) -> anyhow::Result<()> {
-    const HUGS: [&str; 2] = [
-        "https://cdn.discordapp.com/attachments/403697175948820481/413015715273113601/Nxdr0qO_1.jpg",
-        "https://cdn.discordapp.com/attachments/403697175948820481/444226349121404960/hug.jpg",
-    ];
-    let hug = *HUGS
-        .choose(&mut rand::rng())
-        .expect("Choosing from an empty image list!");
     let text = text.as_deref().unwrap_or("Yuri");
-
-    ctx.send(poise::CreateReply {
-        embeds: vec![serenity::CreateEmbed::new()
-            .description(ctx.author().to_string() + " hugged " + text + "!")
-            .image(hug)],
-        ..Default::default()
-    })
-    .await?;
-    Ok(())
+    let description = ctx.author().to_string() + " hugged " + text + "!";
+    send_image_embed(ctx, "https://api.otakugifs.xyz/gif?reaction=hug", description).await
 }
 
 /// Kiss someone
@@ -72,31 +67,11 @@ pub async fn hug(
 #[poise::command(category = "Weeb", slash_command)]
 pub async fn kiss(
     ctx: Context<'_>,
-    #[description = "Someone to hug"] text: Option<String>,
+    #[description = "Someone to kiss"] text: Option<String>,
 ) -> anyhow::Result<()> {
-    const KISSES: [&str; 8] = [
-        "https://cdn.discordapp.com/attachments/403299886352695297/428494387341688833/hJ6DcXJUurOfHcyG5Sv3wSzZafNqhSGbKTnpF6fFzV4.png",
-        "https://cdn.discordapp.com/attachments/403299886352695297/428483005389078528/WfvNDEnq_HoNHwr5-o9fIf0W7x2Rw5Q0tXbLNJy-a8Q.png",
-        "https://cdn.discordapp.com/attachments/409037934470234113/429673201614848004/qzZgXh-ZBV2674hpTt0gKy6YO85Nack3CbZdHqlxLy8.jpg",
-        "https://cdn.discordapp.com/attachments/409037934470234113/429673204282294282/w6wubjO6iugro-v6N8iX69-R3FK41ZXJ4Com1zSzi2Y.jpg",
-        "https://cdn.discordapp.com/attachments/409037934470234113/429673205846900736/kiss1.jpg",
-        "https://cdn.discordapp.com/attachments/409037934470234113/429673205876260864/Copy_of_x3j03ojjwsg01.jpg",
-        "https://cdn.discordapp.com/attachments/403697175948820481/444355145124544513/11b4bc2.png",
-        "https://cdn.discordapp.com/attachments/409037934470234113/449736165290016782/8qlcohr5c1011.png",
-    ];
-    let kiss = *KISSES
-        .choose(&mut rand::rng())
-        .expect("Choosing from an empty image list!");
     let text = text.as_deref().unwrap_or("Natsuki");
-
-    ctx.send(poise::CreateReply {
-        embeds: vec![serenity::CreateEmbed::new()
-            .description(ctx.author().to_string() + " kissed " + text + "!")
-            .image(kiss)],
-        ..Default::default()
-    })
-    .await?;
-    Ok(())
+    let description = ctx.author().to_string() + " kissed " + text + "!";
+    send_image_embed(ctx, "https://api.otakugifs.xyz/gif?reaction=kiss", description).await
 }
 
 /// Display a video
@@ -121,14 +96,8 @@ pub async fn lick(
     #[description = "Someone to lick"] text: Option<String>,
 ) -> anyhow::Result<()> {
     let text = text.as_deref().unwrap_or("the air");
-    ctx.send(poise::CreateReply {
-        embeds: vec![serenity::CreateEmbed::new()
-            .description(ctx.author().to_string() + " licked " + text + "!")
-            .image("https://cdn.discordapp.com/attachments/421196261132075009/421920949277818891/LickTemplate.gif")
-        ],
-        ..Default::default()
-    }).await?;
-    Ok(())
+    let description = ctx.author().to_string() + " licked " + text + "!";
+    send_image_embed(ctx, "https://api.otakugifs.xyz/gif?reaction=lick", description).await
 }
 
 /// Show a random neko
@@ -138,23 +107,10 @@ pub async fn lick(
 /// **Usage:** /neko
 #[poise::command(category = "Weeb", slash_command)]
 pub async fn neko(ctx: Context<'_>) -> anyhow::Result<()> {
-    let endpoint = "https://nekos.life/api/v2/img/neko";
-    let json = ctx
-        .data()
-        .http
-        .get(endpoint)
-        .send()
-        .await?
-        .json::<serde_json::Value>()
-        .await?;
-    let url = json["url"].as_str().context("Invalid image URL")?;
-
-    ctx.send(poise::CreateReply {
-        embeds: vec![serenity::CreateEmbed::new()
-            .description("Here comes your random neko.")
-            .image(url)],
-        ..Default::default()
-    })
-    .await?;
-    Ok(())
+    send_image_embed(
+        ctx,
+        "https://nekos.life/api/v2/img/neko",
+        "Here comes your random neko.".to_owned(),
+    )
+    .await
 }
