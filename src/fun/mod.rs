@@ -13,7 +13,7 @@ use tokio::time::{sleep, Duration};
 
 static MENTION: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"<@!(\d+)>").unwrap());
 
-const AVATAR_MAX_BYTES: usize = 4 * 1024 * 1024;
+const AVATAR_MAX_BYTES: usize = 8 * 1024 * 1024;
 
 async fn read_capped(mut resp: reqwest::Response, max: usize) -> anyhow::Result<Vec<u8>> {
     if let Some(len) = resp.content_length() {
