@@ -4,6 +4,11 @@ use anyhow::Context as _;
 use poise::serenity_prelude as serenity;
 use rand::seq::IteratorRandom as _;
 use regex::{Captures, Regex};
+use std::sync::LazyLock;
+
+static OPTION_SEP: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\s+\|\s+").unwrap());
+static DIGIT: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\d").unwrap());
+static UPPER: LazyLock<Regex> = LazyLock::new(|| Regex::new("[[:upper:]]").unwrap());
 
 /// Display a color
 ///
@@ -54,7 +59,7 @@ pub async fn poll(
     ctx: Context<'_>,
     #[description = "Question or options"] text: String,
 ) -> anyhow::Result<()> {
-    let options: Vec<_> = Regex::new(r"\s+\|\s+")?.splitn(&text, 20).collect();
+    let options: Vec<_> = OPTION_SEP.splitn(&text, 20).collect();
 
     if options.len() == 1 {
         let question = options[0];
@@ -94,8 +99,8 @@ pub async fn keycaps(
     #[description = "Text to wrap in keycaps"] text: String,
 ) -> anyhow::Result<()> {
     let text = text.to_uppercase().replace(' ', "\u{2002}");
-    let text = Regex::new(r"\d")?.replace_all(&text, "$0\u{20E3}");
-    let text = Regex::new("[[:upper:]]")?.replace_all(&text, |c: &Captures<'_>| {
+    let text = DIGIT.replace_all(&text, "$0\u{20E3}");
+    let text = UPPER.replace_all(&text, |c: &Captures<'_>| {
         let c = c[0].as_bytes()[0];
         let c = char::from_u32(0x1F1E6 - u32::from(b'A') + u32::from(c));
         c.into_iter().chain(Some('\u{AD}')).collect::<String>()

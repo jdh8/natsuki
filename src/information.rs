@@ -1,7 +1,11 @@
 use crate::Context;
 use chrono::{DateTime, SecondsFormat, Utc};
 use poise::serenity_prelude as serenity;
+use regex::Regex;
+use std::sync::LazyLock;
 use std::time;
+
+static DIGITS: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\d+").unwrap());
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 struct Snowflake(u64);
@@ -77,7 +81,7 @@ pub async fn snowflake(
     ctx: Context<'_>,
     #[description = "Snowflake (any Discord entity) to decode"] snowflake: String,
 ) -> anyhow::Result<()> {
-    ctx.say(regex::Regex::new(r"\d+")?.find(&snowflake).map_or_else(
+    ctx.say(DIGITS.find(&snowflake).map_or_else(
         || "No snowflake is found.".to_owned(),
         |mat| {
             mat.as_str().parse::<u64>().map_or_else(

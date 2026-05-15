@@ -3,6 +3,11 @@ use base64::{engine, Engine as _};
 use futures::stream::FuturesOrdered;
 use futures::TryStreamExt as _;
 use poise::serenity_prelude as serenity;
+use regex::Regex;
+use std::sync::LazyLock;
+
+static MIME_TYPE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^([-.\w]+)/([-.\w]+)").unwrap());
 
 const ENGINE: engine::GeneralPurpose = engine::GeneralPurpose::new(
     &base64::alphabet::STANDARD,
@@ -157,13 +162,12 @@ fn guess_extension_from_mime<'a>(main: &'_ str, subtype: &'a str) -> &'a str {
 }
 
 fn guess_extension(bytes: &[u8]) -> &'static str {
-    let pattern = regex::Regex::new(r"^([-.\w]+)/([-.\w]+)").expect("Invalid regex");
-    let captures = pattern.captures(tree_magic_mini::from_u8(bytes));
-
-    captures.map_or("bin", |captures| {
-        let (_, [main, subtype]) = captures.extract();
-        guess_extension_from_mime(main, subtype)
-    })
+    MIME_TYPE
+        .captures(tree_magic_mini::from_u8(bytes))
+        .map_or("bin", |captures| {
+            let (_, [main, subtype]) = captures.extract();
+            guess_extension_from_mime(main, subtype)
+        })
 }
 
 async fn decode_attachment(

@@ -6,8 +6,12 @@ use image::imageops::FilterType::CatmullRom;
 use image::{GenericImageView, Pixel};
 use poise::serenity_prelude as serenity;
 use rand::RngExt as _;
+use regex::Regex;
 use serenity::Mentionable as _;
+use std::sync::LazyLock;
 use tokio::time::{sleep, Duration};
+
+static MENTION: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"<@!(\d+)>").unwrap());
 
 async fn face_image(
     client: &reqwest::Client,
@@ -184,7 +188,7 @@ pub async fn rate(
     let character = text.unwrap_or_else(|| ctx.author().to_string());
     let trimmed = character.trim();
     let lower = trimmed.to_lowercase();
-    let canonical = regex::Regex::new(r"<@!(\d+)>")?.replace_all(&lower, "<@$1>");
+    let canonical = MENTION.replace_all(&lower, "<@$1>");
     let digest = md5::compute(canonical.as_bytes()).0;
     let prefix: [u8; 8] = digest[..8].try_into().unwrap();
     let percentage = u64::from_le_bytes(prefix).wrapping_add(14) % 101;
