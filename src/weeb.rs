@@ -15,7 +15,11 @@ pub async fn feed(
 ) -> anyhow::Result<()> {
     let text = text.as_deref().unwrap_or("a random anime character");
     let endpoint = "https://nekos.life/api/v2/img/feed";
-    let json = reqwest::get(endpoint)
+    let json = ctx
+        .data()
+        .http
+        .get(endpoint)
+        .send()
         .await?
         .json::<serde_json::Value>()
         .await?;
@@ -135,7 +139,11 @@ pub async fn lick(
 #[poise::command(category = "Weeb", slash_command)]
 pub async fn neko(ctx: Context<'_>) -> anyhow::Result<()> {
     let endpoint = "https://nekos.life/api/v2/img/neko";
-    let json = reqwest::get(endpoint)
+    let json = ctx
+        .data()
+        .http
+        .get(endpoint)
+        .send()
         .await?
         .json::<serde_json::Value>()
         .await?;

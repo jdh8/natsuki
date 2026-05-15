@@ -9,9 +9,12 @@ use rand::RngExt as _;
 use serenity::Mentionable as _;
 use tokio::time::{sleep, Duration};
 
-async fn face_image(user: &serenity::User) -> anyhow::Result<image::DynamicImage> {
+async fn face_image(
+    client: &reqwest::Client,
+    user: &serenity::User,
+) -> anyhow::Result<image::DynamicImage> {
     let uri = user.face();
-    let buffer = reqwest::get(&uri).await?.bytes().await?;
+    let buffer = client.get(&uri).send().await?.bytes().await?;
     let extension = std::path::Path::new(&uri).extension();
 
     if extension.is_some_and(|s| s.eq_ignore_ascii_case("webp")) {
@@ -89,7 +92,9 @@ pub async fn cupcake(
     #[description = "User to bake a cupcake out of"] user: Option<serenity::User>,
 ) -> anyhow::Result<()> {
     let target = user.as_ref().unwrap_or_else(|| ctx.author());
-    let face = face_image(target).await?.resize(128, 128, CatmullRom);
+    let face = face_image(&ctx.data().http, target)
+        .await?
+        .resize(128, 128, CatmullRom);
     let cake = image::open("assets/290px-Hostess-Cupcake-Whole.jpg")?.into_rgba8();
     let cake: image::RgbImage = blend_image(cake, &face, 80, 80).convert();
     let cake = webp::Encoder::from_rgb(&cake, cake.width(), cake.height());
@@ -239,12 +244,15 @@ pub async fn ship(
 }
 
 async fn fuck(ctx: Context<'_>, user: Option<&serenity::User>) -> anyhow::Result<()> {
+    let http = &ctx.data().http;
     let base = image::open("assets/566424ede431200e3985ca6f21287cee.png")?.into_rgba8();
-    let author = face_image(ctx.author()).await?.resize(256, 256, CatmullRom);
+    let author = face_image(http, ctx.author())
+        .await?
+        .resize(256, 256, CatmullRom);
     let image = blend_image(base, &author, 364, 120);
     let image: image::RgbImage = match user {
         Some(u) => {
-            let t = face_image(u).await?.resize(256, 256, CatmullRom);
+            let t = face_image(http, u).await?.resize(256, 256, CatmullRom);
             blend_image(image, &t, 110, 20)
         }
         None => image,

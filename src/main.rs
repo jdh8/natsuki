@@ -6,8 +6,10 @@ mod weeb;
 use poise::serenity_prelude as serenity;
 use std::env;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-pub struct Data;
+#[derive(Debug)]
+pub struct Data {
+    pub http: reqwest::Client,
+}
 
 type Context<'a> = poise::Context<'a, Data, anyhow::Error>;
 
@@ -81,7 +83,11 @@ async fn main() -> anyhow::Result<()> {
                     }
                     Err(e) => return Err(e.into()),
                 }
-                Ok(Data)
+                let http = reqwest::Client::builder()
+                    .timeout(std::time::Duration::from_secs(10))
+                    .user_agent(concat!("natsuki/", env!("CARGO_PKG_VERSION")))
+                    .build()?;
+                Ok(Data { http })
             })
         })
         .build();
