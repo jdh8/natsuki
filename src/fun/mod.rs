@@ -185,8 +185,9 @@ pub async fn rate(
     let trimmed = character.trim();
     let lower = trimmed.to_lowercase();
     let canonical = regex::Regex::new(r"<@!(\d+)>")?.replace_all(&lower, "<@$1>");
-    let digest: [u64; 2] = unsafe { core::mem::transmute(md5::compute(canonical.as_bytes())) };
-    let percentage = digest[0].wrapping_add(14) % 101;
+    let digest = md5::compute(canonical.as_bytes()).0;
+    let prefix: [u8; 8] = digest[..8].try_into().unwrap();
+    let percentage = u64::from_le_bytes(prefix).wrapping_add(14) % 101;
     ctx.say(format!(
         "<:natsuki:424991419329937428> I'd give {trimmed} {percentage}%."
     ))
