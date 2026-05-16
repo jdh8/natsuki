@@ -54,7 +54,7 @@ pub async fn hug(
     ctx: Context<'_>,
     #[description = "Someone to hug"] text: Option<String>,
 ) -> anyhow::Result<()> {
-    let text = text.as_deref().unwrap_or("Yuri");
+    let text = text.as_deref().unwrap_or("a random anime character");
     let description = ctx.author().to_string() + " hugged " + text + "!";
     send_image_embed(ctx, "https://api.otakugifs.xyz/gif?reaction=hug", description).await
 }
@@ -69,7 +69,7 @@ pub async fn kiss(
     ctx: Context<'_>,
     #[description = "Someone to kiss"] text: Option<String>,
 ) -> anyhow::Result<()> {
-    let text = text.as_deref().unwrap_or("Natsuki");
+    let text = text.as_deref().unwrap_or("a random anime character");
     let description = ctx.author().to_string() + " kissed " + text + "!";
     send_image_embed(ctx, "https://api.otakugifs.xyz/gif?reaction=kiss", description).await
 }
