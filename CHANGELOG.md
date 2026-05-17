@@ -53,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Shuttle-specific glue (`shuttle-poise`, `shuttle-static-folder`,
   `shuttle-runtime`, `Shuttle.toml`, secrets handling).
 
-## [3.0.10] — 2025-07-11
+## 3.0.10 — 2025-07-11
 
 Final release under Shuttle hosting.
 
@@ -63,4 +63,3 @@ Final release under Shuttle hosting.
 [3.1.2]: https://github.com/jdh8/natsuki/compare/3.1.1...3.1.2
 [3.1.1]: https://github.com/jdh8/natsuki/compare/3.1.0...3.1.1
 [3.1.0]: https://github.com/jdh8/natsuki/compare/3.0.10...3.1.0
-[3.0.10]: https://github.com/jdh8/natsuki/releases/tag/3.0.10
