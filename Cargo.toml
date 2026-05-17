@@ -1,6 +1,6 @@
 [package]
 name = "natsuki"
-version = "3.1.2-dev"
+version = "3.1.2"
 authors = [
     "Chen-Pang He (https://jdh8.org)",
     "u/YourWrstNightmare (https://www.reddit.com/user/YourWrstNightmare)",
