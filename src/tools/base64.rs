@@ -6,8 +6,7 @@ use poise::serenity_prelude as serenity;
 use regex::Regex;
 use std::sync::LazyLock;
 
-static MIME_TYPE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"^([-.\w]+)/([-.\w]+)").unwrap());
+static MIME_TYPE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^([-.\w]+)/([-.\w]+)").unwrap());
 
 const ENGINE: engine::GeneralPurpose = engine::GeneralPurpose::new(
     &base64::alphabet::STANDARD,

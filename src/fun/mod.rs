@@ -17,7 +17,10 @@ const AVATAR_MAX_BYTES: usize = 8 * 1024 * 1024;
 
 async fn read_capped(mut resp: reqwest::Response, max: usize) -> anyhow::Result<Vec<u8>> {
     if let Some(len) = resp.content_length() {
-        anyhow::ensure!(len <= max as u64, "response advertises {len} bytes (>{max})");
+        anyhow::ensure!(
+            len <= max as u64,
+            "response advertises {len} bytes (>{max})"
+        );
     }
     let mut out = Vec::new();
     while let Some(chunk) = resp.chunk().await? {

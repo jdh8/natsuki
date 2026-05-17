@@ -56,7 +56,12 @@ pub async fn hug(
 ) -> anyhow::Result<()> {
     let text = text.as_deref().unwrap_or("a random anime character");
     let description = ctx.author().to_string() + " hugged " + text + "!";
-    send_image_embed(ctx, "https://api.otakugifs.xyz/gif?reaction=hug", description).await
+    send_image_embed(
+        ctx,
+        "https://api.otakugifs.xyz/gif?reaction=hug",
+        description,
+    )
+    .await
 }
 
 /// Kiss someone
@@ -71,7 +76,12 @@ pub async fn kiss(
 ) -> anyhow::Result<()> {
     let text = text.as_deref().unwrap_or("a random anime character");
     let description = ctx.author().to_string() + " kissed " + text + "!";
-    send_image_embed(ctx, "https://api.otakugifs.xyz/gif?reaction=kiss", description).await
+    send_image_embed(
+        ctx,
+        "https://api.otakugifs.xyz/gif?reaction=kiss",
+        description,
+    )
+    .await
 }
 
 /// Display a video
@@ -97,7 +107,12 @@ pub async fn lick(
 ) -> anyhow::Result<()> {
     let text = text.as_deref().unwrap_or("the air");
     let description = ctx.author().to_string() + " licked " + text + "!";
-    send_image_embed(ctx, "https://api.otakugifs.xyz/gif?reaction=lick", description).await
+    send_image_embed(
+        ctx,
+        "https://api.otakugifs.xyz/gif?reaction=lick",
+        description,
+    )
+    .await
 }
 
 /// Show a random neko
