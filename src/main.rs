@@ -1,3 +1,4 @@
+mod chat;
 mod core;
 mod fun;
 mod information;
@@ -11,12 +12,15 @@ pub struct Data {
     pub http: reqwest::Client,
     pub cupcake_base: image::RgbaImage,
     pub smash_base: image::RgbaImage,
+    pub groq_key: String,
+    pub chat_history: chat::ChatHistory,
 }
 
 type Context<'a> = poise::Context<'a, Data, anyhow::Error>;
 
 fn get_commands() -> Vec<poise::Command<Data, anyhow::Error>> {
     vec![
+        chat::chat(),
         core::git(),
         core::help(),
         core::invite(),
@@ -59,6 +63,8 @@ fn get_commands() -> Vec<poise::Command<Data, anyhow::Error>> {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     use serenity::{ClientBuilder, GatewayIntents, GuildId};
+    // MESSAGE_CONTENT intent not needed: content is always populated in
+    // messages that mention the bot, which is all the chat handler reads.
     const INTENTS: GatewayIntents = GatewayIntents::non_privileged();
     let token = env::var("TOKEN")?;
 
@@ -70,6 +76,9 @@ async fn main() -> anyhow::Result<()> {
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
             commands: env::var_os("CLEAR").map_or_else(get_commands, |_| Vec::new()),
+            event_handler: |ctx, event, framework, data| {
+                Box::pin(chat::event_handler(ctx, event, framework, data))
+            },
             ..Default::default()
         })
         .setup(|ctx, _, framework| {
@@ -97,6 +106,8 @@ async fn main() -> anyhow::Result<()> {
                     http,
                     cupcake_base,
                     smash_base,
+                    groq_key: env::var("GROQ_API_KEY")?,
+                    chat_history: Default::default(),
                 })
             })
         })

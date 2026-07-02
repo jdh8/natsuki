@@ -14,6 +14,7 @@ Usage
 
 * `/help` prints info about commands
 * `/ping` checks if Natsuki is working
+* `/chat` (or just @mention her) talks with Natsuki
 * Other commands mentioned in `/help`
 
 [invite]: https://discordapp.com/oauth2/authorize?&client_id=410315411695992833&scope=bot&permissions=0

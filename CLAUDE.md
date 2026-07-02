@@ -1,7 +1,8 @@
 # Natsuki
 
-Natsuki is a stateless Discord bot.  She is roleplaying Natsuki from
-[Doki Doki Literature Club][ddlc].
+Natsuki is a Discord bot roleplaying Natsuki from
+[Doki Doki Literature Club][ddlc].  She keeps no persistent storage; the only
+state is a short in-memory chat history (see `src/chat.rs`).
 
 [ddlc]: https://ddlc.moe/
 
