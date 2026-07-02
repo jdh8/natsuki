@@ -69,9 +69,9 @@ dependencies = [
 
 [[package]]
 name = "arrayvec"
-version = "0.7.7"
+version = "0.7.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f02882884d3e1bc524fb12c79f107f6ad0e1cfd498c536ffb494301740995dfe"
+checksum = "d3fb67a6e08acf24fdeccbac2cb6ac4305825bd1f117462e0e6f2f193345ad56"
 dependencies = [
  "serde",
 ]
@@ -1546,7 +1546,7 @@ dependencies = [
 
 [[package]]
 name = "natsuki"
-version = "3.1.3-dev"
+version = "3.2.0"
 dependencies = [
  "anyhow",
  "base64",
@@ -1557,7 +1557,7 @@ dependencies = [
  "image",
  "md5",
  "poise",
- "rand 0.10.1",
+ "rand 0.10.2",
  "regex",
  "reqwest 0.13.4",
  "serde_json",
@@ -2029,9 +2029,9 @@ dependencies = [
 
 [[package]]
 name = "rand"
-version = "0.10.1"
+version = "0.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d2e8e8bcc7961af1fdac401278c6a831614941f6164ee3bf4ce61b7edb162207"
+checksum = "c7f5fa3a058cd35567ef9bfa5e75732bee0f9e4c55fa90477bef2dfcdbc4be80"
 dependencies = [
  "chacha20",
  "getrandom 0.4.3",
