@@ -17,6 +17,11 @@ Usage
 * `/chat` (or just @mention her) talks with Natsuki
 * Other commands mentioned in `/help`
 
+Self-hosting
+------------
+The production Podman/Quadlet deployment is documented in
+[`deploy/README.md`](deploy/README.md).
+
 [invite]: https://discordapp.com/oauth2/authorize?&client_id=410315411695992833&scope=bot&permissions=0
 
 Contributors

@@ -1,0 +1,29 @@
+[Unit]
+Description=Natsuki llama.cpp inference server
+Wants=network-online.target
+After=network-online.target
+
+[Container]
+ContainerName=natsuki-model
+Image=natsuki-llama.image
+Network=natsuki-internal.network
+AddDevice=nvidia.com/gpu=0
+User=65532:65532
+ReadOnly=true
+ReadOnlyTmpfs=true
+NoNewPrivileges=true
+DropCapability=all
+PidsLimit=256
+Memory=8g
+Volume=/var/lib/natsuki/models/natsuki.gguf:/models/natsuki.gguf:ro,Z
+Secret=natsuki-chat-api-key,type=env,target=LLAMA_API_KEY
+Exec=--model /models/natsuki.gguf --alias natsuki --n-gpu-layers 99 --ctx-size 4096 --ubatch-size 128 --parallel 1 --flash-attn on --host 0.0.0.0 --port 8080 --jinja --no-webui --no-slots --metrics
+
+[Service]
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=900
+TimeoutStopSec=30
+
+[Install]
+WantedBy=default.target

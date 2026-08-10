@@ -1,0 +1,29 @@
+[Unit]
+Description=Natsuki Discord bot
+Wants=network-online.target
+After=network-online.target natsuki-model.service
+
+[Container]
+ContainerName=natsuki-bot
+Image=natsuki-bot.build
+Network=natsuki-egress.network
+Network=natsuki-internal.network
+User=65532:65532
+ReadOnly=true
+ReadOnlyTmpfs=true
+NoNewPrivileges=true
+DropCapability=all
+PidsLimit=128
+Memory=1g
+EnvironmentFile=/var/lib/natsuki/config/bot.env
+Secret=natsuki-discord-token,type=env,target=TOKEN
+Secret=natsuki-chat-api-key,type=env,target=GROQ_API_KEY
+# TOP_GG_SECRET
+
+[Service]
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+
+[Install]
+WantedBy=default.target

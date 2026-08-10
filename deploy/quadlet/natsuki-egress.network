@@ -1,0 +1,6 @@
+[Unit]
+Description=Outbound-only network for the Natsuki Discord bot
+
+[Network]
+NetworkName=natsuki-egress
+Options=isolate=true

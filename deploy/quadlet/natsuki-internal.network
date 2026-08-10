@@ -1,0 +1,7 @@
+[Unit]
+Description=Private network between Natsuki and her model
+
+[Network]
+NetworkName=natsuki-internal
+Internal=true
+Options=isolate=true

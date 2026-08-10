@@ -1,0 +1,28 @@
+FROM docker.io/library/rust@sha256:14bc9c5966e7b3a385794b3d5389a8765668342025fbcc7b2e3d2866ac4bd8c3 AS build
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install --yes --no-install-recommends \
+        libssl-dev \
+        pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+COPY Cargo.toml Cargo.lock ./
+COPY src ./src
+RUN cargo build --locked --release
+
+FROM docker.io/library/debian@sha256:abd67ffcfa541b485a3dff59865ab629aa048a6c613e639d36e7456b0b229241
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install --yes --no-install-recommends \
+        ca-certificates \
+        libssl3 \
+        zlib1g \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=build /src/target/release/natsuki /usr/local/bin/natsuki
+COPY --chown=65532:65532 assets /app/assets
+
+USER 65532:65532
+WORKDIR /app
+ENTRYPOINT ["/usr/local/bin/natsuki"]

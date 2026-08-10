@@ -1,0 +1,9 @@
+[Unit]
+Description=Build the Natsuki Discord bot image
+
+[Build]
+ImageTag=localhost/natsuki-bot:3.3.0
+File=/var/lib/natsuki/src/Containerfile.bot
+SetWorkingDirectory=/var/lib/natsuki/src
+IgnoreFile=/var/lib/natsuki/src/bot.containerignore
+Pull=missing

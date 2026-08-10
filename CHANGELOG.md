@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- A hardened rootless Podman deployment for the Discord bot and `llama-server`,
+  including a locked system account, private container network, Podman secrets,
+  pinned images, NVIDIA CDI, and read-only Quadlet services.
+
 ### Internal
 - Added the isolated Python 3.12 M0 harness, fixed 20-prompt stock-model sniff
   test, VRAM sampler, benchmark/evaluation runners, blinded comparison tooling,

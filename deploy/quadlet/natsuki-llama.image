@@ -1,0 +1,6 @@
+[Unit]
+Description=Pull the pinned llama.cpp CUDA server image
+
+[Image]
+Image=ghcr.io/ggml-org/llama.cpp@sha256:dd0c408a4c3285f7809323ac17f85e70ef756bf67a3a30d4eed6805a8c1df16b
+Policy=missing
