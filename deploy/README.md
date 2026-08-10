@@ -20,28 +20,30 @@ Then run the interactive setup from the repository root:
 The wizard requests sudo only for account, package, CDI, and installation
 steps.  It refuses to weaken SELinux if CDI device access fails.
 
-Manage the rootless services without enabling an interactive login:
+The services are rootless user units, so they live in the `natsuki` account's
+systemd manager rather than the system one.  Reach it with `-M natsuki@`,
+which needs no interactive login on the service account:
 
 ```sh
-uid=$(id -u natsuki)
-sudo runuser -u natsuki -- env \
-  HOME=/var/lib/natsuki \
-  XDG_RUNTIME_DIR="/run/user/$uid" \
-  DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
-  systemctl --user status natsuki-model.service natsuki-bot.service
+sudo systemctl --user -M natsuki@ status natsuki-model.service natsuki-bot.service
+sudo systemctl --user -M natsuki@ restart natsuki-bot.service
+```
+
+Logs go to the system journal, so match on the user unit instead:
+
+```sh
+sudo journalctl _SYSTEMD_USER_UNIT=natsuki-model.service -f
 ```
 
 Stop the local model after switching the bot to a healthy private endpoint on
 `dl02`:
 
 ```sh
-uid=$(id -u natsuki)
-sudo runuser -u natsuki -- env \
-  HOME=/var/lib/natsuki \
-  XDG_RUNTIME_DIR="/run/user/$uid" \
-  DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
-  systemctl --user stop natsuki-model.service
+sudo systemctl --user -M natsuki@ stop natsuki-model.service
 ```
+
+Both units start on boot because `setup` enables lingering.  Add
+`disable --now` to keep one down across reboots.
 
 Use only a WireGuard/Tailscale address or an SSH-forwarded endpoint for `dl02`.
 Copy the generated `CHAT_API_KEY` from `.env.dev` into the backup server's
