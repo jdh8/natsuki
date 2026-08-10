@@ -17,7 +17,7 @@ correction is what appears here.  Anything still unverified says so.
 ## Decisions
 
 | Question | Decision |
-|---|---|
+| --- | --- |
 | Training code home | `trainer/`, its own `uv` project, invisible to `cargo` |
 | Backend switch | `CHAT_URL` + `CHAT_MODEL`, Groq defaults preserved |
 | Publishing | Weights + synthetic corpus + recipe.  Canon-derived rows withheld. |
@@ -36,7 +36,7 @@ models also keeps self-preference bias out of the evaluation.
 ## Constraints
 
 | | Dev (train) | Prod (serve) |
-|---|---|---|
+| --- | --- | --- |
 | GPU | RTX 4070 SUPER, 12282 MiB, cc 8.9 | GTX 1660, 6 GB, cc 7.5 |
 | Tensor cores | yes (Ada) | **none** (TU116) |
 | Usable VRAM | ~8.8 GB with a desktop session up | **~4.5 GB** assumed — M0 must confirm |
@@ -97,6 +97,37 @@ no Turing data point exists at all), no thinking mode to suppress (#20182 open,
 QLoRA.  Runner-up is `mistralai/Ministral-3-3B-Instruct-2512`, whose `-BF16` repo
 is the one to fine-tune since the default release is FP8.
 
+**Rescanned 2026-08-10** (three-agent web pass): the decision stands — no
+released ≤5B model displaces Qwen3-4B-Instruct-2507 as a plain-GQA, text-only,
+non-thinking, Apache-2.0 base.  What changed underneath:
+
+- **Qwen3.5-4B's blockers softened, but the rejection holds.**  GDN now runs
+  fully on CUDA with no arch gate (llama.cpp #19504/#20340, merged 2026-03) and
+  #24712 has morphed into a VRAM-pressure scheduling bug; thinking suppression
+  works via `chat_template_kwargs` and the small series defaults non-thinking.
+  But the fast chunked-prefill kernel (#26001) is **Ampere-only by design** —
+  Turing keeps the token-by-token recurrent prefill path permanently, on the
+  axis that is already the 1660's weak spot — there is still not one Turing GDN
+  benchmark anywhere, and the model carries a vision stack.  No Qwen3.6 exists
+  below 27B.
+- **New runner-up: `ibm-granite/granite-4.1-3b`** (2026-04, Apache-2.0), the
+  only 2026 release matching the spec exactly: dense GQA, explicitly
+  non-thinking, text-only, first-party GGUFs, Q5_K_M ≈ 2.4 GB.  Zero persona/RP
+  track record and an enterprise-assistant default template, so it enters as M0
+  sniff-test challenger, not as the pick.  It displaces Ministral-3-3B
+  (vision encoder, template quirks, weak chat benches).
+- **Gemma 4 fixed the license, not the fit.**  E4B is genuine Apache-2.0 — the
+  Gemma-3 use-policy passthrough is gone — but its 8B raw params put Q4 at
+  ~4.6–5.0 GB, over the 1660 budget; E2B fits at only 2.3B effective.
+  Gemma-3-4B stays excluded: its license makes downstream users subject to a
+  Google use policy updateable by URL, with delete-on-termination rights.
+- Ruled out on arrival: LFM2.5-2.6B (template-forced thinking, LFM license),
+  Nemotron-3-Nano-4B (Mamba-2 hybrid, thinking on by default; its Dec-2025
+  license is Apache-style clean, so the exclusion is purely technical),
+  Phi-4-mini (MIT, but documented "lifeless prose" and zero RP fine-tunes in
+  18 months), SmolLM3-3B (clean but no edge over the incumbent, no RP record),
+  Falcon-H1-3B (TII license, hybrid fragility).
+
 **Training: Unsloth + QLoRA.**  Adapters are plain PEFT, so the choice is
 reversible.  Runner-up: Axolotl.
 
@@ -141,7 +172,7 @@ statements, and exactly one escaped quote in all 1,520.
 ### Bucket
 
 | Bucket | Count | Use |
-|---|---|---|
+| --- | --- | --- |
 | A — gold pairs, previous turn is `mc`/`s`/`y`/`m` | **718 of 987 turns** | Direct `(user, assistant)` pairs |
 | B — previous turn is narration | 235 | Scene context field only |
 | C — all lines | 2,319 (1,189 unique) | Local scorer bank only |
@@ -215,7 +246,7 @@ That opener cap is the single filter separating "sounds like Natsuki" from
 ### Targets
 
 | Stage | Count |
-|---|---|
+| --- | --- |
 | Gold pairs | 718 |
 | Raw synthetic conversations | ~4,000 |
 | Post-filter | ~2,500 |
@@ -360,8 +391,8 @@ Each names a **deliverable**, a **measure**, and its **deps**.
 
 - ⬜ **M0 Measure the prod box, and the do-nothing baseline.**  *Deliverable:*
   a day of `nvidia-smi` samples with the desktop up; `llama-bench -fa 0,1`; the
-  bot pointed at stock Qwen3-4B-Instruct-2507 with the **current, unchanged**
-  system prompt.  *Measure:* p99 free VRAM ≥4.0 GiB; full offload at ≥30 tok/s;
+  bot pointed at stock Qwen3-4B-Instruct-2507 — and, same protocol, stock
+  granite-4.1-3b as challenger — with the **current, unchanged** system prompt.  *Measure:* p99 free VRAM ≥4.0 GiB; full offload at ≥30 tok/s;
   a 20-prompt sniff test.  *Deps:* M-1.
   **This milestone can cancel the project, in either direction.**  If the stock
   model already holds character, ship the prompted 4B and skip fine-tuning
@@ -442,7 +473,9 @@ Each names a **deliverable**, a **measure**, and its **deps**.
    class follows conflicting instructions reliably, so the fine-tune has to carry
    the entire load.  4B remains the right pick because the VRAM is there.
 4. ⬜ Flash attention on TU116 — help or hurt?  No published data for the
-   16-series.
+   16-series.  Nearest datapoint (2026-08): the FP32 FA vector kernel helped a
+   tensor-core-less 2×GTX 1080 Ti, 20.2 vs 13.4 t/s decode; `-fa` defaults to
+   auto since 2025-08, and `llama-bench -fa 0,1` still decides.
 5. ⬜ Does `GGML_CUDA_FORCE_MMQ=ON` help prefill?  Community reports say yes;
    llama.cpp's own docs scope the flag to other architectures, so the mechanism
    story is suspect.  Highest-value single experiment on the list.
