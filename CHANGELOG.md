@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The deploy wizard now requires an explicit `prod` or `dev` argument and
   loads the matching `.env.prod` or `.env.dev` file.  Switching environments
   redeploys the same services with the selected credentials and configuration.
+- The deploy wizard now defaults to the cached stock Qwen3 GGUF when
+  `MODEL_PATH` is not set.
 
 ### Fixed
 - The deploy wizard now sets the `container_use_devices` SELinux boolean;

@@ -5,15 +5,16 @@ Quadlets owned by a locked `natsuki` system account.  It imports credentials
 from the selected ignored environment file into Podman secrets; the file is
 never copied into the build context or service account.
 
-Keep each environment's credentials and deployment values in its own file:
+Keep each environment's credentials and deployment overrides in its own file:
 
 ```text
 # .env.prod or .env.dev
 MODEL_PATH=/absolute/path/to/natsuki.gguf
 ```
 
-If `MODEL_PATH` is missing, the wizard prompts for it.  It also generates and
-saves a separate `CHAT_API_KEY` when the selected file does not have one.
+If `MODEL_PATH` is missing, the wizard uses the stock Qwen3 GGUF in the current
+user's Hugging Face cache.  It also generates and saves a separate
+`CHAT_API_KEY` when the selected file does not have one.
 
 Run the interactive setup from the repository root and explicitly select the
 environment:

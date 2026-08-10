@@ -197,6 +197,7 @@ readonly SERVICE_HOME=/var/lib/natsuki
 readonly SUBID_START=655360
 readonly SUBID_COUNT=65536
 readonly SUBID_END=720895
+readonly DEFAULT_MODEL_PATH="${HF_HUB_CACHE:-${HF_HOME:-$HOME/.cache/huggingface}/hub}/models--unsloth--Qwen3-4B-Instruct-2507-GGUF/snapshots/a06e946bb6b655725eafa393f4a9745d460374c9/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 readonly LLAMA_IMAGE='ghcr.io/ggml-org/llama.cpp@sha256:dd0c408a4c3285f7809323ac17f85e70ef756bf67a3a30d4eed6805a8c1df16b'
 readonly CURL_IMAGE='docker.io/curlimages/curl@sha256:4026b29997dc7c823b51c164b71e2b51e0fd95cce4601f78202c513d97da2922'
 ENV_FILE="$REPO_ROOT/.env.$ENVIRONMENT"
@@ -313,9 +314,7 @@ fi
 stage "Model and secrets"
 say "Copy the GGUF into private service storage and import runtime secrets."
 MODEL_PATH=$(_existing MODEL_PATH || true)
-if [[ -z "$MODEL_PATH" ]]; then
-  ask MODEL_PATH "Absolute path to the final Natsuki GGUF:"
-fi
+MODEL_PATH=${MODEL_PATH:-$DEFAULT_MODEL_PATH}
 [[ "$MODEL_PATH" == /* ]] || die "MODEL_PATH must be absolute"
 [[ "$MODEL_PATH" != *$'\n'* && -f "$MODEL_PATH" ]] || die "MODEL_PATH is not a regular file"
 MODEL_PATH=$(readlink -f "$MODEL_PATH")
