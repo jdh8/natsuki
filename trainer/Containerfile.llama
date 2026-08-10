@@ -1,0 +1,12 @@
+# linux/amd64 manifest for nvidia/cuda:12.9.1-devel-ubuntu24.04
+FROM docker.io/nvidia/cuda@sha256:e542739fcaa4f45da5add8c4cf5769783a61628b2518304a5bbe4ace468b8c8f
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install --yes --no-install-recommends \
+        ca-certificates \
+        cmake \
+        g++ \
+        git \
+        ninja-build \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*

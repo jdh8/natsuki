@@ -1,0 +1,62 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$SCRIPT_DIR/m0-env.sh"
+
+readonly OUT="$REPO_ROOT/trainer/out/m0/bench"
+readonly QWEN="$NATSUKI_M0_MODEL_ROOT/Qwen3-4B-Instruct-2507-Q5_K_M.gguf"
+readonly GRANITE="$NATSUKI_M0_MODEL_ROOT/granite-4.1-3b-Q5_K_M.gguf"
+mkdir -p "$OUT"
+readonly STATUS="$OUT/status.tsv"
+printf 'model\tbuild\texit_status\n' >"$STATUS"
+failures=0
+
+for build in turing mmq; do
+    bench="$NATSUKI_M0_BUILD_ROOT/llama.cpp-$build/bin/llama-bench"
+    for model_name in qwen granite; do
+        if [[ "$model_name" == qwen ]]; then
+            model="$QWEN"
+        else
+            model="$GRANITE"
+        fi
+        if "$bench" \
+                --model "$model" \
+                --n-prompt 512,1536 \
+                --n-gen 128 \
+                --repetitions 5 \
+                --ubatch-size 128 \
+                --n-gpu-layers 99 \
+                --flash-attn off,on \
+                --output jsonl \
+                >"$OUT/$model_name.$build.jsonl" \
+                2>"$OUT/$model_name.$build.log"; then
+            status=0
+        else
+            status=$?
+            failures=$((failures + 1))
+            echo "$model_name/$build benchmark failed with status $status; continuing" >&2
+        fi
+        printf '%s\t%s\t%d\n' "$model_name" "$build" "$status" >>"$STATUS"
+    done
+done
+
+inputs=()
+for result in "$OUT"/*.jsonl; do
+    if [[ -s "$result" ]]; then
+        inputs+=("$result")
+    fi
+done
+if (( ${#inputs[@]} > 0 )); then
+    "$REPO_ROOT/trainer/m0" summarize-bench \
+        "${inputs[@]}" \
+        --output "$REPO_ROOT/trainer/out/m0/bench-summary.json"
+else
+    echo "all benchmark configurations failed before producing results" >&2
+    exit 1
+fi
+
+if (( failures > 0 )); then
+    exit 1
+fi

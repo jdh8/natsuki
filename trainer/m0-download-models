@@ -1,0 +1,21 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/m0-env.sh"
+
+readonly QWEN="$NATSUKI_M0_MODEL_ROOT/Qwen3-4B-Instruct-2507-Q5_K_M.gguf"
+readonly GRANITE="$NATSUKI_M0_MODEL_ROOT/granite-4.1-3b-Q5_K_M.gguf"
+
+mkdir -p "$NATSUKI_M0_MODEL_ROOT"
+curl --fail --location --continue-at - --output "$QWEN" \
+    https://huggingface.co/unsloth/Qwen3-4B-Instruct-2507-GGUF/resolve/a06e946bb6b655725eafa393f4a9745d460374c9/Qwen3-4B-Instruct-2507-Q5_K_M.gguf
+printf '%s  %s\n' \
+    5bde5e9d883622acb02bf77fe7dcbc56a8b9a9ad4be78a72ca23a532658b4ecb \
+    "$QWEN" | sha256sum --check -
+
+curl --fail --location --continue-at - --output "$GRANITE" \
+    https://huggingface.co/ibm-granite/granite-4.1-3b-GGUF/resolve/ab4701481089b58a082ef63cc1cee738887293ff/granite-4.1-3b-Q5_K_M.gguf
+printf '%s  %s\n' \
+    f7724d259f29b0edf147144ac530ca26f91c97af8274249f933073c461678a3c \
+    "$GRANITE" | sha256sum --check -

@@ -1,0 +1,120 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+if (( $# < 3 || $# > 4 )); then
+    echo "usage: $0 <qwen|granite> <turing|mmq> <off|on> [port]" >&2
+    exit 2
+fi
+
+readonly MODEL_NAME=$1
+readonly BUILD=$2
+readonly FLASH_ATTN=$3
+readonly PORT=${4:-8080}
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$SCRIPT_DIR/m0-env.sh"
+
+case "$MODEL_NAME" in
+    qwen)
+        MODEL="$NATSUKI_M0_MODEL_ROOT/Qwen3-4B-Instruct-2507-Q5_K_M.gguf"
+        ALIAS=qwen-stock
+        ;;
+    granite)
+        MODEL="$NATSUKI_M0_MODEL_ROOT/granite-4.1-3b-Q5_K_M.gguf"
+        ALIAS=granite-stock
+        ;;
+    *)
+        echo "unknown model: $MODEL_NAME" >&2
+        exit 2
+        ;;
+esac
+
+if [[ "$BUILD" != turing && "$BUILD" != mmq ]]; then
+    echo "unknown build: $BUILD" >&2
+    exit 2
+fi
+if [[ "$FLASH_ATTN" != off && "$FLASH_ATTN" != on ]]; then
+    echo "flash attention must be off or on" >&2
+    exit 2
+fi
+
+readonly SERVER="$NATSUKI_M0_BUILD_ROOT/llama.cpp-$BUILD/bin/llama-server"
+readonly OUT="$REPO_ROOT/trainer/out/m0/eval/$MODEL_NAME"
+readonly ENDPOINT="http://127.0.0.1:$PORT"
+mkdir -p "$OUT"
+
+server_pid=
+sampler_pid=
+cleanup() {
+    if [[ -n "$sampler_pid" ]]; then
+        kill "$sampler_pid" 2>/dev/null || true
+        wait "$sampler_pid" 2>/dev/null || true
+    fi
+    if [[ -n "$server_pid" ]]; then
+        kill "$server_pid" 2>/dev/null || true
+        wait "$server_pid" 2>/dev/null || true
+    fi
+}
+trap cleanup EXIT
+
+"$SCRIPT_DIR/m0" sample-vram \
+    --output "$OUT/vram.$BUILD.fa-$FLASH_ATTN.csv" \
+    --duration 7200 \
+    --interval 1 &
+sampler_pid=$!
+
+"$SERVER" \
+    --model "$MODEL" \
+    --alias "$ALIAS" \
+    --n-gpu-layers 99 \
+    --ctx-size 4096 \
+    --ubatch-size 128 \
+    --parallel 1 \
+    --flash-attn "$FLASH_ATTN" \
+    --host 127.0.0.1 \
+    --port "$PORT" \
+    --metrics \
+    --verbose \
+    >"$OUT/server.$BUILD.fa-$FLASH_ATTN.log" 2>&1 &
+server_pid=$!
+
+for _attempt in $(seq 1 180); do
+    if curl --fail --silent "$ENDPOINT/health" >/dev/null; then
+        break
+    fi
+    if ! kill -0 "$server_pid" 2>/dev/null; then
+        echo "llama-server exited during startup" >&2
+        tail -n 80 "$OUT/server.$BUILD.fa-$FLASH_ATTN.log" >&2
+        exit 1
+    fi
+    sleep 1
+done
+curl --fail --silent "$ENDPOINT/health" >"$OUT/health.$BUILD.fa-$FLASH_ATTN.json"
+
+offload=$(rg -o 'offloaded [0-9]+/[0-9]+ layers to GPU' \
+    "$OUT/server.$BUILD.fa-$FLASH_ATTN.log" | tail -n1 || true)
+if [[ -z "$offload" ]]; then
+    echo "server log did not confirm GPU layer offload" >&2
+    exit 1
+fi
+loaded=${offload#offloaded }
+loaded=${loaded%%/*}
+total=${offload#*/}
+total=${total%% layers*}
+if [[ "$loaded" != "$total" ]]; then
+    echo "partial GPU offload: $offload" >&2
+    exit 1
+fi
+
+env -u GROQ_API_KEY \
+    CHAT_URL="$ENDPOINT/v1/chat/completions" \
+    CHAT_MODEL="$ALIAS" \
+    cargo test --test chat_smoke -- --ignored --nocapture \
+    >"$OUT/chat-smoke.$BUILD.fa-$FLASH_ATTN.log" 2>&1
+
+"$SCRIPT_DIR/m0" sniff \
+    --endpoint "$ENDPOINT/v1/chat/completions" \
+    --model "$ALIAS" \
+    --output "$OUT/sniff.$BUILD.fa-$FLASH_ATTN.jsonl"
+
+curl --fail --silent "$ENDPOINT/metrics" >"$OUT/metrics.$BUILD.fa-$FLASH_ATTN.txt"

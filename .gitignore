@@ -12,3 +12,10 @@ Secrets*.toml
 # Environment files
 .env
 .env.*
+
+# Self-hosted model artifacts (regenerate from the committed recipe)
+/trainer/data/
+/trainer/out/
+/trainer/.venv/
+**/__pycache__/
+*.py[cod]

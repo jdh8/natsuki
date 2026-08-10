@@ -1,0 +1,68 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$SCRIPT_DIR/m0-env.sh"
+
+readonly LLAMA_COMMIT=dd1ea524333b1e697489067d7a4c39c60d32beee
+readonly LLAMA_SOURCE="$NATSUKI_M0_HOT_ROOT/src/llama.cpp"
+readonly BUILDER_IMAGE=localhost/natsuki-llama-builder:cuda12.9.1
+readonly PODMAN=(
+    podman
+    --root "$NATSUKI_M0_CONTAINER_ROOT"
+    --runroot "$NATSUKI_M0_CONTAINER_RUNROOT"
+)
+
+if [[ ! -d "$LLAMA_SOURCE/.git" ]]; then
+    git clone https://github.com/ggml-org/llama.cpp.git "$LLAMA_SOURCE"
+fi
+git -C "$LLAMA_SOURCE" fetch origin "$LLAMA_COMMIT"
+git -C "$LLAMA_SOURCE" checkout --detach "$LLAMA_COMMIT"
+
+if ! "${PODMAN[@]}" image exists "$BUILDER_IMAGE"; then
+    "${PODMAN[@]}" build \
+        --file "$SCRIPT_DIR/Containerfile.llama" \
+        --tag "$BUILDER_IMAGE" \
+        "$REPO_ROOT/trainer"
+fi
+
+mkdir -p "$NATSUKI_M0_CUDA_RUNTIME"
+"${PODMAN[@]}" run --rm \
+    --security-opt label=disable \
+    --volume "$NATSUKI_M0_CUDA_RUNTIME:/runtime" \
+    "$BUILDER_IMAGE" \
+    bash -euo pipefail -c '
+        cp -a /usr/local/cuda/targets/x86_64-linux/lib/libcudart.so* /runtime/
+        cp -a /usr/local/cuda/targets/x86_64-linux/lib/libcublas.so* /runtime/
+        cp -a /usr/local/cuda/targets/x86_64-linux/lib/libcublasLt.so* /runtime/
+        cp -a /usr/local/cuda/targets/x86_64-linux/lib/libnvJitLink.so* /runtime/
+        cp -a /lib/x86_64-linux-gnu/libnccl.so* /runtime/
+    '
+
+"${PODMAN[@]}" run --rm \
+    --network none \
+    --security-opt label=disable \
+    --volume "$LLAMA_SOURCE:/src:ro" \
+    --volume "$NATSUKI_M0_BUILD_ROOT:/build" \
+    "$BUILDER_IMAGE" \
+    bash -euo pipefail -c '
+        cmake --fresh -S /src -B /build/llama.cpp-turing -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CUDA_ARCHITECTURES=75-real \
+            -DGGML_CUDA=ON \
+            -DLLAMA_CURL=OFF \
+            -DBUILD_SHARED_LIBS=OFF
+        cmake --build /build/llama.cpp-turing --parallel 8 \
+            --target llama-server llama-bench
+
+        cmake --fresh -S /src -B /build/llama.cpp-mmq -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            "-DCMAKE_CUDA_ARCHITECTURES=61-virtual;80-virtual" \
+            -DGGML_CUDA=ON \
+            -DGGML_CUDA_FORCE_MMQ=ON \
+            -DLLAMA_CURL=OFF \
+            -DBUILD_SHARED_LIBS=OFF
+        cmake --build /build/llama.cpp-mmq --parallel 8 \
+            --target llama-server llama-bench
+    '

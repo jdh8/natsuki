@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$SCRIPT_DIR/m0-env.sh"
+
+exec uv run --project "$REPO_ROOT/trainer" --python 3.12 \
+    python "$REPO_ROOT/trainer/m0.py" "$@"

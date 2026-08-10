@@ -1,0 +1,19 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$SCRIPT_DIR/m0-env.sh"
+
+"$SCRIPT_DIR/m0" sample-vram \
+    --output "$REPO_ROOT/trainer/out/m0/vram.csv" \
+    --duration 86400 \
+    --interval 30
+"$SCRIPT_DIR/m0" summarize-vram \
+    --input "$REPO_ROOT/trainer/out/m0/vram.csv" \
+    --output "$REPO_ROOT/trainer/out/m0/vram-summary.json"
+"$SCRIPT_DIR/m0" final-report \
+    --output "$REPO_ROOT/trainer/out/m0/m0-report.json"
+"$SCRIPT_DIR/m0" archive \
+    "$REPO_ROOT/trainer/out/m0/m0-report.json" \
+    --destination "$NATSUKI_M0_COLD_ROOT"

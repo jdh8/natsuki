@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Internal
+- Added the isolated Python 3.12 M0 harness, fixed 20-prompt stock-model sniff
+  test, VRAM sampler, benchmark/evaluation runners, blinded comparison tooling,
+  and self-finalizing compact reports.  Pinned native Turing and GTX-16 MMQ
+  llama.cpp builds run against an isolated CUDA 12.9 runtime.  Large caches,
+  models, build products, and raw results are kept under `/srv` on the
+  production host.
+
 ## [3.3.0] — 2026-08-10
 
 ### Added

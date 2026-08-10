@@ -1,0 +1,9 @@
+[project]
+name = "natsuki-trainer"
+version = "0.1.0"
+description = "Reproducible training and evaluation tools for Natsuki's self-hosted model"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[tool.uv]
+package = false

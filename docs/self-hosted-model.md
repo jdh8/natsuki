@@ -389,16 +389,31 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   green against Groq with defaults unchanged.  *Deps:* none.  **Done** in 3.3.0 —
   this is what lets M0 point the bot at a local server.
 
-- ⬜ **M0 Measure the prod box, and the do-nothing baseline.**  *Deliverable:*
+- 🚧 **M0 Measure the prod box, and the do-nothing baseline.**  *Deliverable:*
   a day of `nvidia-smi` samples with the desktop up; `llama-bench -fa 0,1`; the
   bot pointed at stock Qwen3-4B-Instruct-2507 — and, same protocol, stock
   granite-4.1-3b as challenger — with the **current, unchanged** system prompt.  *Measure:* p99 free VRAM ≥4.0 GiB; full offload at ≥30 tok/s;
   a 20-prompt sniff test.  *Deps:* M-1.
   **This milestone can cancel the project, in either direction.**  If the stock
   model already holds character, ship the prompted 4B and skip fine-tuning
-  entirely.  If VRAM comes up short, move the display to an iGPU before
-  considering a smaller model.  Do this first; it is the cheapest thing that can
-  invalidate everything below.
+  entirely.  If VRAM comes up short, serve on the 4070 rather than reducing the
+  quantization quality, partially offloading to the CPU, or choosing a smaller
+  model.  Do this first; it is the cheapest thing that can invalidate everything
+  below.  Reproducible M0 tooling lives in `trainer/`, with raw output ignored
+  under `trainer/out/m0/`.  The clean 24-hour prod sample started at 2026-08-11
+  00:48 CST and will finalize its compact report automatically under
+  `/srv/home/jdh8/natsuki/m0`.
+
+  **Interim M0 result (2026-08-11):** both stock Q5_K_M models fully offloaded
+  and every measured decode configuration cleared 30 tok/s.  MMQ plus flash
+  attention won end-to-end latency because it raised 1,536-token prefill from
+  245 to 769 tok/s for Qwen and from 268 to 884 tok/s for Granite.  Neither
+  stock model clears the quality gate: blinded Granite won 11/20 with three
+  ties (below 14), scored 3.15/5 persona, and had one hard refusal; Qwen scored
+  3.8/5 persona and had hard-rule failures on 15/20 prompts.  Continue to M1.
+  A 31-minute preflight retained 4,096 MiB free in only 47.6% of samples, so the
+  1660 capacity gate looks unlikely but remains pending the uncontaminated
+  24-hour window; a confirmed failure routes serving to the 4070.
 
 - ⬜ **M1 Extract and parse the script.**  *Deliverable:* `trainer/extract.py`,
   canon lines and gold pairs as JSONL.  *Measure:* **1,520 Natsuki lines, 601
