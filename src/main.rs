@@ -12,7 +12,10 @@ pub struct Data {
     pub http: reqwest::Client,
     pub cupcake_base: image::RgbaImage,
     pub smash_base: image::RgbaImage,
-    pub groq_key: String,
+    pub chat_url: String,
+    pub chat_model: String,
+    /// Absent when talking to a self-hosted model, which needs no bearer token.
+    pub chat_key: Option<String>,
     pub chat_history: chat::ChatHistory,
 }
 
@@ -106,7 +109,10 @@ async fn main() -> anyhow::Result<()> {
                     http,
                     cupcake_base,
                     smash_base,
-                    groq_key: env::var("GROQ_API_KEY")?,
+                    chat_url: env::var("CHAT_URL").unwrap_or_else(|_| chat::GROQ_URL.to_owned()),
+                    chat_model: env::var("CHAT_MODEL")
+                        .unwrap_or_else(|_| chat::GROQ_MODEL.to_owned()),
+                    chat_key: env::var("GROQ_API_KEY").ok(),
                     chat_history: Default::default(),
                 })
             })

@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.0] — 2026-08-10
+
+### Added
+- `CHAT_URL` and `CHAT_MODEL` environment variables choose the chat backend.
+  They default to Groq's `llama-3.3-70b-versatile`, so existing deployments
+  behave exactly as before.  Pointing them at any OpenAI-compatible server —
+  llama.cpp's `llama-server`, Ollama, and so on — lets Natsuki run on
+  self-hosted hardware.
+
+### Changed
+- `GROQ_API_KEY` is now optional.  The bot starts without it and sends no
+  bearer token, which is what a self-hosted backend expects.  This also fixes
+  the bot refusing to start from `.env.prod`, which never defined it.
+- Chat history is trimmed six messages at a time rather than two.  Natsuki
+  keeps slightly less context on average, in exchange for a prompt prefix that
+  stays put for three exchanges; a self-hosted model can reuse its cache
+  across them instead of re-reading the conversation every message.
+- `PRIVACY.md` now describes the chat backend as configurable, and notes that
+  self-hosted deployments keep messages on the operator's own hardware.
+
+### Internal
+- `tests/groq_smoke.rs` is now `tests/chat_smoke.rs` and honours `CHAT_URL` /
+  `CHAT_MODEL`, with a longer timeout so a cold self-hosted model can load.
+- Chat history trimming moved into `remember()` and gained a unit test: the
+  prompt format assumes turns strictly alternate, so evicting an odd number of
+  messages would corrupt every later exchange.
+
 ## [3.2.0] — 2026-07-03
 
 ### Added
@@ -73,6 +100,7 @@ Final release under Shuttle hosting.
 ### Internal
 - Dependency refresh.
 
+[3.3.0]: https://github.com/jdh8/natsuki/compare/3.2.0...3.3.0
 [3.2.0]: https://github.com/jdh8/natsuki/compare/3.1.2...3.2.0
 [3.1.2]: https://github.com/jdh8/natsuki/compare/3.1.1...3.1.2
 [3.1.1]: https://github.com/jdh8/natsuki/compare/3.1.0...3.1.1

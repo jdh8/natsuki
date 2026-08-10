@@ -2,9 +2,18 @@ use crate::{Context, Data};
 use poise::serenity_prelude as serenity;
 use std::collections::{HashMap, VecDeque};
 
-const MODEL: &str = "llama-3.3-70b-versatile";
+/// Defaults, used unless `CHAT_URL` / `CHAT_MODEL` override them.
+pub const GROQ_URL: &str = "https://api.groq.com/openai/v1/chat/completions";
+pub const GROQ_MODEL: &str = "llama-3.3-70b-versatile";
+
 // ponytail: 10 exchanges per channel, in-memory only; persist if users complain
 const MAX_HISTORY: usize = 20;
+
+/// Messages dropped per eviction.  Trimming one exchange at a time would shift
+/// the prompt prefix on every single message, so a self-hosted model would
+/// re-read the whole history each turn instead of reusing its cached KV.
+/// Evicting in chunks keeps that prefix stable for three exchanges.
+const EVICT_CHUNK: usize = 6;
 
 const SYSTEM_PROMPT: &str = "You are Natsuki from Doki Doki Literature Club, \
 chatting on Discord.  You are tsundere: blunt, easily flustered, secretly kind.  \
@@ -48,23 +57,27 @@ async fn complete(
 
     let request = data
         .http
-        .post("https://api.groq.com/openai/v1/chat/completions")
-        .bearer_auth(&data.groq_key)
-        // Groq's free tier queues requests under load, which can outlive the
-        // shared client's 10 s timeout, so give this request its own.
+        .post(&data.chat_url)
+        // Groq's free tier queues requests under load, and a self-hosted model
+        // may still be loading, either of which can outlive the shared client's
+        // 10 s timeout, so give this request its own.
         .timeout(std::time::Duration::from_secs(30))
         .json(&serde_json::json!({
-            "model": MODEL,
+            "model": data.chat_model,
             "messages": messages,
             "max_tokens": 256,
             "temperature": 0.8,
         }));
+    let request = match &data.chat_key {
+        Some(key) => request.bearer_auth(key),
+        None => request,
+    };
 
     let response = match request.send().await {
         Ok(response) => response,
         // Transient network trouble: reply in character instead of erroring
         Err(e) => {
-            eprintln!("Groq request failed: {e:?}");
+            eprintln!("Chat request failed: {e:?}");
             return Ok("Hmph, my brain just froze for a sec.  Say that again?".to_owned());
         }
     };
@@ -81,7 +94,7 @@ async fn complete(
         .await?;
     let reply = json["choices"][0]["message"]["content"]
         .as_str()
-        .ok_or_else(|| anyhow::anyhow!("Unexpected Groq response: {json}"))?
+        .ok_or_else(|| anyhow::anyhow!("Unexpected chat response: {json}"))?
         .trim()
         .to_owned();
 
@@ -93,19 +106,27 @@ async fn complete(
     };
 
     let mut history = data.chat_history.lock().unwrap();
-    let deque = history.entry(channel).or_default();
+    remember(
+        history.entry(channel).or_default(),
+        user_content,
+        reply.clone(),
+    );
+    Ok(reply)
+}
+
+/// Append one exchange, evicting a whole chunk once the window overflows.
+fn remember(deque: &mut VecDeque<ChatMessage>, user_content: String, reply: String) {
     deque.push_back(ChatMessage {
         role: "user",
         content: user_content,
     });
     deque.push_back(ChatMessage {
         role: "assistant",
-        content: reply.clone(),
+        content: reply,
     });
-    while deque.len() > MAX_HISTORY {
-        deque.pop_front();
+    if deque.len() > MAX_HISTORY {
+        deque.drain(..EVICT_CHUNK);
     }
-    Ok(reply)
 }
 
 /// Chat with Natsuki
@@ -149,4 +170,29 @@ pub async fn event_handler(
     let reply = complete(data, msg.channel_id, &msg.author.name, input).await?;
     msg.reply(ctx, reply).await?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The prompt format assumes history always starts with a user turn and
+    /// strictly alternates, so evicting an odd number of messages would flip
+    /// every later exchange -- silently, and only after 10 exchanges.
+    #[test]
+    fn eviction_preserves_alternation() {
+        let mut deque = VecDeque::new();
+        for i in 0..50 {
+            remember(&mut deque, format!("dave: {i}"), format!("reply {i}"));
+            assert!(
+                deque.len() <= MAX_HISTORY,
+                "window overflowed: {}",
+                deque.len()
+            );
+            for (n, msg) in deque.iter().enumerate() {
+                let expected = if n % 2 == 0 { "user" } else { "assistant" };
+                assert_eq!(msg.role, expected, "turn {n} after exchange {i}");
+            }
+        }
+    }
 }
