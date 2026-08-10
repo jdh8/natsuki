@@ -1,21 +1,31 @@
 # Secure deployment
 
-`./deploy/setup` installs the production bot and model as hardened rootless
-Podman Quadlets owned by a locked `natsuki` system account.  It imports
-credentials from the ignored `.env.dev` file into Podman secrets; `.env.dev`
-is never copied into the build context or service account.
+`./deploy/setup` installs the bot and model as hardened rootless Podman
+Quadlets owned by a locked `natsuki` system account.  It imports credentials
+from the selected ignored environment file into Podman secrets; the file is
+never copied into the build context or service account.
 
-Before running it, put the final GGUF path in `.env.dev`:
+Keep each environment's credentials and deployment values in its own file:
 
 ```text
+# .env.prod or .env.dev
 MODEL_PATH=/absolute/path/to/natsuki.gguf
 ```
 
-Then run the interactive setup from the repository root:
+If `MODEL_PATH` is missing, the wizard prompts for it.  It also generates and
+saves a separate `CHAT_API_KEY` when the selected file does not have one.
+
+Run the interactive setup from the repository root and explicitly select the
+environment:
 
 ```sh
-./deploy/setup
+./deploy/setup prod
+./deploy/setup dev
 ```
+
+Both modes deploy the same service names.  Running setup for one environment
+replaces the active credentials and configuration from the other and restarts
+the services; prod and dev do not run concurrently.
 
 The wizard requests sudo only for account, package, CDI, and installation
 steps.  It refuses to weaken SELinux if CDI device access fails.
@@ -46,6 +56,7 @@ Both units start on boot because `setup` enables lingering.  Add
 `disable --now` to keep one down across reboots.
 
 Use only a WireGuard/Tailscale address or an SSH-forwarded endpoint for `dl02`.
-Copy the generated `CHAT_API_KEY` from `.env.dev` into the backup server's
-protected configuration and require it with `llama-server --api-key-file`.
-Never publish the llama.cpp port on a public interface.
+Copy the generated `CHAT_API_KEY` from the selected environment file into the
+backup server's protected configuration and require it with
+`llama-server --api-key-file`.  Never publish the llama.cpp port on a public
+interface.

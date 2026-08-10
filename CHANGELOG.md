@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   including a locked system account, private container network, Podman secrets,
   pinned images, NVIDIA CDI, and read-only Quadlet services.
 
+### Changed
+- The deploy wizard now requires an explicit `prod` or `dev` argument and
+  loads the matching `.env.prod` or `.env.dev` file.  Switching environments
+  redeploys the same services with the selected credentials and configuration.
+
 ### Fixed
 - The deploy wizard now sets the `container_use_devices` SELinux boolean;
   without it the model container is denied `/dev/nvidiactl` and `llama-server`

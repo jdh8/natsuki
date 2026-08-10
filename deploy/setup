@@ -188,13 +188,18 @@ TOTAL_STAGES=5
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+if (( $# != 1 )) || [[ "$1" != dev && "$1" != prod ]]; then
+  printf 'usage: %s {prod|dev}\n' "$0" >&2
+  exit 2
+fi
+readonly ENVIRONMENT="$1"
 readonly SERVICE_HOME=/var/lib/natsuki
 readonly SUBID_START=655360
 readonly SUBID_COUNT=65536
 readonly SUBID_END=720895
 readonly LLAMA_IMAGE='ghcr.io/ggml-org/llama.cpp@sha256:dd0c408a4c3285f7809323ac17f85e70ef756bf67a3a30d4eed6805a8c1df16b'
 readonly CURL_IMAGE='docker.io/curlimages/curl@sha256:4026b29997dc7c823b51c164b71e2b51e0fd95cce4601f78202c513d97da2922'
-ENV_FILE="$REPO_ROOT/.env.dev"
+ENV_FILE="$REPO_ROOT/.env.$ENVIRONMENT"
 
 die() {
   printf '  %s✗ %s%s\n' "$RED" "$1" "$RESET" >&2
@@ -241,7 +246,7 @@ install_secret() {
 banner "Secure Natsuki deployment"
 
 stage "Preflight"
-say "Validate Fedora, .env.dev, required tools, and sudo access."
+say "Validate Fedora, .env.$ENVIRONMENT, required tools, and sudo access."
 [[ -t 0 ]] || die "run this wizard from an interactive terminal"
 [[ -f "$REPO_ROOT/Cargo.toml" && -d "$REPO_ROOT/deploy/quadlet" ]] \
   || die "run the wizard from a complete Natsuki checkout"
@@ -254,7 +259,7 @@ done
 TOKEN=$(_existing TOKEN || true)
 GUILD=$(_existing GUILD || true)
 TOP_GG_TOKEN=$(_existing TOP_GG_TOKEN || true)
-[[ -n "$TOKEN" ]] || die "TOKEN is missing from .env.dev"
+[[ -n "$TOKEN" ]] || die "TOKEN is missing from $ENV_FILE"
 [[ -z "$GUILD" || "$GUILD" =~ ^[0-9]+$ ]] || die "GUILD must be a Discord numeric ID"
 sudo -v
 confirm "Create the system account, install CDI, and deploy the services?" || exit 0
