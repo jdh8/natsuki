@@ -248,7 +248,7 @@ say "Validate Fedora, .env.dev, required tools, and sudo access."
 grep -q '^ID=fedora$' /etc/os-release || die "this deployment targets Fedora"
 [[ -f "$ENV_FILE" ]] || die "missing $ENV_FILE"
 chmod 600 "$ENV_FILE"
-for command in awk dnf getenforce loginctl nvidia-smi openssl podman rsync runuser sudo systemctl useradd usermod; do
+for command in awk dnf getenforce loginctl nvidia-smi openssl podman rsync runuser setsebool sudo systemctl useradd usermod; do
   require "$command"
 done
 TOKEN=$(_existing TOKEN || true)
@@ -293,6 +293,7 @@ stage "NVIDIA CDI"
 say "Install NVIDIA's CDI generator and verify GPU access without disabling SELinux."
 [[ $(getenforce) == Enforcing ]] || die "SELinux must be enforcing"
 sudo dnf install --assumeyes nvidia-container-toolkit-base
+sudo setsebool -P container_use_devices on
 sudo install -d -m 0755 /etc/cdi
 sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
 nvidia-ctk cdi list | grep -qx 'nvidia.com/gpu=0' || die "CDI did not expose GPU 0"
@@ -300,7 +301,7 @@ as_natsuki podman info >/dev/null
 if ! as_natsuki podman run --rm \
     --read-only --cap-drop all --security-opt no-new-privileges \
     --device nvidia.com/gpu=0 --user 65532:65532 \
-    "$LLAMA_IMAGE" --list-devices; then
+    "$LLAMA_IMAGE" --list-devices | grep CUDA0; then
   die "GPU access failed with SELinux enabled; review AVCs instead of using label=disable"
 fi
 
@@ -355,9 +356,8 @@ if [[ -n "$TOP_GG_TOKEN" ]]; then
 fi
 
 userctl daemon-reload
-userctl start natsuki-bot-build.service natsuki-llama-image.service
-userctl enable natsuki-model.service natsuki-bot.service
-userctl start natsuki-model.service
+userctl restart natsuki-bot-build.service natsuki-llama-image.service
+userctl restart natsuki-model.service
 as_natsuki podman run --rm --network natsuki-internal \
   --entrypoint /bin/sh "$CURL_IMAGE" -eu -c '
     for _attempt in $(seq 1 180); do
@@ -366,14 +366,18 @@ as_natsuki podman run --rm --network natsuki-internal \
     done
     exit 1
   '
+model_pid=$(as_natsuki podman inspect --format '{{.State.Pid}}' natsuki-model)
+nvidia-smi --query-compute-apps=pid --format=csv,noheader | grep -wF "$model_pid" >/dev/null \
+  || die "the model is not using the GPU; review journalctl --user -u natsuki-model and AVCs"
 as_natsuki podman run --rm --network natsuki-internal \
   --secret natsuki-chat-api-key,type=env,target=CHAT_API_KEY \
   --entrypoint /bin/sh "$CURL_IMAGE" -eu -c '
+    body="{\"model\":\"natsuki\",\"messages\":[{\"role\":\"user\",\"content\":\"Hi\"}],\"max_tokens\":1}"
     code=$(curl --silent --output /dev/null --write-out "%{http_code}" \
-      http://natsuki-model:8080/v1/models)
+      --json "$body" http://natsuki-model:8080/v1/chat/completions)
     test "$code" = 401
     curl --fail --silent --header "Authorization: Bearer $CHAT_API_KEY" \
-      http://natsuki-model:8080/v1/models >/dev/null
+      --json "$body" http://natsuki-model:8080/v1/chat/completions >/dev/null
   '
 [[ -z $(as_natsuki podman port natsuki-model) ]] || die "the model published a host port"
 [[ $(as_natsuki podman network inspect --format '{{.Internal}}' natsuki-internal) == true ]] \
@@ -382,7 +386,7 @@ as_natsuki podman run --rm --network natsuki-internal \
   || die "the model container is privileged"
 [[ $(as_natsuki podman inspect --format '{{.HostConfig.ReadonlyRootfs}}' natsuki-model) == true ]] \
   || die "the model root filesystem is writable"
-userctl start natsuki-bot.service
+userctl restart natsuki-bot.service
 userctl is-active --quiet natsuki-model.service natsuki-bot.service \
   || die "one or more Natsuki services failed to start"
 say "The model is authenticated, internal-only, unprivileged, and read-only."

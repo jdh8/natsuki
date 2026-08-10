@@ -12,6 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   including a locked system account, private container network, Podman secrets,
   pinned images, NVIDIA CDI, and read-only Quadlet services.
 
+### Fixed
+- The deploy wizard now sets the `container_use_devices` SELinux boolean;
+  without it the model container is denied `/dev/nvidiactl` and `llama-server`
+  silently falls back to the CPU.  The wizard also fails loudly when the
+  served model is not on the GPU, verifies the API key against a protected
+  endpoint (`/v1/models` never requires auth, so the old check aborted the
+  wizard before the bot ever started), and restarts services on re-runs so
+  updated code and secrets actually deploy.
+
 ### Internal
 - Added the isolated Python 3.12 M0 harness, fixed 20-prompt stock-model sniff
   test, VRAM sampler, benchmark/evaluation runners, blinded comparison tooling,
