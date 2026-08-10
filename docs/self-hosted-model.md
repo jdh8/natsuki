@@ -41,6 +41,10 @@ models also keeps self-preference bias out of the evaluation.
 | Tensor cores | yes (Ada) | **none** (TU116) |
 | Usable VRAM | ~8.8 GB with a desktop session up | **~4.5 GB** assumed — M0 must confirm |
 
+**Update 2026-08-11: serving is routed to the RTX 4070 SUPER** (see M0).  The
+prod column stays as the record of why the choices below look the way they do;
+1660-specific reasoning is marked where it no longer binds.
+
 Two facts shape everything downstream.
 
 **TU116 has no tensor cores.**  From llama.cpp's own CUDA scoreboard
@@ -345,6 +349,16 @@ TU116 is unknown — no benchmark for the GTX 16-series exists, and
 `-DCMAKE_CUDA_HOST_COMPILER=/usr/bin/g++-14` (llama.cpp #22886), and the default
 build ships PTX only, so expect a JIT compile on first load.
 
+**Ada deltas (serving on the 4070, 2026-08-11).**  The flags above were shaped
+by the 1660; on Ada: `-ub` can return to the default 512 (128 was a VRAM
+concession), flash attention is settled-on, and the `GGML_CUDA_FORCE_MMQ` /
+Turing-build questions stay M0-only artifacts.  Context 8192 becomes affordable
+(KV 1.15 GiB) and the ship quant can move Q5_K_M → Q6_K or Q8_0 — decide both
+at M5 via the KLD procedure above, not now.  The constraint that replaces VRAM
+scarcity is sharing: serving, the desktop session, and QLoRA runs coexist on
+~12 GB, and the 4B footprint (~3.8–5.5 GiB depending on quant and context) is
+what keeps that workable.
+
 ## Evaluation
 
 **Tier 0 — mechanical, every commit, ~10 s, 100% required.**  Zero tolerance for
@@ -415,6 +429,20 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   1660 capacity gate looks unlikely but remains pending the uncontaminated
   24-hour window; a confirmed failure routes serving to the 4070.
 
+  **Decision (2026-08-11): serving moves to the RTX 4070 SUPER, base model
+  unchanged.**  The 1660 constrained quantization and serving flags, not the
+  model pick — the spec filter (plain GQA for QLoRA, non-thinking, text-only,
+  Apache-2.0) still has no better candidate with the ≤5B VRAM cap lifted.
+  Qwen3.5-4B's Ampere-only chunked-prefill objection (#26001) vanishes on Ada,
+  but its vision stack, hybrid fine-tune path, and empty RP record remain: it
+  is the first revisit candidate *if M1 fails the quality gate*, not a reason
+  to restart.  No 8B clears the filter either (no non-thinking
+  Qwen3-8B-Instruct-2507; Llama-3.1-8B trips the naming clause; Gemma 4 E4B
+  keeps its vision/MatFormer baggage).  M0's quality failure is a persona
+  problem, which M1 fine-tuning targets on the base already wired through the
+  whole pipeline.  Spend the 4070's headroom on quant fidelity, context, and
+  prefill — see the Ada deltas under Deployment.
+
 - ⬜ **M1 Extract and parse the script.**  *Deliverable:* `trainer/extract.py`,
   canon lines and gold pairs as JSONL.  *Measure:* **1,520 Natsuki lines, 601
   base-game turns, 718 gold pairs.**  Getting 827 means the regex is missing the
@@ -476,8 +504,8 @@ Each names a **deliverable**, a **measure**, and its **deps**.
 
 ## Open questions
 
-1. ⬜ Does the prod box actually leave 4.5 GB free?  M0 answers it.  Would an
-   iGPU recover all of it, making Q6_K@4096 comfortable?
+1. ✅ Does the prod box actually leave 4.5 GB free?  Likely not (47.6% of
+   preflight samples) — mooted by the 2026-08-11 decision to serve on the 4070.
 2. ⬜ Would a 3B at Q8_0 beat a 4B at Q5_K_M?  Never evaluated.  Llama-3.2-3B
    Q8_0 lands near 4.5 GB total with far better KLD, but 3B is below the size
    where the never-admit-being-an-AI rule reliably holds.  Resolve by measurement
@@ -487,11 +515,9 @@ Each names a **deliverable**, a **measure**, and its **deps**.
    *worse* than 4B on two of nine.  The honest reading is that no model in this
    class follows conflicting instructions reliably, so the fine-tune has to carry
    the entire load.  4B remains the right pick because the VRAM is there.
-4. ⬜ Flash attention on TU116 — help or hurt?  No published data for the
-   16-series.  Nearest datapoint (2026-08): the FP32 FA vector kernel helped a
-   tensor-core-less 2×GTX 1080 Ti, 20.2 vs 13.4 t/s decode; `-fa` defaults to
-   auto since 2025-08, and `llama-bench -fa 0,1` still decides.
-5. ⬜ Does `GGML_CUDA_FORCE_MMQ=ON` help prefill?  Community reports say yes;
-   llama.cpp's own docs scope the flag to other architectures, so the mechanism
-   story is suspect.  Highest-value single experiment on the list.
+4. ✅ Flash attention on TU116 — help or hurt?  Helped (part of the winning M0
+   config); mooted anyway by serving on Ada, where it is settled-on.
+5. ✅ Does `GGML_CUDA_FORCE_MMQ=ON` help prefill?  Yes — MMQ + flash attention
+   raised 1,536-token prefill 245→769 tok/s (Qwen) and 268→884 tok/s (Granite)
+   in M0.  Mooted for prod by the 4070 routing.
 6. ⬜ `gpt-oss-120b`'s actual per-token price.
