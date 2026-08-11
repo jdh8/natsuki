@@ -71,7 +71,8 @@ vllm serve mistralai/Mistral-Large-3-675B-Instruct-2512 \
 Then expose port 8000 only through an SSH loopback tunnel and run the existing
 12-row screen in a fresh `trainer/out/m2-mistral-large-3-screen` directory with
 `TEACHER_TEMPERATURE=0.15`. Do not spend on a full 100-row pilot unless it clears
-both the frozen and fresh gates.
+both the frozen and fresh gates. Current single-node inventory, cold-start cost,
+and teardown guards are in [`m2-rental-scout.md`](m2-rental-scout.md).
 
 ## Fallback: Qwen3-235B Instruct 2507
 
