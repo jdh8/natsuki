@@ -9,8 +9,9 @@ Run a three-student adapter race, but **not yet**. M2 still has no approved
 teacher and therefore no representative Discord-shaped synthetic corpus. The
 canon-only Qwen probe already showed that the available local data teaches
 theater dialogue and replay assistant-isms; racing bases on that data would
-select for the wrong task. Screen only dl02-fit teachers next, then run the race
-after the M3 training split is frozen.
+select for the wrong task. The bounded dl02 teacher hunt has now ended without
+an approved teacher, so M3 and this race remain blocked rather than falling
+back to canon-only data.
 
 The exact three checkpoints are:
 

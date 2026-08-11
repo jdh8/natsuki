@@ -22,7 +22,7 @@ correction is what appears here.  Anything still unverified says so.
 | Backend switch | `CHAT_URL` + `CHAT_MODEL`, Groq defaults preserved |
 | Publishing | Weights + synthetic corpus + recipe.  Canon-derived rows withheld. |
 | Base model | `Qwen/Qwen3-4B-Instruct-2507` (Apache-2.0) |
-| Teacher | None approved or queued; GLM-4.7-Flash failed; dl02 only; no rental |
+| Teacher | None approved or queued; final dl02 candidate Olmo 3.1 failed; no rental |
 | A/B baseline | `llama-3.3-70b-versatile` — today's production behaviour |
 | Judge | `qwen/qwen3.6-27b` — distinct from teacher and baseline |
 
@@ -546,8 +546,19 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   exhausted seven retries without producing an accepted two-speaker
   conversation; the retained final error was `expected 2 speakers, got 1`.
   Failed bodies were not saved, so this is an incomplete frozen screen rather
-  than a 1/12 score.  Do not run its fresh 30.  No teacher is queued; any next
-  experiment must fit dl02, rented accelerators are out of scope, and M3 remains
+  than a 1/12 score.  A repaired explicit-speaker diagnostic later produced
+  valid structure but belittled the small success, independently rejecting the
+  model.  Do not run its fresh 30.
+
+  **Olmo 3.1 32B Instruct screen (2026-08-12): rejected.**  The pinned Q6_K
+  passed its exact hash and rendered-template checks, fully offloaded 65/65
+  layers across dl02, and completed all 12 frozen rows at about 27.5 decode
+  tokens/s.  Both independent strict reviews passed only **2/12**.  Rows 4 and
+  5 had mechanical sentence-count failures; row 5 gave backwards,
+  underqualified buttermilk/flour advice in violation of voice rule 29; and row
+  7 belittled sincere effort and distress in violation of rules 17-18.  Do not
+  run its fresh 30.  No teacher is approved or queued, the current dl02 teacher
+  hunt stops here, rented accelerators remain out of scope, and M3 remains
   blocked.
 
 - ⬜ **M3 Generate and filter the corpus.**  *Deliverable:* ~2,500 filtered

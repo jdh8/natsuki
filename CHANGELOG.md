@@ -86,7 +86,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   recorded its rejection at row 2 after repeated speaker/schema failures. A
   primary-source scout then admitted GLM-4.7-Flash Q8_0 to a dl02 screen; it was
   rejected at row 2 after seven retries produced no accepted two-speaker
-  conversation. The rented-H200 route was dropped and no canon text left the
+  conversation. The frozen prompt now gives multi-user rows an exact speaker
+  plan without weakening validation. The final dl02 candidate, Olmo 3.1 32B
+  Instruct Q6_K, completed all 12 rows but passed only 2/12 under two independent
+  strict reviews, with mechanical, factual, and hard voice failures. Its fresh
+  30 was not run. The rented-H200 route was dropped and no canon text left the
   machine.
 
 ## [3.3.0] — 2026-08-10

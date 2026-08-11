@@ -112,9 +112,16 @@ had one sentence-count violation. Do not run its fresh 30.
 GLM-4.7-Flash Q8_0 then passed the dl02 offload/template probe and persisted one
 weakly voiced frozen row. Row 2 exhausted seven retries without an accepted
 two-speaker conversation; the final error was `expected 2 speakers, got 1`.
-Reject the incomplete screen and do not run its fresh 30. No teacher is queued;
-future screens must fit dl02. See
-[`docs/m2-teacher-scout.md`](../docs/m2-teacher-scout.md). M3 remains blocked.
+Reject the incomplete screen and do not run its fresh 30. The runner now gives
+multi-user rows an exact speaker plan without weakening validation.
+
+Olmo 3.1 32B Instruct Q6_K was the final current dl02 candidate. It fully
+offloaded 65/65 layers and completed all 12 frozen rows, but both independent
+strict reviews passed only 2/12. Rows 4 and 5 exceeded the sentence limit, row
+5 gave backwards and underqualified baking advice, and row 7 belittled sincere
+effort. Do not run its fresh 30. No teacher is approved or queued; the current
+teacher hunt stops here and M3 remains blocked. See
+[`docs/m2-teacher-scout.md`](../docs/m2-teacher-scout.md).
 
 ## M2 canon-only probe
 

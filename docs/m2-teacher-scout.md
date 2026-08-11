@@ -5,13 +5,13 @@ documentation, release notes, and license terms.
 
 ## Decision
 
-**No teacher is approved.** Screen `allenai/Olmo-3.1-32B-Instruct` once as the
-final current dl02 candidate, using the pinned Q6_K artifact below.
-`zai-org/GLM-4.7-Flash` remains rejected after its second frozen row exhausted
-seven retries without an accepted two-speaker conversation; do not run its
-fresh 30 or rerun it after the speaker-plan repair. The user dropped H200
-rentals, so Mistral Large 3 and Qwen3-235B remain parked without a quality
-verdict.
+**No teacher is approved or queued.** `allenai/Olmo-3.1-32B-Instruct` was
+rejected on 2026-08-12: both independent strict reviews passed only 2/12 frozen
+rows, rows 4 and 5 had mechanical sentence-count failures, row 5 gave
+technically backwards and underqualified baking advice, and row 7 belittled
+sincere effort. Do not run its fresh 30. The current dl02 teacher hunt stops
+here. The user dropped H200 rentals, so Mistral Large 3 and Qwen3-235B remain
+parked without a quality verdict; M3 remains blocked.
 
 This does not approve the teacher. The repository's acceptance bar remains
 10/12 frozen cases plus 27/30 fresh cases, with zero hard-rule or factual
@@ -90,17 +90,18 @@ llama-server -m GLM-4.7-Flash-Q8_0.gguf --jinja --reasoning off \
 The screen used an SSH loopback and `TEACHER_TEMPERATURE=0.15`. Its retained
 artifact is local under `trainer/out/m2-glm47-flash-screen`; do not resume it.
 
-## Final dl02 candidate: Olmo 3.1 32B Instruct
+## Rejected final dl02 candidate: Olmo 3.1 32B Instruct
 
-Run this candidate once. If it fails its serving prechecks, frozen 12, or fresh
-30, stop current model churn; do not cascade to Granite, Ministral, or another
-Qwen checkpoint.
+**Result: rejected on 2026-08-12.** The pinned Q6_K artifact completed all 12
+frozen rows with valid structure, but strict review passed only rows 8 and 10.
+Do not run the fresh 30 or cascade to Granite, Ministral, or another Qwen
+checkpoint.
 
 | Check | Finding |
 | --- | --- |
 | Exact checkpoint | `allenai/Olmo-3.1-32B-Instruct` at source revision `ac0587e4a7744a551c059d8cd17ba220bc940dae`. Ai2 describes it as a dense 32B English chat model built for instruction following, tool use, and multi-turn dialogue, distinct from the separately released Think checkpoint. [Pinned official model card](https://huggingface.co/allenai/Olmo-3.1-32B-Instruct/blob/ac0587e4a7744a551c059d8cd17ba220bc940dae/README.md), [official release](https://allenai.org/blog/olmo3) |
 | License / distillation | Ai2 designates the checkpoint Apache-2.0. The standard license permits use, modification, derivative works, sublicensing, and distribution subject to its notice conditions, with no naming or anti-distillation term; self-hosting adds no provider contract. The checkpoint tree does not include a standalone license file, so archive the pinned license designation and preserve the Apache text and notices before publishing. [Pinned official tree](https://huggingface.co/allenai/Olmo-3.1-32B-Instruct/tree/ac0587e4a7744a551c059d8cd17ba220bc940dae), [Apache-2.0 text](https://www.apache.org/licenses/LICENSE-2.0) |
-| Mode / prompt | This exact checkpoint is fixed Instruct rather than hybrid Think. Its official Jinja has no thinking branch, accepts the caller's system message, and emits Ai2's default system text only when none is supplied. Use `--jinja`, keep the existing special-token gate, and verify that M2's voice card replaces rather than accompanies the vendor default. [Pinned official template](https://huggingface.co/allenai/Olmo-3.1-32B-Instruct/blob/ac0587e4a7744a551c059d8cd17ba220bc940dae/chat_template.jinja) |
+| Mode / prompt | This exact checkpoint is fixed Instruct rather than hybrid Think. Its official Jinja has no thinking branch, accepts the caller's system message, and emits Ai2's default system text only when none is supplied. The third-party GGUF's embedded template failed pinned llama.cpp startup because its optional-tools branch called `tojson` on an undefined `tools` value. Adding `--chat-template chatml` kept Jinja/schema support and rendered M2's supplied-system, no-tools request byte-for-byte like Ai2's template, with no vendor, tool, or thinking boilerplate. [Pinned official template](https://huggingface.co/allenai/Olmo-3.1-32B-Instruct/blob/ac0587e4a7744a551c059d8cd17ba220bc940dae/chat_template.jinja) |
 | Exact Q6 artifact | Use Unsloth's `Olmo-3.1-32B-Instruct-Q6_K.gguf` at repository revision `8560671d3678feb9071a684b7110b2df87b49473`: **26,448,497,312 bytes** (24.63 GiB), SHA-256/LFS OID `eb67a1a3c74c717b0a945264f9589c5a4e2bd22c5c38374eae21c19c3440d35a`. This is a third-party quant, not an Ai2 artifact, and its card advertises chat-template fixes; pin the hash and inspect the embedded template instead of assuming source-template parity. [Pinned quant tree](https://huggingface.co/unsloth/Olmo-3.1-32B-Instruct-GGUF/tree/8560671d3678feb9071a684b7110b2df87b49473), [raw LFS pointer](https://huggingface.co/unsloth/Olmo-3.1-32B-Instruct-GGUF/raw/8560671d3678feb9071a684b7110b2df87b49473/Olmo-3.1-32B-Instruct-Q6_K.gguf) |
 | dl02 fit | The Q6 weights leave about 15.37 GiB of dl02's aggregate 40 GiB VRAM for the 8,192-token KV cache and runtime buffers. Split inference across the 24-GiB 4090 and 16-GiB 4070 Ti SUPER at 3:2 and abort unless every model layer is GPU-offloaded; silent CPU spill is not an experiment. The official configuration has 64 layers, eight KV heads, and an original 8,192-token context, so this screen needs no context extrapolation. [Pinned official configuration](https://huggingface.co/allenai/Olmo-3.1-32B-Instruct/blob/ac0587e4a7744a551c059d8cd17ba220bc940dae/config.json) |
 | Quality case | Ai2 reports 88.8 IFEval, 39.7 IFBench, and 59.8 length-controlled AlpacaEval 2 for the final Instruct checkpoint, and calls it its strongest fully open 32B-scale instruct model. Dense 32B capacity, fixed direct-response behavior, multi-turn post-training, and family independence from the three proposed students make it the only remaining dl02 candidate with a material new case. These vendor results provide no Natsuki-persona, strict-schema, or Q6-specific proof; the unchanged repository gate remains decisive. [Pinned official evaluation table](https://huggingface.co/allenai/Olmo-3.1-32B-Instruct/blob/ac0587e4a7744a551c059d8cd17ba220bc940dae/README.md#evaluation), [official release](https://allenai.org/blog/olmo3) |
@@ -109,17 +110,21 @@ Minimal serving shape:
 
 ```sh
 llama-server -m Olmo-3.1-32B-Instruct-Q6_K.gguf --jinja \
+  --chat-template chatml \
   -ngl all --fit off -sm layer -ts 3,2 -c 8192 --port 8080
 ```
 
-Before generating a row, verify the file hash, confirm full GPU offload, and
-inspect one rendered system/user prompt for the supplied voice card, no Ai2
-default or function boilerplate, and no thinking or other special-token
-leakage. Then use the existing SSH loopback, `TEACHER_TEMPERATURE=0.15`, and a
-fresh `trainer/out/m2-olmo31-32b-screen` directory. The acceptance sequence is
-unchanged: first require at least 10/12 frozen passes with zero hard-rule or
-factual failures; only then run the fresh 30 and require at least 27/30 with
-the same zero-failure conditions. A failure ends the current dl02 teacher hunt.
+The exact hash passed; llama.cpp fully offloaded 65/65 layers across both dl02
+GPUs at about 27.5 decode tokens/s, and the rendered prompt passed the system,
+tool, and thinking checks. Quality still failed decisively. Rows 4 and 5 had
+the two stored `sentence_count` violations. Row 5 advised adding flour so a
+buttermilk substitution would not become dense, despite lacking the recipe and
+leavener context; this is backwards and violates voice rule 29. Row 7 repeatedly
+belittled sincere effort and distress, violating rules 17-18. Other failures
+missed their required intent, reply shape, mood, or guarded register. There was
+no AI disclosure, refusal, self-prefix, special-token, or safety failure. The
+ignored artifact remains at `trainer/out/m2-olmo31-32b-screen`; do not resume
+it. This failure ends the current dl02 teacher hunt.
 
 This is a license-and-access assessment under the repository's existing IP
 policy, not independent legal clearance for Team Salvato character rights.
