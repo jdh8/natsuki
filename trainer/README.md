@@ -98,6 +98,40 @@ zero AI disclosures, zero self-prefixes, zero structural failures, and one
 sentence-count violation. These diagnostic results remain local under
 `trainer/out/m2/`.
 
+## M2 canon-only probe
+
+With no approved teacher, the probe trains the student base directly on the
+946 M1 gold pairs plus 500 public instruct replay rows
+(`allenai/tulu-3-sft-mixture`, streamed once) and measures what canon alone
+buys.  It runs on the dev box; the wrapper only redirects caches to
+`/srv/var` where that hot root exists.
+
+```sh
+./trainer/m2-probe data
+./trainer/m2-probe train --max-steps 10   # smoke: VRAM fit + masking assert
+./trainer/m2-probe train                  # full two epochs
+./trainer/m2-probe sniff
+./trainer/m0 blind \
+  --left trainer/out/m0/qwen.sniff.jsonl \
+  --right trainer/out/m2-probe/probe.sniff.jsonl \
+  --output trainer/out/m2-probe/blind-review.md \
+  --key-output trainer/out/m2-probe/blind-key.json
+```
+
+Gold rows sample a system-prompt variant per row (roughly a quarter each of
+none / ultra-short / medium paraphrase / full production prompt); replay rows
+are verbatim and never carry the persona prompt.  Training pins the official
+Instruct-2507 chat template committed as
+`qwen3-instruct-chat-template.jinja` — unsloth's mirror silently substitutes
+a thinking-style template whose empty `<think>` blocks the adapter then
+parrots — refuses to start if response masking leaves any sample fully
+masked or any row renders a think block, and the adapter ships
+with a `probe.json` sidecar recording the base model, LoRA config, data
+hashes, system-prompt hash, tokenized chat-template fixture, and eval-loss
+curve.  Read the blinded review by hand: canon-only beating stock Qwen
+demotes the synthetic corpus from load-bearing to augmentation; losing
+measures the gap a future teacher must close.
+
 The host CUDA 13.1 headers conflict with Fedora 44's glibc declarations, and
 CUDA 13 cannot compile the Pascal PTX used by the GTX-16 MMQ experiment.  The
 build recipe therefore uses a rootless CUDA 12.9.1 builder whose complete

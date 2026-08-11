@@ -34,6 +34,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The completed diagnostic M2 pilot: 100 structurally valid conversations, all
   manually reviewed, with 51 register/persona passes, 49 failures, zero AI
   disclosures or self-prefixes, and one sentence-count violation.
+- A canon-only fine-tune probe (`trainer/m2_probe.py`): with every teacher
+  candidate rejected, it QLoRA-trains Qwen3-4B directly on the 946 gold pairs
+  plus 500 public Tulu-3 replay rows and scores the adapter through the
+  existing blinded 20-prompt review, deciding how much the future synthetic
+  corpus must carry.  Training data stays local and gitignored; users are
+  unaffected until a model ships.
+- The official Qwen3-4B-Instruct-2507 chat template, committed verbatim and
+  enforced during probe training and inference after unsloth's mirror
+  silently substituted a thinking-style template that taught the first
+  adapter to open replies with `<think>`/`<tool_call>` token salad.  The
+  Tier-0 special-token check now also catches `<think>`, `<tool_call>`, and
+  `<tool_response>` leakage, which it previously missed entirely.
+- The completed probe verdict: canon-only training converges but loses the
+  persona (flat replies, replay-taught assistant-isms) while stock Qwen with
+  the production prompt fails register the opposite way, so the synthetic
+  corpus remains load-bearing and the M2 teacher hunt stays the critical
+  path.  No user-facing behavior changes.
 
 ### Changed
 - The deploy wizard now requires an explicit `prod` or `dev` argument and

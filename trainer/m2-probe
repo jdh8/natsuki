@@ -1,0 +1,18 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+# Triton JIT-compiles against Python.h at runtime; uv-managed interpreters
+# bundle the headers, while Fedora's bare python3.12 package does not.
+export UV_PYTHON_PREFERENCE=only-managed
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
+# The hot-root redirection only applies on the prod server; the dev box
+# trains from its default caches.
+if [[ -d /srv/var/jdh8 ]]; then
+    source "$SCRIPT_DIR/m0-env.sh"
+fi
+
+exec uv run --project "$REPO_ROOT/trainer" --group train --python 3.12 \
+    python "$REPO_ROOT/trainer/m2_probe.py" "$@"

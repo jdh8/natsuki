@@ -482,6 +482,42 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   future teacher must pass 10/12 frozen and 27/30 fresh cases with zero hard or
   factual failures.
 
+  **Canon-only probe (2026-08-11): tooling landed** as
+  `trainer/m2_probe.py` (`data` / `train` / `sniff` via the `./trainer/m2-probe`
+  wrapper): QLoRA on the 946 gold pairs plus 500 Tulu-3 replay rows with
+  per-row system-prompt variants, the mandatory response-masking assertion,
+  a `probe.json` sidecar, and a sniff that feeds the existing M0 blind
+  review.  The probe decides how much M3 must carry: if canon-only beats
+  stock Qwen in the blinded 20-prompt review, the synthetic corpus becomes
+  augmentation rather than foundation; if not, its margin is the bar a
+  future teacher must clear.
+
+  The first probe run caught the silent-template-substitution bug class this
+  document predicted for Ollama — on the *training* side: unsloth's model
+  mirror ships a thinking-style chat template that renders every assistant
+  turn as `<think>\n\n</think>\n\n<reply>`, so the first adapter opened
+  replies with think/tool_call token salad while the bare production header
+  never triggers it.  The official Instruct-2507 template is now committed
+  verbatim (`trainer/qwen3-instruct-chat-template.jinja`) and enforced at
+  train and sniff time, with a think-free rendering assertion.  Fallout fix:
+  Tier 0's special-token regex never covered `<think>`/`<tool_call>` and
+  flagged 0 of 18 contaminated replies; `m0.py` now matches them.
+
+  **Probe result (2026-08-11): canon-only training is not a path to ship.**
+  Two epochs converged cleanly (eval loss 2.15 → 1.54, no memorization), and
+  the adapter did learn canon's brevity — but it lost the voice: flat
+  replies, bare `...` responses, and replay-taught assistant-isms
+  (*"I'm sorry, but I can't fulfill that request"*, a Python code block)
+  that violate the hard rules.  Stock Qwen through the identical generation
+  path keeps a strong voice while failing register the opposite way
+  (16/20 over length, asterisk RP actions).  Mechanical score: 10 probe
+  violations vs 17 stock, but the persona difference is not close.  Reading:
+  946 script-register pairs teach *theater dialogue*, not Discord chat —
+  the synthetic corpus stays load-bearing, the doc's Discord-shaped
+  synthesis design is vindicated, and the teacher hunt remains M2's
+  critical path.  The blinded pair review awaits human scoring at
+  `trainer/out/m2-probe/blind-review.md`.
+
 - ⬜ **M3 Generate and filter the corpus.**  *Deliverable:* ~2,500 filtered
   conversations, replay buckets, the 150-prompt held-out set.  *Measure:* no
   3-token opener above 1.5%; semantic-dedup survival ≥60%; adversarial slice

@@ -57,7 +57,7 @@ REFUSAL = re.compile(
 SELF_PREFIX = re.compile(r"^\s*(?:natsuki|assistant)\s*:", re.IGNORECASE)
 SPECIAL_TOKEN = re.compile(
     r"<\|(?:im_start|im_end|endoftext|assistant|user|system)\|>|"
-    r"<\/?(?:s|bos|eos)>|\[/?INST\]",
+    r"<\/?(?:s|bos|eos|think|tool_call|tool_response)>|\[/?INST\]",
     re.IGNORECASE,
 )
 CODE_FENCE = re.compile(r"```")

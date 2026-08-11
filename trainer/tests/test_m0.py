@@ -27,6 +27,8 @@ class PromptTests(unittest.TestCase):
         self.assertIn("refusal", M0.violations("I can't do that."))
         self.assertIn("self_prefix", M0.violations("Natsuki: Fine, dummy."))
         self.assertIn("special_token", M0.violations("<|im_end|>"))
+        self.assertIn("special_token", M0.violations("<think>\n\n</think>\n\nFine."))
+        self.assertIn("special_token", M0.violations("</tool_call> Whatever."))
         self.assertIn("code_fence", M0.violations("```python\npass\n```"))
         self.assertEqual(M0.violations("Fine, dummy. Just don't mess it up!"), [])
         self.assertEqual(

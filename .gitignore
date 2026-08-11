@@ -19,3 +19,4 @@ Secrets*.toml
 /trainer/.venv/
 **/__pycache__/
 *.py[cod]
+unsloth_compiled_cache/
