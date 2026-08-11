@@ -25,6 +25,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The deploy wizard now supports Ubuntu 22.04+ alongside Fedora 43+.  On
   Ubuntu it deploys with Docker Compose against the system daemon and
   requires the NVIDIA container toolkit's `nvidia` Docker runtime.
+- A local-only M1 canon extractor for original DDLC and the three selected
+  Natsuki DDLC Plus Side Stories, with locked asset hashes, provenance, counts,
+  and ignored canon/pair outputs.
+- The M2 paraphrased voice card and deterministic 100-conversation Groq pilot
+  tooling, including strict structured output, bounded retry/resume, transcript,
+  manual review CSV, and diagnostic summary.
+- The completed diagnostic M2 pilot: 100 structurally valid conversations, all
+  manually reviewed, with 51 register/persona passes, 49 failures, zero AI
+  disclosures or self-prefixes, and one sentence-count violation.
 
 ### Changed
 - The deploy wizard now requires an explicit `prod` or `dev` argument and
@@ -52,6 +61,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   llama.cpp builds run against an isolated CUDA 12.9 runtime.  Large caches,
   models, build products, and raw results are kept under `/srv` on the
   production host.
+- Pinned `unrpa`, UnityPy, TypeTreeGeneratorAPI, and the `unrpyc` source commit;
+  added standard-library tests for extraction normalization/control flow, Plus
+  type-tree compatibility, M2 quotas and message shape, retries/resume, and
+  review counts. Production chat behavior is unchanged.
 
 ## [3.3.0] — 2026-08-10
 

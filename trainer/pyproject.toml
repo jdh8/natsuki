@@ -3,7 +3,11 @@ name = "natsuki-trainer"
 version = "0.1.0"
 description = "Reproducible training and evaluation tools for Natsuki's self-hosted model"
 requires-python = ">=3.12,<3.13"
-dependencies = []
+dependencies = [
+    "TypeTreeGeneratorAPI==0.0.10",
+    "UnityPy==1.25.3",
+    "unrpa==2.3.0",
+]
 
 [tool.uv]
 package = false

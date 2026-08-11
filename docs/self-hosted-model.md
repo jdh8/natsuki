@@ -155,6 +155,12 @@ Use `unrpa`, then `unrpyc` **master** — not the `legacy` branch, which hard-
 asserts Python 2.7 that Fedora 44 does not ship.  Skip `--try-harder`; DDLC is
 not obfuscated and the flag is much slower.
 
+DDLC Plus is a Unity build.  The local extractor uses pinned UnityPy and
+TypeTreeGeneratorAPI with `sharedassets2.assets` and `DDLC.dll`, then XOR-decodes
+the English localization bundle locally.  Only `nm1-4`, `sn1-4`, and `ny1-5`
+are included: the duplicate base game and the other Side Stories are excluded.
+No official dialogue leaves the machine.
+
 ### Parse
 
 Match `^\s*(\w+)(\s+[0-9a-z]+)*\s+"(.*)"\s*$`, plus bare `^\s*"(.*)"$` for
@@ -180,6 +186,11 @@ statements, and exactly one escaped quote in all 1,520.
 | A — gold pairs, previous turn is `mc`/`s`/`y`/`m` | **718 of 987 turns** | Direct `(user, assistant)` pairs |
 | B — previous turn is narration | 235 | Scene context field only |
 | C — all lines | 2,319 (1,189 unique) | Local scorer bank only |
+
+The three selected Plus Side Stories add 617 lines, 307 turns, and 228 gold
+pairs.  Combined M1 output is 2,936 canon rows, 1,294 turns, and 946 gold pairs;
+the physical sources contain 1,731 unique raw texts and 1,730 after
+normalization.
 
 **Bucket B must not become the user turn.**  Base-game narration is the
 protagonist's first-person interior monologue, so training on it teaches the
@@ -251,7 +262,7 @@ That opener cap is the single filter separating "sounds like Natsuki" from
 
 | Stage | Count |
 | --- | --- |
-| Gold pairs | 718 |
+| Gold pairs | 946 |
 | Raw synthetic conversations | ~4,000 |
 | Post-filter | ~2,500 |
 | Replay: general prompts, in-character answers | ~750 (30%) |
@@ -443,20 +454,26 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   whole pipeline.  Spend the 4070's headroom on quant fidelity, context, and
   prefill — see the Ada deltas under Deployment.
 
-- ⬜ **M1 Extract and parse the script.**  *Deliverable:* `trainer/extract.py`,
-  canon lines and gold pairs as JSONL.  *Measure:* **1,520 Natsuki lines, 601
-  base-game turns, 718 gold pairs.**  Getting 827 means the regex is missing the
-  sprite-attribute token.  These counts were reproduced exactly by two
-  independent implementations, so a mismatch is a parser bug.  *Deps:* a DDLC
-  install.
+- ✅ **M1 Extract and parse the script.**  *Deliverable:* `trainer/extract.py`,
+  canon lines and gold pairs as JSONL.  *Measure:* **1,520 physical / 2,319
+  route-expanded original lines, 601 / 987 turns, 718 gold pairs; 617 / 307 /
+  228 from Plus; 2,936 / 1,294 / 946 combined.**  Getting 827 means the regex is
+  missing the sprite-attribute token.  The real Steam assets passed every
+  locked count with zero unresolved localization IDs on 2026-08-11; hashes and
+  build IDs are recorded in the ignored report.  *Deps:* both DDLC installs.
 
-- ⬜ **M2 Pilot 100 synthetic conversations and read all 100 by hand.**
+- ✅ **M2 Pilot 100 synthetic conversations and read all 100 by hand.**
   *Deliverable:* voice card, contrastive anchors, attribute grid, 100 samples.
   *Measure:* violation counts for the two hard rules and for register.  *Deps:*
   M1.  Do not skip this — it yields the real filter-attrition rate and, more
   importantly, the ceiling on what the student can reach, since it inherits the
   teacher's failure rate.  If the voice card is not producing recognizable
   Natsuki at 100 samples, fix the prompt rather than scaling a broken template.
+  The real diagnostic-only pilot completed on 2026-08-11: all 100 unique rows
+  passed structural validation and were manually reviewed, with **51 register /
+  persona passes and 49 failures**, zero AI disclosures, zero self-prefixes, and
+  one sentence-count violation.  The failures remain in the pilot and did not
+  trigger an automatic rerun.
 
 - ⬜ **M3 Generate and filter the corpus.**  *Deliverable:* ~2,500 filtered
   conversations, replay buckets, the 150-prompt held-out set.  *Measure:* no
