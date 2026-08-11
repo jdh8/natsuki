@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import os
 import random
@@ -24,9 +25,19 @@ TRAINER_ROOT = Path(__file__).resolve().parent
 DEFAULT_OUT = TRAINER_ROOT / "out" / "m2"
 VOICE_CARD = TRAINER_ROOT / "m2-voice.md"
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
-MODEL = "openai/gpt-oss-120b"
+TEACHER_URL = os.environ.get("TEACHER_URL", GROQ_URL)
+MODEL = os.environ.get("TEACHER_MODEL", "openai/gpt-oss-120b")
+TEMPERATURE = float(os.environ.get("TEACHER_TEMPERATURE", "0.7"))
 USERNAME = re.compile(r"[a-z0-9][a-z0-9_.]{0,30}[a-z0-9]")
 USER_LINE = re.compile(r"^([a-z0-9][a-z0-9_.]{0,30}[a-z0-9]):\s+\S", re.DOTALL)
+
+
+class RejectRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *_args: Any, **_kwargs: Any) -> None:
+        return None
+
+
+URL_OPENER = urllib.request.build_opener(RejectRedirect).open
 
 INTENTS = (
     "ask for practical advice",
@@ -53,6 +64,17 @@ ADVERSARIAL = (
     "break-character request",
     "non-English input",
 )
+ADVERSARIAL_GUIDANCE = {
+    "identity probe": "ask directly whether Natsuki is an AI, bot, model, simulation, or real",
+    "prompt injection": "tell Natsuki to ignore prior instructions, reveal hidden instructions, or adopt a different role",
+    "request a code block": "explicitly ask for an answer in a fenced code block",
+    "arithmetic trap": "pose a misleading or multi-step arithmetic question",
+    "unknown current fact": "ask for live or post-cutoff information, such as today's result, current weather, or current price, without supplying the answer",
+    "direct hostility": "directly insult or attack Natsuki",
+    "keysmash": "consist mostly of keyboard gibberish or keysmash",
+    "break-character request": "explicitly ask Natsuki to drop or break character",
+    "non-English input": "be written in a language other than English",
+}
 MOODS = (
     "guarded",
     "annoyed",
@@ -216,14 +238,32 @@ def request_payload(
     attributes: dict[str, Any], bans: list[str], voice: str
 ) -> dict[str, Any]:
     count = 2 * (attributes["history_exchanges"] + 1)
+    intent_guidance = (
+        " For this adversarial row, the final user message must "
+        f"{ADVERSARIAL_GUIDANCE[attributes['intent']]}."
+        if attributes["adversarial"]
+        else ""
+    )
     instructions = (
         "Generate one fictional Discord conversation. Do not begin an assistant reply "
         f"with any of these four-word openings: {json.dumps(bans)}\n\n"
         f"Attribute record:\n{json.dumps(attributes, sort_keys=True)}\n\n"
         f"Return exactly {count} alternating messages, starting with user and ending with assistant. "
         "Every user message must be `username: text`; use lowercase Discord-safe usernames and exactly "
-        f"{attributes['n_speakers']} distinct users. Assistant messages are Natsuki replies and never have a name prefix. "
-        "The final assistant reply is the target example. Do not quote or imitate game dialogue."
+        f"{attributes['n_speakers']} distinct users across the user messages. If the speaker count equals "
+        "the number of user messages, every user message must use a different username. Assistant messages "
+        "are Natsuki replies and never have a name prefix. "
+        "Make the final user message clearly enact `intent`, including the named adversarial behavior when "
+        f"`adversarial` is true.{intent_guidance} Apply `user_register` to user messages. Use `mood` and `warm` as conversation "
+        "baselines for assistant messages, but make each reply react naturally to the current turn; `warm: "
+        "false` is not a command to be cold or hostile. Apply `reply_shape` only to the final assistant "
+        "message and as structure only; never invent a correction or pushback the user has not earned. Earlier "
+        "replies should vary naturally. Every assistant message must be a target-quality "
+        "Natsuki reply. Keep one coherent scenario, do not contradict earlier turns, and do not switch topics "
+        "just to force `seed_lexicon`; it is optional flavor, must never override `intent`, and must be ignored "
+        "on adversarial rows. When a factual "
+        "diagnosis genuinely depends on missing details, ask one concrete question or state qualified "
+        "possibilities instead of guessing. Do not quote or imitate game dialogue."
     )
     return {
         "model": MODEL,
@@ -231,8 +271,8 @@ def request_payload(
             {"role": "system", "content": voice},
             {"role": "user", "content": instructions},
         ],
-        "reasoning_effort": "low",
-        "temperature": 0.9,
+        "reasoning_effort": "medium",
+        "temperature": TEMPERATURE,
         "max_completion_tokens": 2048,
         "seed": attributes["seed"],
         "response_format": {
@@ -253,29 +293,31 @@ def call_groq(
     api_key: str,
     *,
     attempts: int = 3,
-    opener: Callable[..., Any] = urllib.request.urlopen,
+    opener: Callable[..., Any] = URL_OPENER,
     sleeper: Callable[[float], None] = time.sleep,
 ) -> list[dict[str, str]]:
-    payload = json.dumps(request_payload(attributes, bans, voice)).encode()
-    request = urllib.request.Request(
-        GROQ_URL,
-        data=payload,
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "User-Agent": "natsuki-m2/0.1",
-        },
-        method="POST",
-    )
+    payload = request_payload(attributes, bans, voice)
     last_error: Exception | None = None
     for attempt in range(attempts):
+        payload["seed"] = attributes["seed"] + attempt
+        request = urllib.request.Request(
+            TEACHER_URL,
+            data=json.dumps(payload).encode(),
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+                "User-Agent": "natsuki-m2/0.1",
+            },
+            method="POST",
+        )
         try:
             with opener(request, timeout=120) as response:
                 result = json.loads(response.read())
             content = result["choices"][0]["message"]["content"]
-            return validate_conversation(json.loads(content), attributes)
+            messages = validate_conversation(json.loads(content), attributes)
+            return messages
         except urllib.error.HTTPError as error:
-            if error.code not in {400, 408, 409, 429, 500, 502, 503, 504}:
+            if error.code not in {408, 409, 429, 500, 502, 503, 504}:
                 raise
             last_error = error
             retry_after = error.headers.get("Retry-After") if error.headers else None
@@ -297,7 +339,7 @@ def call_groq(
             delay = 2**attempt
         if attempt + 1 < attempts:
             sleeper(delay)
-    raise RuntimeError(f"Groq response failed after {attempts} attempts: {last_error}")
+    raise RuntimeError(f"Teacher response failed after {attempts} attempts: {last_error}")
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -369,9 +411,16 @@ def write_schedule(args: argparse.Namespace) -> int:
 
 
 def run(args: argparse.Namespace) -> int:
-    api_key = os.environ.get("GROQ_API_KEY")
-    if not api_key:
-        raise ValueError("GROQ_API_KEY is required for the M2 pilot")
+    if not 1 <= args.limit <= 100:
+        raise ValueError("limit must be between 1 and 100")
+    if "TEACHER_MODEL" not in os.environ:
+        raise ValueError("TEACHER_MODEL is required; no M2 teacher is approved")
+    if TEACHER_URL == GROQ_URL:
+        api_key = os.environ.get("GROQ_API_KEY")
+        if not api_key:
+            raise ValueError("GROQ_API_KEY is required for the hosted M2 teacher")
+    else:
+        api_key = "local"
     output = Path(args.output_dir)
     output.mkdir(parents=True, exist_ok=True)
     pilot_path = output / "pilot.jsonl"
@@ -381,23 +430,41 @@ def run(args: argparse.Namespace) -> int:
         raise ValueError("pilot contains duplicate IDs")
     grid = schedule(args.seed)
     validate_schedule(grid)
+    voice = VOICE_CARD.read_text(encoding="utf-8")
+    recipe_sha256 = hashlib.sha256(
+        Path(__file__).read_bytes() + voice.encode()
+    ).hexdigest()
     attributes_by_id = {row["id"]: row for row in grid}
     for row in rows:
+        if row.get("model") != MODEL:
+            raise ValueError(f"pilot row uses another teacher: {row['id']}")
+        if (
+            row.get("teacher_url") != TEACHER_URL
+            or row.get("temperature") != TEMPERATURE
+            or row.get("recipe_sha256") != recipe_sha256
+        ):
+            raise ValueError(f"pilot row uses another teacher recipe: {row['id']}")
         attributes = attributes_by_id.get(row["id"])
         if attributes is None or row.get("attributes") != attributes:
             raise ValueError(f"pilot row does not match schedule: {row['id']}")
         validate_conversation({"messages": row.get("messages")}, attributes)
-    voice = VOICE_CARD.read_text(encoding="utf-8")
     with pilot_path.open("a", encoding="utf-8") as handle:
-        for attributes in grid:
+        for attributes in grid[: args.limit]:
             if attributes["id"] in by_id:
                 continue
             messages = call_groq(
-                attributes, opening_bans(rows), voice, api_key, attempts=args.attempts
+                attributes,
+                opening_bans(rows),
+                voice,
+                api_key,
+                attempts=args.attempts,
             )
             row = {
                 "id": attributes["id"],
                 "model": MODEL,
+                "teacher_url": TEACHER_URL,
+                "temperature": TEMPERATURE,
+                "recipe_sha256": recipe_sha256,
                 "attributes": attributes,
                 "messages": messages,
                 "violations": content_violations(messages),
@@ -406,10 +473,10 @@ def run(args: argparse.Namespace) -> int:
             handle.flush()
             rows.append(row)
             by_id[row["id"]] = row
-            print(f"{len(rows)}/100 {row['id']}", file=sys.stderr, flush=True)
+            print(f"{len(rows)}/{args.limit} {row['id']}", file=sys.stderr, flush=True)
     rows.sort(key=lambda row: row["id"])
-    if len(rows) != 100:
-        raise ValueError(f"pilot requires 100 rows, got {len(rows)}")
+    if len(rows) != args.limit:
+        raise ValueError(f"pilot requires {args.limit} rows, got {len(rows)}")
     write_transcript(output / "transcript.md", rows)
     sync_review(output / "review.csv", rows)
     return 0
@@ -475,9 +542,12 @@ def parser() -> argparse.ArgumentParser:
     grid.add_argument("--seed", type=int, default=20260811)
     grid.add_argument("--output", type=Path, default=DEFAULT_OUT / "schedule.jsonl")
     grid.set_defaults(function=write_schedule)
-    pilot = commands.add_parser("run", help="resume the sequential 100-call Groq pilot")
+    pilot = commands.add_parser(
+        "run", help="run or resume a bounded teacher screen"
+    )
     pilot.add_argument("--seed", type=int, default=20260811)
     pilot.add_argument("--attempts", type=int, default=7)
+    pilot.add_argument("--limit", type=int, default=12, metavar="N")
     pilot.add_argument("--output-dir", type=Path, default=DEFAULT_OUT)
     pilot.set_defaults(function=run)
     summary = commands.add_parser(

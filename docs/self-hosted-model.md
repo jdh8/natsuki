@@ -22,7 +22,7 @@ correction is what appears here.  Anything still unverified says so.
 | Backend switch | `CHAT_URL` + `CHAT_MODEL`, Groq defaults preserved |
 | Publishing | Weights + synthetic corpus + recipe.  Canon-derived rows withheld. |
 | Base model | `Qwen/Qwen3-4B-Instruct-2507` (Apache-2.0) |
-| Teacher | `openai/gpt-oss-120b` (Apache-2.0) |
+| Teacher | None approved; `openai/gpt-oss-120b` failed the M2 quality gate |
 | A/B baseline | `llama-3.3-70b-versatile` — today's production behaviour |
 | Judge | `qwen/qwen3.6-27b` — distinct from teacher and baseline |
 
@@ -462,7 +462,7 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   locked count with zero unresolved localization IDs on 2026-08-11; hashes and
   build IDs are recorded in the ignored report.  *Deps:* both DDLC installs.
 
-- ✅ **M2 Pilot 100 synthetic conversations and read all 100 by hand.**
+- 🚧 **M2 Pilot 100 synthetic conversations and read all 100 by hand.**
   *Deliverable:* voice card, contrastive anchors, attribute grid, 100 samples.
   *Measure:* violation counts for the two hard rules and for register.  *Deps:*
   M1.  Do not skip this — it yields the real filter-attrition rate and, more
@@ -474,6 +474,13 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   persona passes and 49 failures**, zero AI disclosures, zero self-prefixes, and
   one sentence-count violation.  The failures remain in the pilot and did not
   trigger an automatic rerun.
+
+  **Repair screen (2026-08-11): M2 remains open.**  `gpt-oss-120b` passed at
+  most 1/6; Mistral produced one good row before missing intent and speaker
+  invariants.  Neither qualifies, so M3 stays blocked.
+  Next: probe Qwen3-4B on 946 gold pairs plus ~500 public instruct rows.  Any
+  future teacher must pass 10/12 frozen and 27/30 fresh cases with zero hard or
+  factual failures.
 
 - ⬜ **M3 Generate and filter the corpus.**  *Deliverable:* ~2,500 filtered
   conversations, replay buckets, the 150-prompt held-out set.  *Measure:* no

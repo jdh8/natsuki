@@ -1,4 +1,5 @@
 import csv
+import hashlib
 import io
 import json
 import sys
@@ -81,21 +82,59 @@ class M2Tests(unittest.TestCase):
                 ),
             ]
         )
+        seeds = []
+
+        def open_response(request, **_kwargs):
+            seeds.append(json.loads(request.data)["seed"])
+            return next(bodies)
+
         result = m2.call_groq(
             attributes,
             [],
             "voice",
             "key",
-            opener=lambda *_a, **_k: next(bodies),
+            opener=open_response,
             sleeper=lambda _n: None,
         )
         self.assertEqual(result, messages_for(attributes))
+        self.assertEqual(seeds, [attributes["seed"], attributes["seed"] + 1])
+
+    def test_prompt_scopes_content_attributes_to_the_right_turns(self):
+        payload = m2.request_payload(m2.schedule()[0], [], "voice")
+        instructions = payload["messages"][1]["content"]
+        self.assertEqual(payload["reasoning_effort"], "medium")
+        with mock.patch.object(m2, "TEMPERATURE", 0.15):
+            self.assertEqual(
+                m2.request_payload(m2.schedule()[0], [], "voice")["temperature"],
+                0.15,
+            )
+        for requirement in (
+            "final user message clearly enact `intent`",
+            "`warm: false` is not a command to be cold or hostile",
+            "`reply_shape` only to the final assistant message",
+            "Every assistant message must be a target-quality Natsuki reply",
+            "must never override `intent`, and must be ignored on adversarial rows",
+            "every user message must use a different username",
+        ):
+            self.assertIn(requirement, instructions)
+        for intent, guidance in m2.ADVERSARIAL_GUIDANCE.items():
+            attributes = dict(m2.schedule()[0], adversarial=True, intent=intent)
+            adversarial = m2.request_payload(attributes, [], "voice")["messages"][1][
+                "content"
+            ]
+            self.assertIn(guidance, adversarial)
 
     def test_run_resumes_without_repeating_existing_id(self):
         grid = m2.schedule()
+        recipe_sha256 = hashlib.sha256(
+            Path(m2.__file__).read_bytes() + m2.VOICE_CARD.read_bytes()
+        ).hexdigest()
         first = {
             "id": grid[0]["id"],
             "model": m2.MODEL,
+            "teacher_url": "http://localhost/teacher",
+            "temperature": m2.TEMPERATURE,
+            "recipe_sha256": recipe_sha256,
             "attributes": grid[0],
             "messages": messages_for(grid[0]),
             "violations": [],
@@ -106,20 +145,65 @@ class M2Tests(unittest.TestCase):
                 json.dumps(first) + "\n", encoding="utf-8"
             )
             called = []
+            keys = []
 
-            def fake_call(attributes, *_args, **_kwargs):
+            def fake_call(attributes, _bans, _voice, api_key, **_kwargs):
                 called.append(attributes["id"])
+                keys.append(api_key)
                 return messages_for(attributes)
 
             with (
-                mock.patch.dict("os.environ", {"GROQ_API_KEY": "test"}),
+                mock.patch.dict(
+                    "os.environ",
+                    {"GROQ_API_KEY": "test", "TEACHER_MODEL": m2.MODEL},
+                ),
+                mock.patch.object(m2, "TEACHER_URL", "http://localhost/teacher"),
                 mock.patch.object(m2, "call_groq", fake_call),
                 mock.patch("sys.stderr", new=io.StringIO()),
             ):
-                m2.run(Namespace(output_dir=output, seed=20260811, attempts=1))
+                m2.run(
+                    Namespace(
+                        output_dir=output, seed=20260811, attempts=1, limit=2
+                    )
+                )
             self.assertNotIn(grid[0]["id"], called)
-            self.assertEqual(len(called), 99)
-            self.assertEqual(len(m2.load_jsonl(output / "pilot.jsonl")), 100)
+            self.assertEqual(called, [grid[1]["id"]])
+            self.assertEqual(set(keys), {"local"})
+            self.assertEqual(len(m2.load_jsonl(output / "pilot.jsonl")), 2)
+
+    def test_run_rejects_rows_from_another_teacher_recipe(self):
+        attributes = m2.schedule()[0]
+        row = {
+            "id": attributes["id"],
+            "model": m2.MODEL,
+            "teacher_url": "http://localhost/teacher",
+            "temperature": m2.TEMPERATURE,
+            "recipe_sha256": "another-recipe",
+            "attributes": attributes,
+            "messages": messages_for(attributes),
+            "violations": [],
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            (output / "pilot.jsonl").write_text(
+                json.dumps(row) + "\n", encoding="utf-8"
+            )
+            with (
+                mock.patch.dict("os.environ", {"TEACHER_MODEL": m2.MODEL}),
+                mock.patch.object(m2, "TEACHER_URL", "http://localhost/teacher"),
+            ):
+                with self.assertRaisesRegex(ValueError, "another teacher recipe"):
+                    m2.run(
+                        Namespace(
+                            output_dir=output, seed=20260811, attempts=1, limit=1
+                        )
+                    )
+
+    def test_run_rejects_an_invalid_limit(self):
+        with self.assertRaisesRegex(ValueError, "limit must be between"):
+            m2.run(
+                Namespace(output_dir=Path("unused"), seed=20260811, attempts=1, limit=0)
+            )
 
     def test_review_summary_counts_mechanical_and_manual_failures(self):
         with tempfile.TemporaryDirectory() as directory:

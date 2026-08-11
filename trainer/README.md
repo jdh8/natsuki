@@ -63,17 +63,28 @@ The hosted request contains only the original paraphrased
 The deterministic grid has 100 rows, exactly 18 adversarial conversations,
 and 35 warm conversations.
 
+No teacher currently clears the quality gate. New candidates must be named
+explicitly and start with the default 12-row screen in a fresh output directory:
+
 ```sh
 uv run --project trainer python trainer/m2.py schedule
-export GROQ_API_KEY=...
-uv run --project trainer python trainer/m2.py run
+export TEACHER_MODEL=org/candidate-model
+export TEACHER_URL=http://127.0.0.1:18081/v1/chat/completions
+export TEACHER_TEMPERATURE=0.15
+uv run --project trainer python trainer/m2.py run \
+  --output-dir trainer/out/m2-candidate
 ```
 
-`run` calls `openai/gpt-oss-120b` sequentially through `urllib`, resumes from
-`trainer/out/m2/pilot.jsonl`, and maintains the rolling top-50 four-gram opener
-ban. It writes a readable transcript and `review.csv`. Read every transcript
-entry, set each `register_persona_pass` cell to `true` or `false`, add useful
-notes, then validate and summarize the diagnostic-only first pilot:
+Custom endpoints receive no secret API key; use a loopback SSH tunnel for a
+remote local server. The hosted Groq endpoint instead requires
+`GROQ_API_KEY`. Each row records the model, endpoint, temperature, and recipe
+fingerprint, so resume rejects mixed experiments.
+
+`run` maintains the rolling top-50 four-gram opener ban and writes a readable
+transcript plus `review.csv`. Only an approved candidate should be rerun with
+`--limit 100` in a fresh directory. Read every transcript entry, set each
+`register_persona_pass` cell to `true` or `false`, add useful notes, then
+validate and summarize a complete 100-row pilot:
 
 ```sh
 uv run --project trainer python trainer/m2.py summary
