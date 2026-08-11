@@ -108,7 +108,7 @@ The no-spend self-hosted Hermes 4.3 36B screen completed all 12 structurally
 valid rows on 2026-08-12, but strict review passed only 2/12. It belittled the
 small success in row 2, missed several required intents and reply shapes, and
 had one sentence-count violation. Do not run its fresh 30. The next candidate
-is self-hosted Mistral Large 3; see
+is GLM-4.7-Flash Q8_0 on dl02; rented accelerators are out of scope. See
 [`docs/m2-teacher-scout.md`](../docs/m2-teacher-scout.md). M3 remains blocked.
 
 ## M2 canon-only probe
