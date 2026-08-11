@@ -268,13 +268,12 @@ def request_payload(
         "diagnosis genuinely depends on missing details, ask one concrete question or state qualified "
         "possibilities instead of guessing. Do not quote or imitate game dialogue."
     )
-    return {
+    payload = {
         "model": MODEL,
         "messages": [
             {"role": "system", "content": voice},
             {"role": "user", "content": instructions},
         ],
-        "reasoning_effort": "none" if groq_qwen else "medium",
         "temperature": TEMPERATURE,
         "max_completion_tokens": 2048,
         "seed": attributes["seed"],
@@ -291,6 +290,9 @@ def request_payload(
             }
         ),
     }
+    if TEACHER_URL == GROQ_URL:
+        payload["reasoning_effort"] = "none" if groq_qwen else "medium"
+    return payload
 
 
 def call_groq(

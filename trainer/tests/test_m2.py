@@ -135,6 +135,12 @@ class M2Tests(unittest.TestCase):
         self.assertIn("JSON object", payload["messages"][1]["content"])
         self.assertIn("exactly two string fields", payload["messages"][1]["content"])
 
+    def test_local_teacher_omits_groq_reasoning_mode(self):
+        with mock.patch.object(m2, "TEACHER_URL", "http://localhost/teacher"):
+            payload = m2.request_payload(m2.schedule()[0], [], "voice")
+        self.assertNotIn("reasoning_effort", payload)
+        self.assertEqual(payload["response_format"]["type"], "json_schema")
+
     def test_run_resumes_without_repeating_existing_id(self):
         grid = m2.schedule()
         recipe_sha256 = hashlib.sha256(
