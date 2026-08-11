@@ -22,7 +22,7 @@ correction is what appears here.  Anything still unverified says so.
 | Backend switch | `CHAT_URL` + `CHAT_MODEL`, Groq defaults preserved |
 | Publishing | Weights + synthetic corpus + recipe.  Canon-derived rows withheld. |
 | Base model | `Qwen/Qwen3-4B-Instruct-2507` (Apache-2.0) |
-| Teacher | None approved; Hermes 4.3 failed; GLM-4.7-Flash Q8_0 on dl02 next; no rental |
+| Teacher | None approved or queued; GLM-4.7-Flash failed; dl02 only; no rental |
 | A/B baseline | `llama-3.3-70b-versatile` — today's production behaviour |
 | Judge | `qwen/qwen3.6-27b` — distinct from teacher and baseline |
 
@@ -525,9 +525,8 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   failed the speaker/schema invariant through all seven retries.  A direct
   inspection also belittled the user's sincere small success, violating voice
   rule 18.  Stop at 1/2; do not tune the frozen screen around the failure.
-  No canon text was sent.  The next bounded candidate is
-  `zai-org/GLM-4.7-Flash`, served from its Q8_0 GGUF on dl02; the license and
-  access evidence is in [`m2-teacher-scout.md`](m2-teacher-scout.md).
+  No canon text was sent.  The later GLM attempt below also failed; the license
+  and access evidence is in [`m2-teacher-scout.md`](m2-teacher-scout.md).
 
   **Hermes 4.3 36B screen (2026-08-12): rejected.**  The pinned official
   Q4_K_M ran fully offloaded across dl02's two GPUs at about 33.5 tok/s.  Its
@@ -538,8 +537,18 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   rule 18, several rows omitted their required intent or reply shape, and row 9
   had the only mechanical sentence-count violation.  There was no definite
   factual falsehood, but the hard and persona/register failures independently
-  reject the candidate.  Do not run its fresh 30.  GLM-4.7-Flash Q8_0 is next
-  on dl02; rented accelerators are out of scope and M3 remains blocked.
+  reject the candidate.  Do not run its fresh 30.
+
+  **GLM-4.7-Flash screen (2026-08-12): rejected.**  The pinned Q8_0 fully
+  offloaded 48/48 layers across dl02's two GPUs, used the supplied system
+  message with thinking disabled, and decoded at about 116 tok/s.  Row 1 was a
+  narrow but weakly voiced pass with no mechanical or factual failure.  Row 2
+  exhausted seven retries without producing an accepted two-speaker
+  conversation; the retained final error was `expected 2 speakers, got 1`.
+  Failed bodies were not saved, so this is an incomplete frozen screen rather
+  than a 1/12 score.  Do not run its fresh 30.  No teacher is queued; any next
+  experiment must fit dl02, rented accelerators are out of scope, and M3 remains
+  blocked.
 
 - ⬜ **M3 Generate and filter the corpus.**  *Deliverable:* ~2,500 filtered
   conversations, replay buckets, the 150-prompt held-out set.  *Measure:* no

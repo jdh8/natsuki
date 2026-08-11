@@ -5,10 +5,12 @@ documentation, release notes, and license terms.
 
 ## Decision
 
-Screen **`zai-org/GLM-4.7-Flash` next**, once, on dl02 using ggml-org's pinned
-Q8_0 GGUF. This is only admission to the frozen 12, not teacher approval. The
-user dropped H200 rentals on 2026-08-12, so Mistral Large 3 and Qwen3-235B are
-parked without a quality verdict; do not rent hardware for either.
+**No teacher is approved or queued.** `zai-org/GLM-4.7-Flash` was rejected on
+2026-08-12 after its second frozen row exhausted seven retries without an
+accepted two-speaker conversation; the retained final error was `expected 2
+speakers, got 1`. Do not run its fresh 30. The user dropped H200 rentals, so
+Mistral Large 3 and Qwen3-235B remain parked without a quality verdict. Any
+further teacher experiment must fit dl02.
 
 This does not approve the teacher. The repository's acceptance bar remains
 10/12 frozen cases plus 27/30 fresh cases, with zero hard-rule or factual
@@ -44,7 +46,15 @@ The candidate kept the Seed/Hermes teacher, Llama production baseline, and Qwen
 judge in separate families, but quality still failed decisively. It is not an
 approved teacher and not a reason to weaken or regenerate the frozen cases.
 
-## Next dl02 candidate: GLM-4.7-Flash
+## Rejected dl02 candidate: GLM-4.7-Flash
+
+**Result: rejected on 2026-08-12.** The pinned Q8 fully offloaded 48/48 layers
+across dl02's two GPUs, rendered the supplied system message with thinking
+disabled, and decoded at about 116 tokens/s. Row 1 was a narrow but weakly
+voiced pass with no mechanical or factual failure. Row 2 produced no accepted
+conversation after seven retries; failed bodies are not retained, so only the
+final speaker-count error can be stated. This is an incomplete frozen screen,
+not a 1/12 quality score.
 
 | Check | Finding |
 | --- | --- |
@@ -59,15 +69,13 @@ approved teacher and not a reason to weaken or regenerate the frozen cases.
 Minimal serving shape:
 
 ```sh
-llama-server -m GLM-4.7-Flash-Q8_0.gguf --jinja \
-  --chat-template-kwargs '{"enable_thinking":false}' \
-  -ngl 99 -sm layer -ts 3,2 -c 8192 --port 8080
+llama-server -m GLM-4.7-Flash-Q8_0.gguf --jinja --reasoning off \
+  --reasoning-format none -ngl all --fit off -sm layer -ts 3,2 \
+  -c 8192 --port 8080
 ```
 
-Expose port 8080 only through the existing SSH loopback pattern and run the
-unchanged frozen 12 into a fresh `trainer/out/m2-glm47-flash-screen` directory
-with `TEACHER_TEMPERATURE=0.15`. Do not run the fresh 30 unless it first clears
-10/12 with zero hard or factual failures.
+The screen used an SSH loopback and `TEACHER_TEMPERATURE=0.15`. Its retained
+artifact is local under `trainer/out/m2-glm47-flash-screen`; do not resume it.
 
 This is a license-and-access assessment under the repository's existing IP
 policy, not independent legal clearance for Team Salvato character rights.

@@ -107,8 +107,13 @@ failed screen reproducible.
 The no-spend self-hosted Hermes 4.3 36B screen completed all 12 structurally
 valid rows on 2026-08-12, but strict review passed only 2/12. It belittled the
 small success in row 2, missed several required intents and reply shapes, and
-had one sentence-count violation. Do not run its fresh 30. The next candidate
-is GLM-4.7-Flash Q8_0 on dl02; rented accelerators are out of scope. See
+had one sentence-count violation. Do not run its fresh 30.
+
+GLM-4.7-Flash Q8_0 then passed the dl02 offload/template probe and persisted one
+weakly voiced frozen row. Row 2 exhausted seven retries without an accepted
+two-speaker conversation; the final error was `expected 2 speakers, got 1`.
+Reject the incomplete screen and do not run its fresh 30. No teacher is queued;
+future screens must fit dl02. See
 [`docs/m2-teacher-scout.md`](../docs/m2-teacher-scout.md). M3 remains blocked.
 
 ## M2 canon-only probe
