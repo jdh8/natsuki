@@ -102,8 +102,14 @@ The next Groq candidate, `qwen/qwen3.6-27b`, was rejected at row 2: row 1
 narrowly passed, but row 2 failed the required speaker/message shape through
 all seven retries and its inspected reply belittled a sincere success. The
 runner handles that model's non-thinking JSON Object Mode only to keep the
-failed screen reproducible. The next candidate is self-hosted Mistral Large 3;
-see [`docs/m2-teacher-scout.md`](../docs/m2-teacher-scout.md).
+failed screen reproducible.
+
+The no-spend self-hosted Hermes 4.3 36B screen completed all 12 structurally
+valid rows on 2026-08-12, but strict review passed only 2/12. It belittled the
+small success in row 2, missed several required intents and reply shapes, and
+had one sentence-count violation. Do not run its fresh 30. The next candidate
+is self-hosted Mistral Large 3; see
+[`docs/m2-teacher-scout.md`](../docs/m2-teacher-scout.md). M3 remains blocked.
 
 ## M2 canon-only probe
 

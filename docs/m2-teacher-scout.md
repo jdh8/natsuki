@@ -5,16 +5,42 @@ documentation, release notes, and license terms.
 
 ## Decision
 
-Screen **`mistralai/Mistral-Large-3-675B-Instruct-2512` first**. If it fails,
+Screen **`mistralai/Mistral-Large-3-675B-Instruct-2512` next**. If it fails,
 screen **`Qwen/Qwen3-235B-A22B-Instruct-2507`** as the one fallback.
 
 This does not approve either teacher. The repository's acceptance bar remains
 10/12 frozen cases plus 27/30 fresh cases, with zero hard-rule or factual
 failures. `openai/gpt-oss-120b` and
-`mistralai/Mistral-Small-3.2-24B-Instruct-2506` have already been screened and
-are not candidates. As required by [`trainer/README.md`](../trainer/README.md),
+`mistralai/Mistral-Small-3.2-24B-Instruct-2506` have already been screened;
+`qwen/qwen3.6-27b` also failed and conflicts with the current judge. None is a
+candidate. The no-spend Hermes screen below also failed. As required by
+[`trainer/README.md`](../trainer/README.md),
 only the original voice card and synthetic attribute tuple may reach a teacher;
 M1/canon text must stay local.
+
+## Addendum 2026-08-12: no-spend Hermes screen
+
+**Result: rejected on 2026-08-12.** `NousResearch/Hermes-4.3-36B-GGUF`
+completed all 12 frozen rows on dl02 with valid structure and no template or
+thinking-token leakage. Strict all-attribute review passed 2/12 cases;
+independent whole-conversation reviews ranged from 2-3/12. Row 2 belittled a
+sincere success in direct violation of voice rule 18, several rows missed their
+required intent or reply shape, and row 9 had the sole mechanical
+`sentence_count` violation. No definite factual falsehood was needed to reject
+it. Do not run the fresh 30; self-hosted Mistral Large 3 is next.
+
+| Check | Finding |
+| --- | --- |
+| Lineage | Hermes 4.3 36B is Nous's chat/instruct post-training of `ByteDance-Seed/Seed-OSS-36B-Base`, not Seed-OSS Instruct or a Llama/Qwen derivative. Both the repository metadata and Hugging Face model relation name that exact base. [Hermes model card and relation](https://huggingface.co/NousResearch/Hermes-4.3-36B/tree/3899db2b6c4b35f16bde3b570bb7dd2775d56161), [Seed-OSS base card](https://huggingface.co/ByteDance-Seed/Seed-OSS-36B-Base/blob/866afe247a1b86c297a2343900a6aa63747d2a67/MODEL_CARD.md) |
+| License / distillation | Nous designates both the BF16 and GGUF repositories Apache-2.0; the exact base ships the standard Apache-2.0 text. There is no naming or anti-distillation term and self-hosting adds no provider contract, so the repository's conservative treatment of synthetic-output distillation as a derivative is compatible with the standard use, modification, and redistribution grants. The Hermes trees do not contain a separate license/NOTICE file: preserve the base license and archive Nous's license designation before publishing. The Seed model card's use guidance expressly says it does not modify the license. [Hermes BF16](https://huggingface.co/NousResearch/Hermes-4.3-36B/tree/3899db2b6c4b35f16bde3b570bb7dd2775d56161), [official GGUF](https://huggingface.co/NousResearch/Hermes-4.3-36B-GGUF/tree/9ce6f623874b8e9cb7617c399b67cec820b7a594), [base license](https://huggingface.co/ByteDance-Seed/Seed-OSS-36B-Base/blob/866afe247a1b86c297a2343900a6aa63747d2a67/LICENSE.txt) |
+| Mode / prompt | This is a hybrid reasoning model, not a fixed non-reasoning checkpoint. Its official Jinja nevertheless defaults `thinking=false`; reasoning and `<think>` output require `thinking=True` or the documented reasoning prompt. A supplied first system message replaces the vendor default, so M2's voice card is the only system prompt. Keep thinking disabled and retain the existing special-token gate. Hugging Face exposes parsed GGUF template metadata at repository rather than per-file level, so confirm the Q4 rendering after download before the screen. [Official prompt documentation](https://huggingface.co/NousResearch/Hermes-4.3-36B/blob/3899db2b6c4b35f16bde3b570bb7dd2775d56161/README.md#reasoning-mode), [exact chat template](https://huggingface.co/NousResearch/Hermes-4.3-36B/blob/3899db2b6c4b35f16bde3b570bb7dd2775d56161/chat_template.jinja) |
+| Structure / system steering | Nous says the post-training explicitly targets schema-faithful JSON, malformed-object repair, creativity, and steerability. The template accepts the caller's system message, and the pinned llama.cpp server parses the runner's OpenAI-style `response_format: json_schema` into a grammar. These are relevant claims, not proof of this conversation schema; structural retries remain failures. [Official model card](https://huggingface.co/NousResearch/Hermes-4.3-36B/blob/3899db2b6c4b35f16bde3b570bb7dd2775d56161/README.md#whats-new-vs-hermes-3), [pinned llama.cpp parser](https://github.com/ggml-org/llama.cpp/blob/74ce15741b420b8d6f12e720398458b576c51c2c/tools/server/server-common.cpp#L939-L952) |
+| Exact Q4 artifact | `hermes-4_3_36b-Q4_K_M.gguf` at repository revision `9ce6f623874b8e9cb7617c399b67cec820b7a594`: **21,762,145,216 bytes** (20.27 GiB), SHA-256/LFS OID `17823599694fa3503ef54bf748d5078c6ce881f4d01616cafa255dc05d215a08`. The file itself was last changed in commit `e6cfb17bc2a4287a7b9982df186b8c87b6de445c`. Do not place a 20.27-GiB weight file plus KV/runtime buffers on dl02's 24-GB card alone; split inference across its two GPUs. [Pinned tree](https://huggingface.co/NousResearch/Hermes-4.3-36B-GGUF/tree/9ce6f623874b8e9cb7617c399b67cec820b7a594), [raw LFS pointer](https://huggingface.co/NousResearch/Hermes-4.3-36B-GGUF/raw/9ce6f623874b8e9cb7617c399b67cec820b7a594/hermes-4_3_36b-Q4_K_M.gguf) |
+| Quality case | Nous reports 77.9 IFEval, 87.7 MMLU, 80.7 MMLU-Pro, and 74.60% answered on its non-reasoning RefusalBench lane. That is enough first-party evidence for a free bounded screen because instruction following, knowledge, low refusal, JSON training, and steerability all address prior teacher failures. It is not enough for approval: the same card reports only 6.0 SimpleQA, labels the model for roleplay, and gives no Q4-specific quality result. The 12-row gate must therefore reject the first factual, persona/register, roleplay-structure, or schema failure. [Official benchmark table](https://huggingface.co/NousResearch/Hermes-4.3-36B/blob/3899db2b6c4b35f16bde3b570bb7dd2775d56161/README.md#benchmarks-hermes-43-36b) |
+
+The candidate kept the Seed/Hermes teacher, Llama production baseline, and Qwen
+judge in separate families, but quality still failed decisively. It is not an
+approved teacher and not a reason to weaken or regenerate the frozen cases.
 
 ## First candidate: Mistral Large 3
 
