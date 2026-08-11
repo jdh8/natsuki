@@ -63,6 +63,10 @@ fn get_commands() -> Vec<poise::Command<Data, anyhow::Error>> {
     ]
 }
 
+fn env_nonempty(key: &str) -> Option<String> {
+    env::var(key).ok().filter(|value| !value.is_empty())
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     use serenity::{ClientBuilder, GatewayIntents, GuildId};
@@ -71,7 +75,9 @@ async fn main() -> anyhow::Result<()> {
     const INTENTS: GatewayIntents = GatewayIntents::non_privileged();
     let token = env::var("TOKEN")?;
 
-    let poster = env::var("TOP_GG_TOKEN").map(|token| {
+    // Empty environment variables count as unset so one Compose file can
+    // serve both prod (no GUILD) and dev (no TOP_GG_TOKEN).
+    let poster = env_nonempty("TOP_GG_TOKEN").map(|token| {
         let client = topgg::Client::new(token);
         topgg::Autoposter::serenity(&client, std::time::Duration::from_secs(10800)).handler()
     });
@@ -87,15 +93,14 @@ async fn main() -> anyhow::Result<()> {
         .setup(|ctx, _, framework| {
             Box::pin(async move {
                 let commands = &framework.options().commands;
-                match env::var("GUILD") {
-                    Ok(id) => {
+                match env_nonempty("GUILD") {
+                    Some(id) => {
                         let guild = GuildId::new(id.parse::<u64>()?);
                         poise::builtins::register_in_guild(ctx, commands, guild).await?;
                     }
-                    Err(env::VarError::NotPresent) => {
+                    None => {
                         poise::builtins::register_globally(ctx, commands).await?;
                     }
-                    Err(e) => return Err(e.into()),
                 }
                 let http = reqwest::Client::builder()
                     .timeout(std::time::Duration::from_secs(10))
@@ -121,8 +126,8 @@ async fn main() -> anyhow::Result<()> {
 
     let client = ClientBuilder::new(token, INTENTS).framework(framework);
     let client = match poster {
-        Ok(p) => client.event_handler_arc(p),
-        _ => client,
+        Some(p) => client.event_handler_arc(p),
+        None => client,
     };
 
     client.await?.start_autosharded().await?;

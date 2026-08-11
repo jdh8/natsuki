@@ -7,10 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- `deploy/setup` now picks the container engine by platform: Docker Compose
+  (`deploy/compose.yaml`) on Ubuntu, where the system daemon starts the
+  hardened containers at boot (lingering user managers proved unreliable
+  there), and rootless Podman Quadlets on Fedora.  Both paths keep the same
+  hardening: pinned images, read-only, cap-drop, no-new-privileges, and an
+  internal-only model network.
+- Empty `GUILD` and `TOP_GG_TOKEN` environment variables are now treated as
+  unset instead of crashing (empty `GUILD`) or posting with a blank token,
+  so one Compose file serves both prod and dev.
+
 ### Added
 - A hardened rootless Podman deployment for the Discord bot and `llama-server`,
   including a locked system account, private container network, Podman secrets,
   pinned images, NVIDIA CDI, and read-only Quadlet services.
+- The deploy wizard now supports Ubuntu 22.04+ alongside Fedora 43+.  On
+  Ubuntu it deploys with Docker Compose against the system daemon and
+  requires the NVIDIA container toolkit's `nvidia` Docker runtime.
 
 ### Changed
 - The deploy wizard now requires an explicit `prod` or `dev` argument and
@@ -18,6 +32,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   redeploys the same services with the selected credentials and configuration.
 - The deploy wizard now defaults to the cached stock Qwen3 GGUF when
   `MODEL_PATH` is not set.
+- Deployment now uses one shared workflow with Fedora and Ubuntu platform
+  adapters.  The entrypoint rejects versions below the supported minimum and
+  warns when a newer release is not in the explicitly targeted version matrix.
 
 ### Fixed
 - The deploy wizard now sets the `container_use_devices` SELinux boolean;

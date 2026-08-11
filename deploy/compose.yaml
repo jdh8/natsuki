@@ -1,0 +1,76 @@
+# Natsuki on plain Docker. The daemon is a system service, so this survives
+# reboots without lingering user managers.
+#
+# From the repo root:
+#   docker compose --env-file .env.prod -f deploy/compose.yaml up -d --build
+# (use .env.dev for the dev bot; the file supplies TOKEN, CHAT_API_KEY,
+# MODEL_PATH, and optionally GUILD and TOP_GG_TOKEN)
+
+name: natsuki
+
+services:
+  model:
+    image: ghcr.io/ggml-org/llama.cpp@sha256:dd0c408a4c3285f7809323ac17f85e70ef756bf67a3a30d4eed6805a8c1df16b
+    command: >-
+      --model /models/natsuki.gguf --alias natsuki --n-gpu-layers 99
+      --ctx-size 4096 --ubatch-size 128 --parallel 1 --flash-attn on
+      --host 0.0.0.0 --port 8080 --jinja --no-webui --no-slots --metrics
+    environment:
+      LLAMA_API_KEY: ${CHAT_API_KEY}
+    volumes:
+      - ${MODEL_PATH}:/models/natsuki.gguf:ro
+    networks: [internal]
+    user: "65532:65532"
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, http://localhost:8080/health]
+      interval: 30s
+      start_period: 5m
+      start_interval: 5s
+    deploy:
+      resources:
+        limits:
+          memory: 8g
+          pids: 256
+        reservations:
+          devices:
+            # ponytail: GPU 1 is the 4070 Ti SUPER on this box, keeping the
+            # 4090 free for training; parameterize if the host ever changes.
+            - driver: nvidia
+              device_ids: ["1"]
+              capabilities: [gpu]
+
+  bot:
+    build:
+      context: ..
+      dockerfile: deploy/Containerfile.bot
+    environment:
+      TOKEN: ${TOKEN}
+      GROQ_API_KEY: ${CHAT_API_KEY}
+      CHAT_URL: http://model:8080/v1/chat/completions
+      CHAT_MODEL: natsuki
+      GUILD: ${GUILD:-}
+      TOP_GG_TOKEN: ${TOP_GG_TOKEN:-}
+    networks: [internal, egress]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+    depends_on:
+      model:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+          pids: 128
+
+networks:
+  internal:
+    internal: true
+  egress: {}
