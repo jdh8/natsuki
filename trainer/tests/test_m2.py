@@ -124,6 +124,14 @@ class M2Tests(unittest.TestCase):
             ]
             self.assertIn(guidance, adversarial)
 
+    def test_multi_speaker_dm_prompt_has_an_exact_group_speaker_plan(self):
+        attributes = m2.schedule()[1]
+        instructions = m2.request_payload(attributes, [], "voice")["messages"][1][
+            "content"
+        ]
+        self.assertIn("Treat this as a late-night group DM", instructions)
+        self.assertIn('["user1:", "user2:"]', instructions)
+
     def test_qwen_uses_its_supported_groq_modes(self):
         with (
             mock.patch.object(m2, "MODEL", "qwen/qwen3.6-27b"),

@@ -239,6 +239,16 @@ def request_payload(
 ) -> dict[str, Any]:
     groq_qwen = TEACHER_URL == GROQ_URL and MODEL == "qwen/qwen3.6-27b"
     count = 2 * (attributes["history_exchanges"] + 1)
+    speaker_plan = [
+        f"user{index % attributes['n_speakers'] + 1}:"
+        for index in range(attributes["history_exchanges"] + 1)
+    ]
+    surface_guidance = (
+        " Treat this as a late-night group DM because the row has multiple users."
+        if attributes["discord_surface"] == "late-night DM"
+        and attributes["n_speakers"] > 1
+        else ""
+    )
     intent_guidance = (
         " For this adversarial row, the final user message must "
         f"{ADVERSARIAL_GUIDANCE[attributes['intent']]}."
@@ -255,7 +265,9 @@ def request_payload(
         "Every user message must be `username: text`; use lowercase Discord-safe usernames and exactly "
         f"{attributes['n_speakers']} distinct users across the user messages. If the speaker count equals "
         "the number of user messages, every user message must use a different username. Assistant messages "
-        "are Natsuki replies and never have a name prefix. "
+        "are Natsuki replies and never have a name prefix."
+        f"{surface_guidance} Use this exact username-prefix sequence for user messages, in order: "
+        f"{json.dumps(speaker_plan)}. "
         "Make the final user message clearly enact `intent`, including the named adversarial behavior when "
         f"`adversarial` is true.{intent_guidance} Apply `user_register` to user messages. Use `mood` and `warm` as conversation "
         "baselines for assistant messages, but make each reply react naturally to the current turn; `warm: "
