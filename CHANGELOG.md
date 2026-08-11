@@ -82,6 +82,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   added standard-library tests for extraction normalization/control flow, Plus
   type-tree compatibility, M2 quotas and message shape, retries/resume, and
   review counts. Production chat behavior is unchanged.
+- Added Groq Qwen3.6's non-thinking JSON Object Mode to the M2 screen and
+  recorded its rejection at row 2 after repeated speaker/schema failures. A
+  primary-source scout names self-hosted Mistral Large 3 as the next candidate
+  and Qwen3-235B Instruct 2507 as fallback; no canon text left the machine.
 
 ## [3.3.0] — 2026-08-10
 

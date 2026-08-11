@@ -478,9 +478,9 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   **Repair screen (2026-08-11): M2 remains open.**  `gpt-oss-120b` passed at
   most 1/6; Mistral produced one good row before missing intent and speaker
   invariants.  Neither qualifies, so M3 stays blocked.
-  Next: probe Qwen3-4B on 946 gold pairs plus ~500 public instruct rows.  Any
-  future teacher must pass 10/12 frozen and 27/30 fresh cases with zero hard or
-  factual failures.
+  The subsequent canon-only probe (below) was also negative.  Any future
+  teacher must pass 10/12 frozen and 27/30 fresh cases with zero hard or factual
+  failures.
 
   **Canon-only probe (2026-08-11): tooling landed** as
   `trainer/m2_probe.py` (`data` / `train` / `sniff` via the `./trainer/m2-probe`
@@ -517,6 +517,18 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   synthesis design is vindicated, and the teacher hunt remains M2's
   critical path.  The blinded pair review awaits human scoring at
   `trainer/out/m2-probe/blind-review.md`.
+
+  **Qwen3.6-27B screen (2026-08-11): rejected.**  Groq's Apache-2.0
+  `qwen/qwen3.6-27b` required non-thinking mode and JSON Object Mode because
+  Groq limits strict JSON Schema output to GPT-OSS.  After the transport was
+  made compatible, row 1 narrowly passed with sound cookie advice; row 2 still
+  failed the speaker/schema invariant through all seven retries.  A direct
+  inspection also belittled the user's sincere small success, violating voice
+  rule 18.  Stop at 1/2; do not tune the frozen screen around the failure.
+  No canon text was sent.  The next bounded candidate is self-hosted
+  `mistralai/Mistral-Large-3-675B-Instruct-2512`, with
+  `Qwen/Qwen3-235B-A22B-Instruct-2507` as fallback; the license and access
+  evidence is in [`m2-teacher-scout.md`](m2-teacher-scout.md).
 
 - ⬜ **M3 Generate and filter the corpus.**  *Deliverable:* ~2,500 filtered
   conversations, replay buckets, the 150-prompt held-out set.  *Measure:* no

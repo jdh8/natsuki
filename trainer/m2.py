@@ -237,6 +237,7 @@ def opening_bans(rows: Iterable[dict[str, Any]]) -> list[str]:
 def request_payload(
     attributes: dict[str, Any], bans: list[str], voice: str
 ) -> dict[str, Any]:
+    groq_qwen = TEACHER_URL == GROQ_URL and MODEL == "qwen/qwen3.6-27b"
     count = 2 * (attributes["history_exchanges"] + 1)
     intent_guidance = (
         " For this adversarial row, the final user message must "
@@ -248,7 +249,9 @@ def request_payload(
         "Generate one fictional Discord conversation. Do not begin an assistant reply "
         f"with any of these four-word openings: {json.dumps(bans)}\n\n"
         f"Attribute record:\n{json.dumps(attributes, sort_keys=True)}\n\n"
-        f"Return exactly {count} alternating messages, starting with user and ending with assistant. "
+        f"Return one JSON object with a single `messages` array containing exactly {count} alternating "
+        "messages, starting with user and ending with assistant. "
+        "Each array item must be an object with exactly two string fields: `role` and `content`. "
         "Every user message must be `username: text`; use lowercase Discord-safe usernames and exactly "
         f"{attributes['n_speakers']} distinct users across the user messages. If the speaker count equals "
         "the number of user messages, every user message must use a different username. Assistant messages "
@@ -271,18 +274,22 @@ def request_payload(
             {"role": "system", "content": voice},
             {"role": "user", "content": instructions},
         ],
-        "reasoning_effort": "medium",
+        "reasoning_effort": "none" if groq_qwen else "medium",
         "temperature": TEMPERATURE,
         "max_completion_tokens": 2048,
         "seed": attributes["seed"],
-        "response_format": {
-            "type": "json_schema",
-            "json_schema": {
-                "name": "natsuki_conversation",
-                "strict": True,
-                "schema": conversation_schema(),
-            },
-        },
+        "response_format": (
+            {"type": "json_object"}
+            if groq_qwen
+            else {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "natsuki_conversation",
+                    "strict": True,
+                    "schema": conversation_schema(),
+                },
+            }
+        ),
     }
 
 

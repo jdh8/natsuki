@@ -124,6 +124,17 @@ class M2Tests(unittest.TestCase):
             ]
             self.assertIn(guidance, adversarial)
 
+    def test_qwen_uses_its_supported_groq_modes(self):
+        with (
+            mock.patch.object(m2, "MODEL", "qwen/qwen3.6-27b"),
+            mock.patch.object(m2, "TEACHER_URL", m2.GROQ_URL),
+        ):
+            payload = m2.request_payload(m2.schedule()[0], [], "voice")
+        self.assertEqual(payload["reasoning_effort"], "none")
+        self.assertEqual(payload["response_format"], {"type": "json_object"})
+        self.assertIn("JSON object", payload["messages"][1]["content"])
+        self.assertIn("exactly two string fields", payload["messages"][1]["content"])
+
     def test_run_resumes_without_repeating_existing_id(self):
         grid = m2.schedule()
         recipe_sha256 = hashlib.sha256(

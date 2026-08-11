@@ -98,6 +98,13 @@ zero AI disclosures, zero self-prefixes, zero structural failures, and one
 sentence-count violation. These diagnostic results remain local under
 `trainer/out/m2/`.
 
+The next Groq candidate, `qwen/qwen3.6-27b`, was rejected at row 2: row 1
+narrowly passed, but row 2 failed the required speaker/message shape through
+all seven retries and its inspected reply belittled a sincere success. The
+runner handles that model's non-thinking JSON Object Mode only to keep the
+failed screen reproducible. The next candidate is self-hosted Mistral Large 3;
+see [`docs/m2-teacher-scout.md`](../docs/m2-teacher-scout.md).
+
 ## M2 canon-only probe
 
 With no approved teacher, the probe trains the student base directly on the
