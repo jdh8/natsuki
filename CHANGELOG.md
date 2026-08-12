@@ -51,6 +51,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the production prompt fails register the opposite way, so the synthetic
   corpus remains load-bearing and the M2 teacher hunt stays the critical
   path.  No user-facing behavior changes.
+- A hosted-API teacher hunt: a primary-source scout of big open-weight models
+  behind hosted endpoints, with a new provider-contract eligibility axis (no
+  output-training restriction; retention recorded), queueing Kimi K2.6 and
+  DeepSeek-V4-Flash-0731 behind the unchanged 12-row gate and a two-candidate
+  stop rule.  The M2 runner now sends `TEACHER_API_KEY` to hosted non-Groq
+  endpoints and disables hybrid-model thinking via OpenRouter's normalized
+  `reasoning` field.  No request is sent without operator approval; users are
+  unaffected until a teacher passes.
 
 ### Changed
 - The deploy wizard now requires an explicit `prod` or `dev` argument and

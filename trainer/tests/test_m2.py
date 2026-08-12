@@ -147,6 +147,16 @@ class M2Tests(unittest.TestCase):
         with mock.patch.object(m2, "TEACHER_URL", "http://localhost/teacher"):
             payload = m2.request_payload(m2.schedule()[0], [], "voice")
         self.assertNotIn("reasoning_effort", payload)
+        self.assertNotIn("reasoning", payload)
+        self.assertEqual(payload["response_format"]["type"], "json_schema")
+
+    def test_openrouter_teacher_disables_reasoning(self):
+        with mock.patch.object(
+            m2, "TEACHER_URL", "https://openrouter.ai/api/v1/chat/completions"
+        ):
+            payload = m2.request_payload(m2.schedule()[0], [], "voice")
+        self.assertEqual(payload["reasoning"], {"enabled": False})
+        self.assertNotIn("reasoning_effort", payload)
         self.assertEqual(payload["response_format"]["type"], "json_schema")
 
     def test_run_resumes_without_repeating_existing_id(self):
@@ -195,6 +205,35 @@ class M2Tests(unittest.TestCase):
             self.assertEqual(called, [grid[1]["id"]])
             self.assertEqual(set(keys), {"local"})
             self.assertEqual(len(m2.load_jsonl(output / "pilot.jsonl")), 2)
+
+    def test_run_uses_teacher_api_key_for_custom_endpoint(self):
+        keys = []
+
+        def fake_call(attributes, _bans, _voice, api_key, **_kwargs):
+            keys.append(api_key)
+            return messages_for(attributes)
+
+        with tempfile.TemporaryDirectory() as directory:
+            with (
+                mock.patch.dict(
+                    "os.environ",
+                    {"TEACHER_MODEL": m2.MODEL, "TEACHER_API_KEY": "sk-hosted"},
+                ),
+                mock.patch.object(
+                    m2, "TEACHER_URL", "https://example.com/v1/chat/completions"
+                ),
+                mock.patch.object(m2, "call_groq", fake_call),
+                mock.patch("sys.stderr", new=io.StringIO()),
+            ):
+                m2.run(
+                    Namespace(
+                        output_dir=Path(directory),
+                        seed=20260811,
+                        attempts=1,
+                        limit=1,
+                    )
+                )
+        self.assertEqual(keys, ["sk-hosted"])
 
     def test_run_rejects_rows_from_another_teacher_recipe(self):
         attributes = m2.schedule()[0]

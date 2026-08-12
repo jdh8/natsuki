@@ -11,7 +11,9 @@ rows, rows 4 and 5 had mechanical sentence-count failures, row 5 gave
 technically backwards and underqualified baking advice, and row 7 belittled
 sincere effort. Do not run its fresh 30. The current dl02 teacher hunt stops
 here. The user dropped H200 rentals, so Mistral Large 3 and Qwen3-235B remain
-parked without a quality verdict; M3 remains blocked.
+parked without a quality verdict; M3 remains blocked. The hunt has moved to
+hosted APIs — see the hosted-API hunt below; nothing is approved and no
+request has been sent.
 
 This does not approve the teacher. The repository's acceptance bar remains
 10/12 frozen cases plus 27/30 fresh cases, with zero hard-rule or factual
@@ -22,6 +24,96 @@ candidate. The no-spend Hermes screen below also failed. As required by
 [`trainer/README.md`](../trainer/README.md),
 only the original voice card and synthetic attribute tuple may reach a teacher;
 M1/canon text must stay local.
+
+## Hosted-API hunt (2026-08-12)
+
+The dl02 pool is exhausted, so the hunt moves to big open-weight models behind
+cheap hosted APIs — no rental. The egress rule is unchanged: only the original
+voice card and the synthetic attribute tuple leave the machine. Hosting adds
+one eligibility axis the dl02 screens never needed, the **provider contract**:
+the serving endpoint's terms must not restrict using outputs to train a
+published model, and its retention/training-on-inputs stance is recorded
+before any request. Everything else is unchanged — the 10/12 frozen plus
+27/30 fresh gate with zero hard or factual failures, fresh output directories,
+and a bounded stop rule: **at most the two queued candidates below; if both
+fail, this hunt closes like the dl02 hunt did.**
+
+**Status: no request sent, no hosted candidate screened or approved.** The
+runner now accepts `TEACHER_API_KEY` for hosted non-Groq endpoints and forces
+OpenRouter's normalized `reasoning: {"enabled": false}` so hybrid teachers
+cannot leak thinking tokens. Before either 12-row screen, a one-row probe in a
+throwaway directory must confirm the endpoint honors `json_schema`, `seed`,
+and `max_completion_tokens`, and that no think content appears; screening
+starts only on operator approval of the provider account and spend (screen
+ceiling ≈ $1).
+
+### Queued candidate 1: Kimi K2.6, thinking disabled
+
+| Check | Finding |
+| --- | --- |
+| Exact checkpoint | `moonshotai/Kimi-K2.6` at revision `7eb5002f6aadc958aed6a9177b7ed26bb94011bb`: 1T-total/32B-active MoE, 256K context. It is the newest Kimi whose thinking can be disabled server-side; Kimi K3 ("always has thinking enabled") and K2.7-Code (thinking always on) are disqualified, and K2.5/K2-Instruct are sunset or discontinued on the vendor platform. [Pinned tree](https://huggingface.co/moonshotai/Kimi-K2.6/tree/7eb5002f6aadc958aed6a9177b7ed26bb94011bb), [K3 card](https://huggingface.co/moonshotai/Kimi-K3) |
+| License / distillation | Modified MIT whose sole modification requires displaying "Kimi K2.6" only in products exceeding 100M monthly active users or US$20M monthly revenue — unreachable here. No anti-distillation or output-use term; standard MIT grant otherwise, so publishing the student and corpus is unencumbered. [Pinned LICENSE](https://huggingface.co/moonshotai/Kimi-K2.6/raw/7eb5002f6aadc958aed6a9177b7ed26bb94011bb/LICENSE) |
+| Family independence | Moonshot's own 1T MoE pretrain (15.5T tokens, MuonClip; K2.5/K2.6 continue Kimi-K2-Base). DeepSeek-style MLA/MoE architecture but an independent training run — separate from the Qwen judge and control, the Granite and Ministral students, and every rejected family. [K2-Instruct card](https://huggingface.co/moonshotai/Kimi-K2-Instruct), [Kimi-K2.5 card](https://huggingface.co/moonshotai/Kimi-K2.5) |
+| Endpoint | OpenRouter `https://openrouter.ai/api/v1/chat/completions`, model `moonshotai/kimi-k2.6` — about 21 interchangeable providers with structured outputs (DeepInfra fp4, Crusoe bf16, Fireworks, Together, …). Pin providers or enable OpenRouter's train-opt-out and ZDR data-policy filtering in the account. Groq hosts no Kimi today (`kimi-k2-instruct-0905` shut down 2026-04-15), and Moonshot's first-party platform is rejected as a venue: its ToS uses Customer Content "to provide, maintain, develop, support, and improve the Services" by default and prohibits building "models that have potential competitive possibilities with the Services". [Endpoint list](https://openrouter.ai/api/v1/models/moonshotai/kimi-k2.6/endpoints), [Groq deprecations](https://console.groq.com/docs/deprecations), [Moonshot model-use terms](https://platform.kimi.ai/docs/agreement/modeluse.md) |
+| Provider contract | OpenRouter: "Where possible, OpenRouter has opted out of model training with the Models it uses"; prompt logging is opt-in and providers are filterable by data policy. DeepInfra (a pinnable underlying host): "We do not use data you submit to our APIs for training models"; inputs/outputs are not stored beyond the request. [OpenRouter privacy docs](https://openrouter.ai/docs/features/privacy-and-logging), [DeepInfra data privacy](https://docs.deepinfra.com/account/data-privacy) |
+| Mode / transport | Thinking is on by default and disabled per request; through OpenRouter the normalized `reasoning: {"enabled": false}` field is documented for this model. Vendor caveat on structured output: "`kimi-k2.6` occasionally behaves unstably with complex schemas" — M2's single flat object plus the seven-retry budget matches the vendor's own "prefer simple schemas and add a second validation layer" guidance, and the first structural failure still rejects. [Thinking-model guide](https://platform.kimi.ai/docs/guide/use-thinking-models.md), [response_format guide](https://platform.kimi.ai/docs/guide/response_format.md), [OpenRouter reasoning docs](https://openrouter.ai/docs/use-cases/reasoning-tokens) |
+| Quality case | EQ-Bench Creative Writing v3 Elo **1709.6** (secondary, LLM-judged; the scored run's thinking mode is unstated) — the best measured score of any eligible candidate, above its entire K2 lineage, from the family whose frontier K3 ranks #2 overall on that board. The vendor's own K2.6 card markets coding/agentic work, not persona writing, so these numbers justify the screen and nothing more; the unchanged gate is decisive. [EQ-Bench board](https://eqbench.com/creative_writing.html) |
+| Cost | ≈$0.95/1M in, $4.00/1M out class across hosts: 12-row screen ≈ $0.10 nominal, under $1 at the full retry budget. [Kimi pricing](https://platform.kimi.ai/docs/pricing/chat-k26.md) |
+
+### Queued candidate 2: DeepSeek-V4-Flash-0731
+
+| Check | Finding |
+| --- | --- |
+| Exact checkpoint | `deepseek-ai/DeepSeek-V4-Flash-0731` at revision `7872f01b1d1fe23eabc4c98b48bffcef5a386062`: 284B-total/13B-active MoE (the 304B tensor count includes an attached speculative-decoding draft module), 1M context; the official release superseding the preview and the retired V3.2/`deepseek-chat` line. DeepSeek-V4-Pro (1.6T/49B active) is the roughly 12×-dearer quality ceiling. [Pinned tree](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731/tree/7872f01b1d1fe23eabc4c98b48bffcef5a386062), [V4 launch note](https://api-docs.deepseek.com/news/news260424) |
+| License / distillation | Stock MIT at the pinned LICENSE — no naming, anti-distillation, or use restriction. DeepSeek's own platform ToS §4.2 additionally assigns output rights and expressly permits "training other models (such as model distillation)" — the strongest origin-side distillation grant in the pool. [Pinned LICENSE](https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731/blob/7872f01b1d1fe23eabc4c98b48bffcef5a386062/LICENSE), [Open Platform ToS](https://cdn.deepseek.com/policies/en-US/deepseek-open-platform-terms-of-service.html) |
+| Family independence | From-scratch DeepSeek lineage (V2→V3→V4, own `DeepseekV4ForCausalLM` architecture, 32T-token pretrain) — independent of the judge, students, and every rejected family. [V4-Pro card](https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro), [tech report](https://arxiv.org/abs/2606.19348) |
+| Endpoint | DeepInfra `https://api.deepinfra.com/v1/openai/chat/completions`, model `deepseek-ai/DeepSeek-V4-Flash-0731` — strict `json_schema`, `seed`, documented `reasoning_effort: "none"`, $0.08/$0.18 per 1M, fp4 matching the release-native expert precision. The official `api.deepseek.com` is rejected as a venue: `json_object` only with a documented empty-content bug, no seed, and inputs retained and trainable-on in the PRC. OpenRouter `deepseek/deepseek-v4-flash-0731` is the one-account alternative (DeepInfra underneath). [DeepInfra model](https://deepinfra.com/deepseek-ai/DeepSeek-V4-Flash-0731), [structured-output docs](https://docs.deepinfra.com/chat/structured-outputs), [DeepSeek API reference](https://api-docs.deepseek.com/api/create-chat-completion), [JSON-mode guide](https://api-docs.deepseek.com/guides/json_mode) |
+| Provider contract | DeepInfra: "We will not store, sell or train on your Submissions, unless you explicitly requested a model to be trained"; may briefly store some submissions for debugging; no output-use restriction. [Terms](https://deepinfra.com/terms), [privacy](https://deepinfra.com/privacy) |
+| Mode / transport | V4 defaults to thinking **enabled** — the off-knob must ride every request (`reasoning_effort: "none"` on DeepInfra, the normalized `reasoning` field via OpenRouter), and the one-row probe must show zero think leakage before the screen. [Thinking-mode guide](https://api-docs.deepseek.com/guides/thinking_mode) |
+| Quality case | EQ-Bench Creative Writing Elo **1554.2** for the *preview* Flash (V4-Pro 1568.7; 0731's creative performance is unmeasured and its release notes emphasize agentic gains) — above Gemini-3-Pro-preview and its own V3.2, well below K2.6's 1709.6, hence second in the queue. The preview checkpoint remains addressable as a fallback on the same weights family. [EQ-Bench board](https://eqbench.com/creative_writing.html) |
+| Cost | ≈$0.01 nominal, ≈$0.04 worst case per 12-row screen on DeepInfra; even a full ~5k-sample corpus is ≈$5. |
+
+### Parked hosted candidates (no quality verdict)
+
+- **GLM-5.2** — MIT, 1M context, thinking disablable, 30+ hosts from
+  $0.75/$2.36, and the **highest measured eligible writer** (EQ-Bench CW
+  1719.7). Parked only for the family's negative prior: GLM-4.7-Flash failed
+  the frozen screen and belittled in the repaired diagnostic. It outranks
+  both queued candidates if that prior is waived.
+  [Pinned tree](https://huggingface.co/zai-org/GLM-5.2/tree/b4734de4facf877f85769a911abafc5283eab3d9)
+- **LongCat-2.0** (Meituan, MIT, 1.6T/48B active) — the only clean pass with a
+  writing benchmark (vendor WritingBench 83.8 vs Claude Opus 4.8's 85.2), but
+  its sole OpenRouter provider exposes no `response_format`, first-party
+  `json_schema` support is unverified, and host retention terms are
+  unverified. [Pinned tree](https://huggingface.co/meituan-longcat/LongCat-2.0/tree/834bf5ffe3047aa9f6cc7a64a9bc068b146b8274)
+- **Hy3** (Tencent, Apache-2.0 since the 2026-07-06 full release; the old
+  territory-excluded Hunyuan community license is gone) — non-thinking by
+  default and the cheapest schema-capable option ($0.13/$0.53 with strict
+  `json_schema` on DeepInfra), but 21B active with zero public writing
+  evidence — the budget alternate. [Pinned tree](https://huggingface.co/tencent/Hy3/tree/a960ebc3da325ba167f069f76c41eb62c9280d22)
+- **Ling-2.6-1T** (Ant Group, MIT, fixed non-thinking instruct) — structured
+  outputs at promo $0.075/$0.625, but the weakest measured intelligence in
+  the pool. [Pinned tree](https://huggingface.co/inclusionAI/Ling-2.6-1T/tree/07b9e26bb1f97494b4fd62eed83f22722ffd560a)
+- **Nemotron 3 Ultra** (NVIDIA, OpenMDW-1.1 — permissive, no guardrail-
+  termination clause of the old NVIDIA Open Model License) — schema-capable at
+  $0.50/$2.20, but STEM/agent-tuned with no RP record and a gated model card.
+
+### Disqualified hosted candidates
+
+- **Kimi K3, Kimi K2.7-Code, MiniMax M2.5/M3, Thinking Machines Inkling** —
+  thinking cannot be disabled. MiniMax M2.7 additionally relicensed
+  non-commercial; treat the MiniMax family as governance-risky (retroactive
+  relicensing).
+- **xAI Grok** — expressly anti-distillation: "You may not use the Materials,
+  derivatives, or outputs (including generated data) to train, create, or
+  improve any foundational, large language, or general-purpose AI models…";
+  Grok 3 weights remain unreleased.
+  [Grok-2 license](https://huggingface.co/xai-org/grok-2/raw/main/LICENSE)
+- **ERNIE 4.5/5.0** — hosting collapsed / flagship closed. **Cohere Command
+  A+** — Apache-2.0 at last, but first-party-only at 4–18× peer pricing.
+  **K-EXAONE-2.0-750B** — Apache-2.0, released 2026-07-31, no hosting yet.
+  **Gemma 4** — Apache-2.0 now but ≤31B, below the capability bar. **Trinity
+  Large** — no paid non-thinking endpoint.
 
 ## Addendum 2026-08-12: no-spend Hermes screen
 

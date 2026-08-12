@@ -22,7 +22,7 @@ correction is what appears here.  Anything still unverified says so.
 | Backend switch | `CHAT_URL` + `CHAT_MODEL`, Groq defaults preserved |
 | Publishing | Weights + synthetic corpus + recipe.  Canon-derived rows withheld. |
 | Base model | `Qwen/Qwen3-4B-Instruct-2507` (Apache-2.0) |
-| Teacher | None approved or queued; final dl02 candidate Olmo 3.1 failed; no rental |
+| Teacher | None approved; hosted hunt queues Kimi K2.6 then DeepSeek-V4-Flash-0731, awaiting operator go; no rental |
 | A/B baseline | `llama-3.3-70b-versatile` — today's production behaviour |
 | Judge | `qwen/qwen3.6-27b` — distinct from teacher and baseline |
 
@@ -560,6 +560,22 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   run its fresh 30.  No teacher is approved or queued, the current dl02 teacher
   hunt stops here, rented accelerators remain out of scope, and M3 remains
   blocked.
+
+  **Hosted-API hunt opened (2026-08-12): two candidates queued, none
+  screened.**  With the dl02 pool exhausted, a fresh primary-source scout
+  moved the hunt to big open-weight models behind hosted APIs and added a
+  provider-contract eligibility axis (no output-training restriction;
+  retention/training-on-inputs recorded before any request).  The queue:
+  **Kimi K2.6** with thinking disabled (Modified MIT, the best measured
+  eligible writer at EQ-Bench CW 1709.6, via OpenRouter with provider
+  pinning), then **DeepSeek-V4-Flash-0731** (stock MIT, origin ToS expressly
+  permits distillation, strict JSON schema plus seed on DeepInfra).  The M2
+  runner gained `TEACHER_API_KEY` for hosted endpoints and forces thinking
+  off through OpenRouter's normalized `reasoning` field.  At most these two
+  candidates; if both fail, the hosted hunt closes.  No request has been
+  sent — screening starts only on operator approval of the provider account
+  and spend (≈$1 ceiling per screen).  Evidence and per-candidate tables:
+  [`m2-teacher-scout.md`](m2-teacher-scout.md).
 
 - ⬜ **M3 Generate and filter the corpus.**  *Deliverable:* ~2,500 filtered
   conversations, replay buckets, the 150-prompt held-out set.  *Measure:* no

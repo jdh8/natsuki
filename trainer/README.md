@@ -75,8 +75,9 @@ uv run --project trainer python trainer/m2.py run \
   --output-dir trainer/out/m2-candidate
 ```
 
-Custom endpoints receive no secret API key; use a loopback SSH tunnel for a
-remote local server. The hosted Groq endpoint instead requires
+Custom endpoints send no secret unless `TEACHER_API_KEY` is set: leave it
+unset (with a loopback SSH tunnel) for a remote local server, set it for a
+hosted OpenAI-compatible provider. The Groq endpoint instead requires
 `GROQ_API_KEY`. Each row records the model, endpoint, temperature, and recipe
 fingerprint, so resume rejects mixed experiments.
 
@@ -120,8 +121,17 @@ offloaded 65/65 layers and completed all 12 frozen rows, but both independent
 strict reviews passed only 2/12. Rows 4 and 5 exceeded the sentence limit, row
 5 gave backwards and underqualified baking advice, and row 7 belittled sincere
 effort. Do not run its fresh 30. No teacher is approved or queued; the current
-teacher hunt stops here and M3 remains blocked. See
+dl02 teacher hunt stops here and M3 remains blocked. See
 [`docs/m2-teacher-scout.md`](../docs/m2-teacher-scout.md).
+
+The hunt has moved to hosted APIs: Kimi K2.6 (OpenRouter, thinking disabled)
+and then DeepSeek-V4-Flash-0731 (DeepInfra) are queued, pending operator
+approval of the provider account and spend. Set `TEACHER_API_KEY` for such
+endpoints; requests to `openrouter.ai` automatically carry
+`reasoning: {"enabled": false}`. Before a 12-row screen, run a one-row
+`--limit 1` probe in a throwaway output directory to confirm the endpoint
+honors `json_schema`, `seed`, and `max_completion_tokens` and leaks no think
+content.
 
 ## M2 canon-only probe
 

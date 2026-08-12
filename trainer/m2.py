@@ -304,6 +304,10 @@ def request_payload(
     }
     if TEACHER_URL == GROQ_URL:
         payload["reasoning_effort"] = "none" if groq_qwen else "medium"
+    elif TEACHER_URL.startswith("https://openrouter.ai/"):
+        # Hybrid teachers default to thinking; force it off via OpenRouter's
+        # normalized knob so no <think> block reaches the token gate.
+        payload["reasoning"] = {"enabled": False}
     return payload
 
 
@@ -441,7 +445,7 @@ def run(args: argparse.Namespace) -> int:
         if not api_key:
             raise ValueError("GROQ_API_KEY is required for the hosted M2 teacher")
     else:
-        api_key = "local"
+        api_key = os.environ.get("TEACHER_API_KEY", "local")
     output = Path(args.output_dir)
     output.mkdir(parents=True, exist_ok=True)
     pilot_path = output / "pilot.jsonl"
