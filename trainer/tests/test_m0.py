@@ -1,5 +1,6 @@
 import csv
 import importlib.util
+import json
 import sys
 import tempfile
 import unittest
@@ -39,6 +40,19 @@ class PromptTests(unittest.TestCase):
             [],
         )
 
+    def test_in_character_inability_is_not_a_refusal(self):
+        self.assertEqual(M0.violations("Just because I'm short doesn't mean I can't reach it!"), [])
+
+    def test_length_is_measured_in_generated_tokens(self):
+        text = "Fine, dummy."
+        self.assertIn("too_long", M0.violations(text, M0.MAX_COMPLETION_TOKENS + 1))
+        self.assertEqual(M0.violations(text, M0.MAX_COMPLETION_TOKENS), [])
+        # Four punchy Discord fragments are short; the retired sentence count called them long.
+        self.assertEqual(M0.violations("Ugh. Fine. Whatever, dummy. Just eat it."), [])
+        # Unknown token counts skip the check rather than guessing from characters.
+        self.assertEqual(M0.violations(text), [])
+        self.assertEqual(M0.violations(text, None), [])
+
     def test_request_flags_author_prefix(self):
         response = mock.MagicMock(status=200)
         response.read.return_value = b'{"choices":[{"message":{"content":"Amy: Fine."}}]}'
@@ -57,6 +71,47 @@ class PromptTests(unittest.TestCase):
             result = M0.request_completion("http://example.test", "model", prompt, 1)
         self.assertIn("user_prefix", result["violations"])
         self.assertEqual(urlopen.call_args.args[0].get_header("Authorization"), "Bearer secret")
+
+
+class EvaluationSummaryTests(unittest.TestCase):
+    def write_sniff(self, directory, response, stored):
+        path = Path(directory) / "sniff.jsonl"
+        row = {
+            "model": "granite-q8",
+            "response": response,
+            "http_status": 200,
+            "elapsed_seconds": 1.0,
+            "usage": {"completion_tokens": 30},
+            "timings": {"prompt_per_second": 500.0, "predicted_per_second": 40.0},
+            "violations": stored,
+        }
+        with path.open("w", encoding="utf-8") as handle:
+            for index in range(20):
+                handle.write(json.dumps({**row, "prompt_id": f"{index:02d}"}) + "\n")
+        return path
+
+    def test_summary_without_scores_reports_the_mechanical_half_only(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = self.write_sniff(directory, "Fine, dummy.", [])
+            summary = M0.evaluation_summary([path], None, None)
+        model = summary["models"]["granite-q8"]
+        self.assertEqual(model["hard_rule_failure_prompts"], 0)
+        self.assertNotIn("blinded_scores", model)
+        self.assertNotIn("stock_skip_gate_passed", model)
+        self.assertNotIn("blinded_wins", summary)
+
+    def test_rescore_applies_current_rules_to_archived_rows(self):
+        # Archived rows carry the verdicts of the rules in force when they ran: a retired
+        # sentence count, and a refusal the narrowed pattern no longer calls one.  Only the
+        # row-only checks survive, because the text checker cannot recompute them.
+        with tempfile.TemporaryDirectory() as directory:
+            path = self.write_sniff(
+                directory,
+                "Just because I'm short doesn't mean I can't reach it!",
+                ["sentence_count", "refusal", "user_prefix"],
+            )
+            summary = M0.evaluation_summary([path], None, None)
+        self.assertEqual(summary["models"]["granite-q8"]["violation_counts"], {"user_prefix": 20})
 
 
 class VramTests(unittest.TestCase):

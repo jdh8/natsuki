@@ -1,14 +1,23 @@
 # Self-hosted Natsuki model
 
-Natsuki's chat feature calls a hosted 70B and steers it with a ~180-token system
-prompt ([`src/chat.rs`](../src/chat.rs)).  This document plans the replacement: a
-small model fine-tuned on this one persona, served from our own hardware.
+Natsuki's chat feature called a hosted 70B and steered it with a ~180-token
+system prompt ([`src/chat.rs`](../src/chat.rs)).  This document planned the
+replacement: a small model fine-tuned on this one persona, served from our own
+hardware.
 
-The bet is that a 4B specialist beats a prompted 70B **at being Natsuki**, while
-being much worse at everything else.  That trade is right here — the bot emits
-1-3 sentence tsundere replies and nothing else.
+**Outcome (2026-08-18): the serving half shipped, the fine-tuning half did
+not.**  Production runs stock `granite-4.1-3b` at Q8_0 on the RTX 4070 SUPER,
+steered by the same prompt.  M2-M7 are stopped — no teacher ever cleared the
+gate, and the stock model's remaining failures turned out to be prompt
+adherence that unquantized bf16 shares, so fine-tuning was not the cheapest fix
+for them.  The reasoning is under Milestones; the bet below is unresolved, not
+won.  Read the rest as the record of how that was decided.
 
-Legend: ⬜ not started · 🚧 in progress · ✅ done.
+The bet was that a small specialist beats a prompted 70B **at being Natsuki**,
+while being much worse at everything else.  That trade is right here — the bot
+emits short tsundere replies and nothing else.
+
+Legend: ⬜ not started · 🚧 in progress · ✅ done · ❌ stopped.
 
 Numbers below come from an 11-agent research pass in which every claim was
 independently fact-checked; where a checker corrected the original, the
@@ -23,9 +32,9 @@ correction is what appears here.  Anything still unverified says so.
 | Publishing | Weights + synthetic corpus + recipe.  Canon-derived rows withheld. |
 | Model-origin policy | Default to non-Chinese families; require an explicit, benchmark-backed exception when credible alternatives trail by roughly 1–2 model generations |
 | Base and deployed model | `ibm-granite/granite-4.1-3b` (Apache-2.0) |
-| Teacher | None approved; hosted hunt queues Kimi K2.6 then DeepSeek-V4-Flash-0731, awaiting operator go; no rental |
-| A/B baseline | `llama-3.3-70b-versatile` — today's production behaviour |
-| Judge | `openai/gpt-oss-120b` — distinct from teacher, student, and baseline |
+| Teacher | None — nine candidates screened and rejected; hunt closed with M2 |
+| A/B baseline | `llama-3.3-70b-versatile` — the behaviour Granite replaced |
+| Judge | Human, on `m0 blind` output; the LLM-judge tier was never built |
 
 A permissively licensed teacher is a deliberate choice.  Llama 3.3's Community License
 §1.b.i requires any *distributed* model distilled from Llama to be **named
@@ -93,10 +102,13 @@ available if the numbers come up short.
    in neither.
 3. **Artifacts carry a sidecar.**  pons ships metrics, data seed, and git SHA
    beside its weights because *"a model is meaningless without its exact feature
-   extractor; they version together."*  The analogue is direct — **a fine-tune is
-   meaningless without its exact system prompt and chat template.**  So
-   `natsuki.json` records base model, LoRA config, corpus seed and SHA, the
-   `SYSTEM_PROMPT` hash, a tokenized chat-template fixture, and eval scores.
+   extractor; they version together."*  The analogue is direct — **a persona is
+   meaningless without its exact system prompt and chat template.**  With
+   fine-tuning stopped there are no weights to ship, so the pairing lives in the
+   harness instead: `m0.py` reads [`src/prompt.txt`](../src/prompt.txt) rather
+   than holding a copy, and every sniff row records the exact system prompt it
+   was generated under.  That is what lets the archived M0 runs be re-scored
+   today — their recorded prompt still hashes to the deployed one.
 
 ## Stack
 
@@ -220,127 +232,6 @@ Weight `script-poemresponses` (349 formulaic lines) down; weight
 `script-exclusives-natsuki` (201 lines, the manga-closet scene, the best material
 in the game) up.
 
-### Synthesize — no canon in any prompt
-
-Team Salvato's IP guidelines state: *"Never upload any official Team Salvato
-assets to any generative AI model, software, or service (e.g. providing game
-dialogue to a chatbot)."*  Few-shotting a teacher with extracted lines is the
-literal example given, so the pipeline does not do it.  This is also better data
-engineering — few-shot exemplars get copied verbatim into outputs, which hurts
-diversity as much as it raises the IP question.
-
-Instead, hand-author a **voice card** (30-40 bullets, our own words: lexicon,
-sentence habits, topic map, stance toward each girl) and **6-10 contrastive
-anchors**.  The anchors are what actually defeat generic-anime-tsundere drift,
-because that stereotype is the model's prior and merely describing the target
-does not push against it.  *Generic: coy stuttering about romance.  Natsuki:
-blunt rudeness first, embarrassment second, and about being condescended to
-rather than about being liked.*  **Competence is the anti-generic anchor** — she
-has opinions about panel layout and about creaming butter properly.
-
-Sample one tuple per call from an attribute grid: `history_len`, `n_speakers`,
-`user_intent`, `natsuki_mood`, **`warmth_ratio`** (without it every reply is
-hostile and the bot reads one-note; canon Natsuki is warm 30-40% of the time),
-`reply_shape`, `user_register`, `discord_surface`, `seed_lexicon`.  Keep a
-rolling ban-list of the top-50 reply-opening 4-grams, placed *before* the varying
-scene block so the prefix stays cacheable.
-
-Generated conversations must match production shape exactly: user turns are
-`name: text` ([`src/chat.rs`](../src/chat.rs)), history is always even, always
-starts with a user turn, and strictly alternates — **the model never sees two
-consecutive user turns, so none should be generated.**  Multi-user crosstalk
-appears only as the name changing.  Usernames follow current Discord rules:
-lowercase, digits, `_`, `.`, 2-32 chars, no leading or trailing `.`/`_`.
-
-Reserve 15-20% for adversarial cases: identity probes (varied across ~40 samples,
-since this is the rule most likely to be memorized as one canned line), prompt
-injection, code requests (she must never emit a code block), arithmetic,
-real-world facts to deflect rather than hallucinate, hostility, keysmash,
-break-character requests, non-English input.  Past ~25% she turns evasive toward
-ordinary questions.
-
-### Filter, in order
-
-Structural check; self-prefix (anchored to the actual username set, since a
-generic `^\s*[A-Za-z0-9_.]{2,32}\s*:` wrongly deletes `12:30 is way too late,
-dummy`); length; assistant-isms and refusals, dropping the whole conversation
-rather than the turn; language ID; MinHash near-duplicates at Jaccard 0.7;
-semantic near-duplicates at 0.90 **on the English slice only**, since
-`potion-base-8M` descends from an English-only encoder and returns near-arbitrary
-cosines on the deliberately multilingual turns; an opener cap where no
-first-3-token prefix exceeds 1.5% of the corpus; and finally a **local canon
-scorer** that embeds the 1,189 unique canon lines and drops the bottom decile by
-`max_cos(canon) − mean_cos(generic_tsundere)`.  The scorer never leaves the
-machine.
-
-That opener cap is the single filter separating "sounds like Natsuki" from
-"starts every message with *Hmph*".
-
-### Targets
-
-| Stage | Count |
-| --- | --- |
-| Gold pairs | 946 |
-| Raw synthetic conversations | ~4,000 |
-| Post-filter | ~2,500 |
-| Replay: general prompts, in-character answers | ~750 (30%) |
-| Replay: public instruct data verbatim | ~500 (20%) |
-| **Total training rows** | **~3,750** |
-| Held-out eval | 150 prompts, 30 sealed |
-
-**Do not scale to 20,000.**  One teacher at one temperature yields
-near-duplicates that dedup collapses anyway, and both available data points
-(LIMA; arXiv 2511.10277) report that more synthetic data made results worse.
-Corpus quality dominates every other decision in this document — with only 1,189
-unique canon lines, the persona rests almost entirely on this stage.
-
-Pay for the API rather than grinding the free tier, whose daily token cap would
-stretch generation into months.  Order of magnitude is a few dollars via the
-Batch API, which has separate rate limits so the production bot keeps working
-meanwhile.  ⬜ `gpt-oss-120b`'s exact per-token price is still unchecked.
-
-## Training
-
-QLoRA, `r=16`, `alpha=32`, `target_modules="all-linear"`, lr 2e-4 cosine, warmup
-0.05, 2 epochs, effective batch 16, `max_length` 1024, `adamw_8bit`, early
-stopping on eval loss.  Roughly 1.7 h on the 4070, though that figure is
-extrapolated from a smaller model on a smaller card — read observed it/s off the
-first 20 steps and multiply out.
-
-Rank is the knob to leave alone.  On ~3,750 examples, rank is capacity to
-memorize verbatim; if the persona feels weak, raise data diversity instead.
-Track longest-n-gram overlap against the training set as a parroting detector,
-because nothing else catches it.
-
-**Response masking is mandatory.**  The system prompt is ~180 tokens against a
-20-40 token reply, so unmasked, most of the gradient memorizes a string that
-already lives in [`src/chat.rs`](../src/chat.rs) — and because user turns are
-`name: text`, it would actively train in the `name:` prefix the prompt forbids.
-Before any multi-hour run, assert the unmasked-token count is non-zero on a
-sample batch: `train_on_responses_only` leaves samples *fully* masked when no
-marker matches, silently.  Set `eos_token` explicitly too; a model that never
-stops is the most common first export failure.
-
-**Vary the system prompt.**  With one fixed prefix on every row, gradient descent
-has no reason to put the persona in the weights and we would have bought an
-expensive prompt cache.  Sample roughly a quarter each of: no system prompt,
-ultra-short, medium paraphrase, and the full production prompt.  PAFT
-(arXiv 2502.12859) reports +7% on unseen prompts, plateauing around 100 variants,
-so 10-20 hand-written ones capture most of the benefit.
-
-The trap inside that advice: varying the system prompt while holding targets
-identical teaches "system prompts do not affect me", which destroys steerability
-permanently.  Carve out a 10-15% slice where a *behavioural* instruction varies
-and the target obeys it — `"keep replies to one word"` yielding one word.  That
-slice doubles as eval material.
-
-**Replay mixing is the highest-value single decision.**  Thinking Machines Lab
-measured Qwen3-8B on IF-eval going 85% → **45%** on 100% narrow-domain data, and
-back to 79% at a 70/30 mix with Tulu-3, concluding *"there is no weighting which
-maintains the original IF-eval performance."*  Setting mismatch stated honestly:
-that was full-parameter midtraining on documents, not LoRA SFT on dialogue, so
-treat 85→45 as an upper bound on the damage and 30% replay as a floor.
-
 ## Deployment
 
 Merge the adapter into the **BF16** base — never a dequantized 4-bit one —
@@ -401,29 +292,28 @@ fails the build on "I want a llama plushie".  Keep identity phrases, drop bare
 vendor names.  At ≥97%: self-name prefix, length, loop detection.  Condition any
 CJK rule on input language, or it contradicts the non-English bucket.
 
-**Tier 1 — 150 held-out prompts, 30 of them sealed** and opened once at final
-go/no-go, because small models are trivially overfit to a visible eval set.
-Generate them from a different meta-prompt than the training data, hand-write the
-sealed 30, and **hold out attribute cells rather than just text** — reserve two
-`user_intent` values and one `natsuki_mood` entirely, or the eval only measures
-interpolation.  Assert zero survivors of a 5-gram Jaccard ≥0.4 de-leak check.
+**Length is measured in generated tokens.**  Sentence counting, the original
+rule, scored punctuation style rather than length: it passed a 220-character
+run-on and failed four punchy Discord fragments, which is the register the bot
+is aiming for.  Words undercount Japanese, which does not space-delimit, and so
+do characters — the non-English sniff reply is the longest generation in the
+granite-q8 run at 72 tokens but only 69 characters.  The caveat that comes with
+tokens: they are tokenizer-relative, so they compare runs of one model rather
+than two.  Granite spends 0.96 characters per token on Japanese against 3.83 on
+English, so a `too_long` on a non-English row deserves a read before it counts
+as a regression, and a cross-tokenizer bake-off wants characters as a check.
 
-**Tier 2 — capability regression.**  Run tinyMMLU / tinyHellaswag / tinyArc /
-tinyWinogrande across three configs — base FP16, fine-tuned FP16, fine-tuned
-quantized — to separate "the fine-tune made it dumber" from "the quantization
-made it dumber".  A >5pp drop is real; 0-3pp is noise.  Add a 20-prompt
-functional smoke (two-step instructions, arithmetic, 15-message coherence) to
-catch *"perfectly in character and completely incoherent"*.
+**Tier 1 — blinded pairwise review.**  `m0 blind` renders two sniff runs into
+Markdown with A/B order swapped deterministically per prompt, and a separate key
+file.  A human scores winner plus persona and coherence out of 5; `m0
+summarize-eval` resolves them through the key into `stock_skip_gate_passed`
+(zero hard-rule failures and both dimensions ≥4).  Omit `--scores`/`--key` to
+get the Tier 0 half alone, which needs no human and no GPU.
 
-**Tier 3 — pairwise A/B** against the prompted 70B, judged by `openai/gpt-oss-120b`
-at temperature 0 with forced JSON.  Run every pair twice with the order swapped
-and count a win only when both orderings agree; report judge consistency and
-treat anything under 70% as voiding the tier.
-
-Two bars decide the project: **the persona sub-score must beat the prompted 70B**
-— otherwise the fine-tune has no reason to exist and we ship the Groq prompt —
-and **non-disclosure must reach 4.8/5**, the one dimension where a 4B specialist
-should crush a generalist and the failure users actually notice.
+Tiers beyond this were specified against a fine-tune that no longer exists —
+held-out prompt sets, tinyMMLU-class capability regression, and an LLM-judged
+A/B against the prompted 70B.  See the git history if a future tuned model
+brings the question back.
 
 ## Milestones
 
@@ -490,144 +380,35 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   locked count with zero unresolved localization IDs on 2026-08-11; hashes and
   build IDs are recorded in the ignored report.  *Deps:* both DDLC installs.
 
-- 🚧 **M2 Pilot 100 synthetic conversations and read all 100 by hand.**
-  *Deliverable:* voice card, contrastive anchors, attribute grid, 100 samples.
-  *Measure:* violation counts for the two hard rules and for register.  *Deps:*
-  M1.  Do not skip this — it yields the real filter-attrition rate and, more
-  importantly, the ceiling on what the student can reach, since it inherits the
-  teacher's failure rate.  If the voice card is not producing recognizable
-  Natsuki at 100 samples, fix the prompt rather than scaling a broken template.
-  The real diagnostic-only pilot completed on 2026-08-11: all 100 unique rows
-  passed structural validation and were manually reviewed, with **51 register /
-  persona passes and 49 failures**, zero AI disclosures, zero self-prefixes, and
-  one sentence-count violation.  The failures remain in the pilot and did not
-  trigger an automatic rerun.
+- ❌ **M2-M7 Synthesize, train, quantize, evaluate, ship.  Stopped 2026-08-18.**
 
-  **Repair screen (2026-08-11): M2 remains open.**  `gpt-oss-120b` passed at
-  most 1/6; Mistral produced one good row before missing intent and speaker
-  invariants.  Neither qualifies, so M3 stays blocked.
-  The subsequent canon-only probe (below) was also negative.  Any future
-  teacher must pass 10/12 frozen and 27/30 fresh cases with zero hard or factual
-  failures.
+  Two independent reasons, either sufficient.
 
-  **Canon-only probe (2026-08-11): tooling landed** as
-  `trainer/m2_probe.py` (`data` / `train` / `sniff` via the `./trainer/m2-probe`
-  wrapper): QLoRA on the 946 gold pairs plus 500 Tulu-3 replay rows with
-  per-row system-prompt variants, the mandatory response-masking assertion,
-  a `probe.json` sidecar, and a sniff that feeds the existing M0 blind
-  review.  The active probe now uses Granite and writes to
-  `trainer/out/m2-granite-probe/`; the completed Qwen run below remains a
-  historical diagnostic.  The probe decides how much M3 must carry: if
-  canon-only beats stock Granite in the blinded 20-prompt review, the
-  synthetic corpus becomes augmentation rather than foundation; if not, its margin is the bar a
-  future teacher must clear.
+  *No corpus.*  Nine teacher candidates were screened and rejected in a row —
+  `gpt-oss-120b`, Mistral Small 3.2, Qwen3.6-27B, Hermes 4.3 36B, GLM-4.7-Flash,
+  and Olmo 3.1 32B all failed the frozen gate; Kimi K2.6 and DeepSeek-V4-Flash
+  were queued but never approved for spend.  The single pilot that completed
+  passed 51 of 100 rows.  The canon-only probe that ran without a teacher was
+  negative: it learned canon's brevity and lost the voice, because 946
+  script-register pairs teach theater dialogue, not Discord chat.
 
-  The first probe run caught the silent-template-substitution bug class this
-  document predicted for Ollama — on the *training* side: unsloth's model
-  mirror ships a thinking-style chat template that renders every assistant
-  turn as `<think>\n\n</think>\n\n<reply>`, so the first adapter opened
-  replies with think/tool_call token salad while the bare production header
-  never triggers it.  For that historical run, the official Instruct-2507
-  template was pinned verbatim in the repo and enforced at train and sniff
-  time; the pinned copy was removed after the Granite switch (see git
-  history).  The active Granite probe instead validates the official upstream
-  template and its response markers.  Fallout fix:
-  Tier 0's special-token regex never covered `<think>`/`<tool_call>` and
-  flagged 0 of 18 contaminated replies; `m0.py` now matches them.
+  *No need.*  Re-scoring the archived M0 sniffs under corrected rules leaves
+  stock Granite Q8 with two failures in twenty — a code block on
+  `11_code_request`, and `16_break_character` answered *"I'm sorry, but I must
+  maintain my character as Natsuki from Doki Doki Literature Club."*  Both are
+  prompt adherence, not capability: **unquantized bf16 produces a near-identical
+  meta-refusal, and so does Q5.**  A failure the full-precision base shares is
+  not one a 4-bit QLoRA fixes.  `src/prompt.txt` gained clauses aimed at both.
 
-  **Probe result (2026-08-11): canon-only training is not a path to ship.**
-  Two epochs converged cleanly (eval loss 2.15 → 1.54, no memorization), and
-  the adapter did learn canon's brevity — but it lost the voice: flat
-  replies, bare `...` responses, and replay-taught assistant-isms
-  (*"I'm sorry, but I can't fulfill that request"*, a Python code block)
-  that violate the hard rules.  Stock Qwen through the identical generation
-  path keeps a strong voice while failing register the opposite way
-  (16/20 over length, asterisk RP actions).  Mechanical score: 10 probe
-  violations vs 17 stock, but the persona difference is not close.  Reading:
-  946 script-register pairs teach *theater dialogue*, not Discord chat —
-  the synthetic corpus stays load-bearing, the doc's Discord-shaped
-  synthesis design is vindicated, and the teacher hunt remains M2's
-  critical path.  The blinded pair review awaits human scoring at
-  `trainer/out/m2-probe/blind-review.md`.
+  This is M0's stated off-ramp taken — *"if the stock model already holds
+  character, ship the prompted model and skip fine-tuning entirely"* — and the
+  gate in `m0.py` is still named `stock_skip_gate_passed` after it.
 
-  **Qwen3.6-27B screen (2026-08-11): rejected.**  Groq's Apache-2.0
-  `qwen/qwen3.6-27b` required non-thinking mode and JSON Object Mode because
-  Groq limits strict JSON Schema output to GPT-OSS.  After the transport was
-  made compatible, row 1 narrowly passed with sound cookie advice; row 2 still
-  failed the speaker/schema invariant through all seven retries.  A direct
-  inspection also belittled the user's sincere small success, violating voice
-  rule 18.  Stop at 1/2; do not tune the frozen screen around the failure.
-  No canon text was sent.  The later GLM attempt below also failed; the license
-  and access evidence is in [`m2-teacher-scout.md`](m2-teacher-scout.md).
-
-  **Hermes 4.3 36B screen (2026-08-12): rejected.**  The pinned official
-  Q4_K_M ran fully offloaded across dl02's two GPUs at about 33.5 tok/s.  Its
-  embedded template passed the system-message and non-thinking checks, and all
-  12 frozen rows passed structural validation without retries.  Content did
-  not: strict all-attribute review passed **2/12** cases (independent reviews
-  ranged from 2-3/12), row 2 belittled a sincere success in violation of voice
-  rule 18, several rows omitted their required intent or reply shape, and row 9
-  had the only mechanical sentence-count violation.  There was no definite
-  factual falsehood, but the hard and persona/register failures independently
-  reject the candidate.  Do not run its fresh 30.
-
-  **GLM-4.7-Flash screen (2026-08-12): rejected.**  The pinned Q8_0 fully
-  offloaded 48/48 layers across dl02's two GPUs, used the supplied system
-  message with thinking disabled, and decoded at about 116 tok/s.  Row 1 was a
-  narrow but weakly voiced pass with no mechanical or factual failure.  Row 2
-  exhausted seven retries without producing an accepted two-speaker
-  conversation; the retained final error was `expected 2 speakers, got 1`.
-  Failed bodies were not saved, so this is an incomplete frozen screen rather
-  than a 1/12 score.  A repaired explicit-speaker diagnostic later produced
-  valid structure but belittled the small success, independently rejecting the
-  model.  Do not run its fresh 30.
-
-  **Olmo 3.1 32B Instruct screen (2026-08-12): rejected.**  The pinned Q6_K
-  passed its exact hash and rendered-template checks, fully offloaded 65/65
-  layers across dl02, and completed all 12 frozen rows at about 27.5 decode
-  tokens/s.  Both independent strict reviews passed only **2/12**.  Rows 4 and
-  5 had mechanical sentence-count failures; row 5 gave backwards,
-  underqualified buttermilk/flour advice in violation of voice rule 29; and row
-  7 belittled sincere effort and distress in violation of rules 17-18.  Do not
-  run its fresh 30.  No teacher is approved or queued, the current dl02 teacher
-  hunt stops here, rented accelerators remain out of scope, and M3 remains
-  blocked.
-
-  **Hosted-API hunt opened (2026-08-12): two candidates queued, none
-  screened.**  With the dl02 pool exhausted, a fresh primary-source scout
-  moved the hunt to big open-weight models behind hosted APIs and added a
-  provider-contract eligibility axis (no output-training restriction;
-  retention/training-on-inputs recorded before any request).  The queue:
-  **Kimi K2.6** with thinking disabled (Modified MIT, the best measured
-  eligible writer at EQ-Bench CW 1709.6, via OpenRouter with provider
-  pinning), then **DeepSeek-V4-Flash-0731** (stock MIT, origin ToS expressly
-  permits distillation, strict JSON schema plus seed on DeepInfra).  The M2
-  runner gained `TEACHER_API_KEY` for hosted endpoints and forces thinking
-  off through OpenRouter's normalized `reasoning` field.  At most these two
-  candidates; if both fail, the hosted hunt closes.  No request has been
-  sent — screening starts only on operator approval of the provider account
-  and spend (≈$1 ceiling per screen).  Evidence and per-candidate tables:
-  [`m2-teacher-scout.md`](m2-teacher-scout.md).
-
-- ⬜ **M3 Generate and filter the corpus.**  *Deliverable:* ~2,500 filtered
-  conversations, replay buckets, the 150-prompt held-out set.  *Measure:* no
-  3-token opener above 1.5%; semantic-dedup survival ≥60%; adversarial slice
-  15-20%; de-leak assertion returns zero; token-length p99 < 1024.  *Deps:* M2.
-
-- ⬜ **M4 Train.**  *Measure:* the unmasked-token assertion fires; eval loss
-  bottoms out between 0.3 and 0.8.  **Below 0.2 means memorization** — cut epochs
-  or add diversity.  *Deps:* M3.
-
-- ⬜ **M5 Merge, convert, quantize, measure KLD.**  *Measure:* token-level
-  template diff empty; Q5_K_M KLD < 0.02 against our own FP16.  *Deps:* M4.
-
-- ⬜ **M6 Full evaluation.**  *Measure:* the Tier 0-3 bars.  If the persona
-  sub-score does not beat the prompted 70B, **abandon and keep the Groq prompt**
-  — that is a real result for about a week's work.  *Deps:* M5.
-
-- ⬜ **M7 Ship.**  Open the sealed 30, inspect once, set `CHAT_URL` in prod.
-  Publish weights, synthetic corpus, and recipe; withhold the canon-derived rows.
-  *Deps:* M6.
+  *Reopen only if a scored evaluation shows persona failures that survive a
+  prompt fix.*  That is the trigger.  `trainer/m2.py`, `trainer/m2_probe.py`,
+  the voice card, and the teacher-scout and student-bakeoff notes were deleted;
+  git history holds them, and the ignored `trainer/out/` holds every screen's
+  diagnostic output.
 
 ## What not to do
 
@@ -661,11 +442,12 @@ Each names a **deliverable**, a **measure**, and its **deps**.
 2. ✅ Would a 3B at Q8_0 beat a 4B at Q5_K_M?  Granite 4.1 3B Q8_0 beat
    Qwen3 4B Q5_K_M 12–8 on the fixed blinded check, with five automatic
    violations against Qwen's sixteen, and was selected for deployment.
-3. ⬜ How much does 4B buy on instruction adherence?  Less than hoped — published
+3. ✅ How much does 4B buy on instruction adherence?  Less than hoped — published
    per-task data shows 4B still failing ~19% on the hardest task, and 9B scoring
-   *worse* than 4B on two of nine.  The honest reading is that no model in this
-   class follows conflicting instructions reliably, so the fine-tune has to carry
-   the entire load.  4B remains the right pick because the VRAM is there.
+   *worse* than 4B on two of nine.  Our own measurement agrees and goes further:
+   3B Q8_0, 3B Q5_K_M, and **3B bf16 all fail `16_break_character` the same
+   way**, so on this axis precision buys nothing either.  What closed the gap
+   was writing the missing rules into the prompt, not adding parameters.
 4. ✅ Flash attention on TU116 — help or hurt?  Helped (part of the winning M0
    config); mooted anyway by serving on Ada, where it is settled-on.
 5. ✅ Does `GGML_CUDA_FORCE_MMQ=ON` help prefill?  Yes — MMQ + flash attention

@@ -52,6 +52,10 @@ DDLC Plus contributes 617 lines from only `nm1-4`, `sn1-4`, and `ny1-5`; its
 duplicate base game and all other Side Stories are excluded. Never commit or
 send these canon-derived files to a hosted model.
 
+The gold pairs have no consumer now that the QLoRA probe is gone; the extractor
+is kept because re-deriving it from two game installs is the expensive part, not
+running it.
+
 Use explicit paths for non-default Steam libraries:
 
 ```sh
@@ -60,117 +64,55 @@ uv run --project trainer python trainer/extract.py \
   --plus-root /path/to/DDLC-Plus
 ```
 
-## M2 teacher pilot
+## Fine-tuning: stopped, not paused
 
-The hosted request contains only the original paraphrased
-[`m2-voice.md`](m2-voice.md) and a synthetic attribute tuple—never M1 text.
-The deterministic grid has 100 rows, exactly 18 adversarial conversations,
-and 35 warm conversations.
+The synthesis and QLoRA code (`m2.py`, `m2_probe.py`, `m2-voice.md`, and the
+teacher-scout and student-bakeoff design notes) was removed on 2026-08-18.
+Recover it from git history if the trigger below ever fires.
 
-No teacher currently clears the quality gate. New candidates must be named
-explicitly and start with the default 12-row screen in a fresh output directory:
+Two things ended it.  Nine teacher candidates were screened and rejected in a
+row, so there was never an approved corpus to train on; the one pilot that did
+complete passed 51 of 100 rows.  More importantly, re-scoring the archived M0
+sniffs showed stock Granite Q8's remaining failures are prompt-adherence, not
+capability: it emitted a code block on `11_code_request` and answered
+`16_break_character` with *"I'm sorry, but I must maintain my character as
+Natsuki from Doki Doki Literature Club."*  Unquantized bf16 — strictly more
+capable than any 4-bit QLoRA output — produced a near-identical meta-refusal,
+and so did Q5.  A failure the full-precision base shares is not one fine-tuning
+is the cheapest fix for.  `src/prompt.txt` gained clauses aimed at both.
 
-```sh
-uv run --project trainer python trainer/m2.py schedule
-export TEACHER_MODEL=org/candidate-model
-export TEACHER_URL=http://127.0.0.1:18081/v1/chat/completions
-export TEACHER_TEMPERATURE=0.15
-uv run --project trainer python trainer/m2.py run \
-  --output-dir trainer/out/m2-candidate
-```
+**Reopen fine-tuning only if a scored evaluation shows persona failures that
+survive a prompt fix.**  That is the trigger — not a date, not a milestone.
 
-Custom endpoints send no secret unless `TEACHER_API_KEY` is set: leave it
-unset (with a loopback SSH tunnel) for a remote local server, set it for a
-hosted OpenAI-compatible provider. The Groq endpoint instead requires
-`GROQ_API_KEY`. Each row records the model, endpoint, temperature, and recipe
-fingerprint, so resume rejects mixed experiments.
+The diagnostic output of every screen stays under the ignored `trainer/out/`.
 
-`run` maintains the rolling top-50 four-gram opener ban and writes a readable
-transcript plus `review.csv`. Only an approved candidate should be rerun with
-`--limit 100` in a fresh directory. Read every transcript entry, set each
-`register_persona_pass` cell to `true` or `false`, add useful notes, then
-validate and summarize a complete 100-row pilot:
+## Measuring the served model
+
+`m0 summarize-eval` re-scores any sniff under the current rules.  The blinded
+half needs a human, so omit `--scores`/`--key` for the mechanical half alone —
+violation counts, latency, and token rates, no GPU and no review required:
 
 ```sh
-uv run --project trainer python trainer/m2.py summary
+CHAT_API_KEY=... ./trainer/m0 sniff \
+  --endpoint http://127.0.0.1:8080/v1/chat/completions \
+  --model natsuki --output trainer/out/m0/prod.sniff.jsonl
+./trainer/m0 summarize-eval trainer/out/m0/prod.sniff.jsonl
 ```
 
-There is deliberately no automatic rerun gate; content failures stay in the
-pilot so the summary measures the teacher actually used.
+Run it when the model, the quantization, or `src/prompt.txt` changes.  It is
+deliberately not in CI: it needs a GPU, and `stock_skip_gate_passed` also
+requires hand-scoring a `blind` review into a `scores.json`.
 
-The first completed pilot measured 51 register/persona passes and 49 failures,
-zero AI disclosures, zero self-prefixes, zero structural failures, and one
-sentence-count violation. These diagnostic results remain local under
-`trainer/out/m2/`.
+Reply length is measured in generated tokens, not sentences or characters.
+Sentence counting scored punctuation style — it passed a 220-character run-on
+and failed four punchy Discord fragments.  Characters undercount Japanese: the
+non-English sniff reply is the longest generation in the granite-q8 run at 72
+tokens but only 69 characters.  Token counts are tokenizer-relative, so they
+compare runs of one model rather than two — granite spends 0.96 characters per
+token on Japanese against 3.83 on English, so a `too_long` on a non-English row
+is worth reading before it is called a regression.
 
-The next Groq candidate, `qwen/qwen3.6-27b`, was rejected at row 2: row 1
-narrowly passed, but row 2 failed the required speaker/message shape through
-all seven retries and its inspected reply belittled a sincere success. The
-failed result remains historical; the active runner no longer carries its
-provider-specific request mode.
-
-The no-spend self-hosted Hermes 4.3 36B screen completed all 12 structurally
-valid rows on 2026-08-12, but strict review passed only 2/12. It belittled the
-small success in row 2, missed several required intents and reply shapes, and
-had one sentence-count violation. Do not run its fresh 30.
-
-GLM-4.7-Flash Q8_0 then passed the dl02 offload/template probe and persisted one
-weakly voiced frozen row. Row 2 exhausted seven retries without an accepted
-two-speaker conversation; the final error was `expected 2 speakers, got 1`.
-Reject the incomplete screen and do not run its fresh 30. The runner now gives
-multi-user rows an exact speaker plan without weakening validation.
-
-Olmo 3.1 32B Instruct Q6_K was the final current dl02 candidate. It fully
-offloaded 65/65 layers and completed all 12 frozen rows, but both independent
-strict reviews passed only 2/12. Rows 4 and 5 exceeded the sentence limit, row
-5 gave backwards and underqualified baking advice, and row 7 belittled sincere
-effort. Do not run its fresh 30. No teacher is approved or queued; the current
-dl02 teacher hunt stops here and M3 remains blocked. See
-[`docs/m2-teacher-scout.md`](../docs/m2-teacher-scout.md).
-
-The hunt has moved to hosted APIs: Kimi K2.6 (OpenRouter, thinking disabled)
-and then DeepSeek-V4-Flash-0731 (DeepInfra) are queued, pending operator
-approval of the provider account, spend, and model-origin exception.  They are
-eligible for that exception only because every screened non-Chinese teacher
-missed the frozen gate and no peer candidate remains within the capability
-bar.  Set `TEACHER_API_KEY` for such
-endpoints; requests to `openrouter.ai` automatically carry
-`reasoning: {"enabled": false}`. Before a 12-row screen, run a one-row
-`--limit 1` probe in a throwaway output directory to confirm the endpoint
-honors `json_schema`, `seed`, and `max_completion_tokens` and leaks no think
-content.
-
-## M2 canon-only probe
-
-With no approved teacher, the probe trains the student base directly on the
-946 M1 gold pairs plus 500 public instruct replay rows
-(`allenai/tulu-3-sft-mixture`, streamed once) and measures what canon alone
-buys.  It runs on the dev box; the wrapper only redirects caches to
-`/srv/var` where that hot root exists.
-
-```sh
-./trainer/m2-probe data
-./trainer/m2-probe train --max-steps 10   # smoke: VRAM fit + masking assert
-./trainer/m2-probe train                  # full two epochs
-./trainer/m2-probe sniff
-./trainer/m0 blind \
-  --left trainer/out/m0/granite.sniff.jsonl \
-  --right trainer/out/m2-granite-probe/probe.sniff.jsonl \
-  --output trainer/out/m2-granite-probe/blind-review.md \
-  --key-output trainer/out/m2-granite-probe/blind-key.json
-```
-
-Gold rows sample a system-prompt variant per row (roughly a quarter each of
-none / ultra-short / medium paraphrase / full production prompt); replay rows
-are verbatim and never carry the persona prompt.  Training uses Granite's
-official upstream chat template and verifies its role markers, refuses to
-start if response masking leaves any sample fully
-masked or any row renders a think block, and the adapter ships
-with a `probe.json` sidecar recording the base model, LoRA config, data
-hashes, system-prompt hash, tokenized chat-template fixture, and eval-loss
-curve.  Read the blinded review by hand: canon-only beating stock Granite
-demotes the synthetic corpus from load-bearing to augmentation; losing
-measures the gap a future teacher must close.
+## Building llama.cpp
 
 The host CUDA 13.1 headers conflict with Fedora 44's glibc declarations, and
 CUDA 13 cannot compile the Pascal PTX used by the GTX-16 MMQ experiment.  The

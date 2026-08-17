@@ -40,8 +40,11 @@ AI_DISCLOSURE = re.compile(
     r"(?i)\b(?:as an? (?:ai|assistant|language model)|i(?:'m| am) (?:an? )?"
     r"(?:ai|assistant|language model)|artificial intelligence|large language model)\b"
 )
+# Natsuki says "I can't reach things" in character, so a bare "I can't" is not a refusal.
+# Only an assistant-shaped object counts.
 REFUSAL = re.compile(
-    r"(?i)\b(?:i (?:cannot|can't|won't|am unable to)|i must decline|"
+    r"(?i)\b(?:i (?:cannot|can't|won't|am unable to) "
+    r"(?:help|assist|do that|provide|comply|continue|engage)|i must decline|"
     r"i(?:'m| am) sorry,? but)\b"
 )
 SELF_PREFIX = re.compile(r"^\s*(?:natsuki|assistant)\s*:", re.IGNORECASE)
@@ -234,22 +237,29 @@ def validate_prompts(prompts: Iterable[dict[str, Any]]) -> None:
         raise ValueError(f"M0 requires exactly 20 prompts, got {count}")
 
 
-def sentence_count(text: str) -> int:
-    chunks = [
-        chunk
-        for chunk in re.split(r"(?<=[.!?])(?:[\"')\]]*)\s+|\n+", text.strip())
-        if re.search(r"\w", chunk, re.UNICODE)
-    ]
-    return len(chunks)
-
-
 def repeated_ngram(text: str, size: int = 4) -> bool:
     words = re.findall(r"\w+", text.casefold())
     grams = [tuple(words[index : index + size]) for index in range(len(words) - size + 1)]
     return len(grams) != len(set(grams))
 
 
-def violations(text: str) -> list[str]:
+# Length is measured in generated tokens, not sentences, words, or characters.
+# Sentence counting scored punctuation style, not length: it passed a 220-character
+# run-on and failed four punchy Discord fragments.  Words undercount Japanese, which
+# does not space-delimit.  Characters undercount it too -- the Japanese sniff reply is
+# the longest generation in the granite-q8 run at 72 tokens but only 69 characters.
+# Token counts are tokenizer-relative, so they compare runs of one model, not two:
+# granite spends 0.96 characters per token on Japanese against 3.83 on English.
+MAX_COMPLETION_TOKENS = 100
+
+# Violations ``violations()`` cannot recompute from the reply text alone: they need the
+# prompt's author or the HTTP status.  The rescore keeps these from a row's stored list and
+# discards the rest, so archived runs are re-scored under the current rules rather than the
+# ones in force when they were recorded.
+ROW_ONLY_VIOLATIONS = frozenset({"user_prefix", "empty_response"})
+
+
+def violations(text: str, completion_tokens: int | None = None) -> list[str]:
     found: list[str] = []
     checks = {
         "ai_disclosure": AI_DISCLOSURE,
@@ -261,9 +271,8 @@ def violations(text: str) -> list[str]:
     for name, pattern in checks.items():
         if pattern.search(text):
             found.append(name)
-    sentences = sentence_count(text)
-    if sentences < 1 or sentences > 3:
-        found.append("sentence_count")
+    if completion_tokens is not None and completion_tokens > MAX_COMPLETION_TOKENS:
+        found.append("too_long")
     if repeated_ngram(text):
         found.append("loop")
     return found
@@ -306,7 +315,10 @@ def request_completion(
     content = ""
     if status < 400:
         content = body["choices"][0]["message"]["content"].strip()
-    found = violations(content) if content else ["empty_response"]
+    usage = body.get("usage") or {}
+    found = (
+        violations(content, usage.get("completion_tokens")) if content else ["empty_response"]
+    )
     if content and re.match(rf"^\s*{re.escape(prompt['author'])}\s*:", content, re.I):
         found.append("user_prefix")
     return {
@@ -432,7 +444,7 @@ def summarize_bench(args: argparse.Namespace) -> int:
 
 
 def evaluation_summary(
-    inputs: list[Path], scores_path: Path, key_path: Path
+    inputs: list[Path], scores_path: Path | None, key_path: Path | None
 ) -> dict[str, Any]:
     models: dict[str, dict[str, Any]] = {}
     for path in inputs:
@@ -444,7 +456,20 @@ def evaluation_summary(
             raise ValueError(f"{path}: expected one model, got {sorted(model_names)}")
         model = model_names.pop()
         rescored = [
-            list(dict.fromkeys([*violations(row["response"]), *row.get("violations", [])]))
+            list(
+                dict.fromkeys(
+                    [
+                        *violations(
+                            row["response"], (row.get("usage") or {}).get("completion_tokens")
+                        ),
+                        *(
+                            name
+                            for name in row.get("violations", [])
+                            if name in ROW_ONLY_VIOLATIONS
+                        ),
+                    ]
+                )
+            )
             for row in rows
         ]
         counts: dict[str, int] = {}
@@ -477,6 +502,11 @@ def evaluation_summary(
                 "decode_mean": round(statistics.mean(decode_rates), 3),
             },
         }
+
+    # The blinded half needs a human scorer; without one, report the mechanical half
+    # alone so a plain sniff can be checked for regressions with no GPU and no review.
+    if scores_path is None or key_path is None:
+        return {"generated_at": utc_now(), "models": models}
 
     scores_document = json.loads(scores_path.read_text(encoding="utf-8"))
     key = json.loads(key_path.read_text(encoding="utf-8"))
@@ -541,8 +571,12 @@ def evaluation_summary(
 
 
 def summarize_eval(args: argparse.Namespace) -> int:
+    if (args.scores is None) != (args.key is None):
+        raise ValueError("--scores and --key must be given together")
     summary = evaluation_summary(
-        [Path(value) for value in args.inputs], Path(args.scores), Path(args.key)
+        [Path(value) for value in args.inputs],
+        Path(args.scores) if args.scores else None,
+        Path(args.key) if args.key else None,
     )
     rendered = json.dumps(summary, indent=2, sort_keys=True)
     print(rendered)
@@ -593,6 +627,10 @@ def final_report(args: argparse.Namespace) -> int:
             "complete": loaded == total,
             "source": str(log_path),
         }
+    # An unscored evaluation summary carries no gate keys; it cannot qualify a stock model.
+    stock_qualifies = any(
+        model.get("stock_skip_gate_passed", False) for model in evaluation["models"].values()
+    )
     complete = bool(capacity["complete_24h_window"])
     hardware_route = (
         "gtx-1660"
@@ -620,19 +658,9 @@ def final_report(args: argparse.Namespace) -> int:
             "full_offload_verified_for_served_models": all(
                 result["complete"] for result in offload.values()
             ),
-            "stock_model_qualifies": any(
-                model["stock_skip_gate_passed"]
-                for model in evaluation["models"].values()
-            ),
-            "granite_replaces_qwen": evaluation["granite_replacement_gate_passed"],
-            "quality_route": (
-                "full-evaluation-tiers"
-                if any(
-                    model["stock_skip_gate_passed"]
-                    for model in evaluation["models"].values()
-                )
-                else "m1"
-            ),
+            "stock_model_qualifies": stock_qualifies,
+            "granite_replaces_qwen": evaluation.get("granite_replacement_gate_passed", False),
+            "quality_route": "full-evaluation-tiers" if stock_qualifies else "m1",
             "serving_hardware_route": hardware_route,
         },
     }
@@ -702,8 +730,10 @@ def build_parser() -> argparse.ArgumentParser:
         "summarize-eval", help="summarize sniff runs and resolve blinded scores"
     )
     evaluation.add_argument("inputs", nargs="+")
-    evaluation.add_argument("--scores", required=True)
-    evaluation.add_argument("--key", required=True)
+    evaluation.add_argument(
+        "--scores", help="hand-scored blind review; omit for the mechanical half only"
+    )
+    evaluation.add_argument("--key", help="blind review key; required with --scores")
     evaluation.add_argument("--output")
     evaluation.set_defaults(function=summarize_eval)
 

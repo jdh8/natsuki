@@ -7,7 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- The fine-tuning half of the trainer: the synthetic-corpus generator, the QLoRA
+  probe, the voice card, and the teacher-scout and student-bakeoff notes.  Nine
+  teacher candidates were screened and rejected, so no corpus ever existed; and
+  re-scoring the archived measurements showed stock Granite Q8's two remaining
+  failures in twenty are prompt adherence, not capability — **unquantized bf16
+  fails the same way**, so fine-tuning was not the cheapest fix.  Fine-tuning
+  reopens only if a scored evaluation shows persona failures that survive a
+  prompt fix.  Canon extraction, the M0 measurement harness, and every archived
+  screen's local output are kept; git history holds the rest.
+
 ### Changed
+- Natsuki now refuses to break character in character, and no longer sends code
+  blocks.  Both were measured failures of the deployed model.  The reply-length
+  rule is stated in words rather than sentences.
+- The evaluation harness measures reply length in **generated tokens** instead
+  of sentences.  Sentence counting scored punctuation style, not length: it
+  passed a 220-character run-on and failed four punchy Discord fragments, which
+  is the register the bot aims for.  It accounted for three of the deployed
+  model's four recorded failures.  Words undercount Japanese, which does not
+  space-delimit, and so do characters — the non-English reply is the longest
+  generation in the archived Q8 run at 72 tokens but only 69 characters.  Token
+  counts are tokenizer-relative, so they compare runs of one model rather than
+  two: Granite spends 0.96 characters per token on Japanese against 3.83 on
+  English, and a `too_long` on a non-English row is worth reading before it is
+  called a regression.
+- The harness no longer reports an in-character "I can't reach it" as a refusal;
+  only an assistant-shaped object counts.  Re-scoring an archived run now
+  applies today's rules rather than the ones recorded at the time.
+- `m0 summarize-eval` accepts a sniff with no hand-scored blind review, so
+  violation counts, latency, and token rates can be checked with no GPU and no
+  human.  This is the regression check to run when the model, the quantization,
+  or `src/prompt.txt` changes.  Note that the mechanical checks alone never
+  separated Granite from Qwen — under the corrected rules Qwen3 4B scores zero
+  violations on the same archived run.  Persona is decided by the blinded human
+  review, which recorded Granite winning 12–8.
 - Chat replies no longer strip an echoed current-user speaker label after
   Granite Q8_0 produced zero such leaks across 60 production-shaped samples.
   The M0 harness now detects these leaks, supports the deployed server's API
