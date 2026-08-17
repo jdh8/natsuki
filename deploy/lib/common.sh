@@ -276,7 +276,7 @@ deploy_main() {
   platform_prepare_gpu "$uid"
   sudo install -d -m 0755 /etc/cdi
   sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
-  nvidia-ctk cdi list | grep -qx 'nvidia.com/gpu=0' || die "CDI did not expose GPU 0"
+  nvidia-ctk cdi list | grep -Fx 'nvidia.com/gpu=0' >/dev/null || die "CDI did not expose GPU 0"
   as_natsuki podman info >/dev/null
   if ! as_natsuki podman run --rm \
       --read-only --cap-drop all --security-opt no-new-privileges \
