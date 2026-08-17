@@ -237,7 +237,6 @@ def opening_bans(rows: Iterable[dict[str, Any]]) -> list[str]:
 def request_payload(
     attributes: dict[str, Any], bans: list[str], voice: str
 ) -> dict[str, Any]:
-    groq_qwen = TEACHER_URL == GROQ_URL and MODEL == "qwen/qwen3.6-27b"
     count = 2 * (attributes["history_exchanges"] + 1)
     speaker_plan = [
         f"user{index % attributes['n_speakers'] + 1}:"
@@ -289,21 +288,17 @@ def request_payload(
         "temperature": TEMPERATURE,
         "max_completion_tokens": 2048,
         "seed": attributes["seed"],
-        "response_format": (
-            {"type": "json_object"}
-            if groq_qwen
-            else {
-                "type": "json_schema",
-                "json_schema": {
-                    "name": "natsuki_conversation",
-                    "strict": True,
-                    "schema": conversation_schema(),
-                },
-            }
-        ),
+        "response_format": {
+            "type": "json_schema",
+            "json_schema": {
+                "name": "natsuki_conversation",
+                "strict": True,
+                "schema": conversation_schema(),
+            },
+        },
     }
     if TEACHER_URL == GROQ_URL:
-        payload["reasoning_effort"] = "none" if groq_qwen else "medium"
+        payload["reasoning_effort"] = "medium"
     elif TEACHER_URL.startswith("https://openrouter.ai/"):
         # Hybrid teachers default to thinking; force it off via OpenRouter's
         # normalized knob so no <think> block reaches the token gate.

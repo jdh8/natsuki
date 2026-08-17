@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Canon-only fine-tune probe: can Qwen3-4B hold the persona without a teacher?
+"""Canon-only fine-tune probe: can Granite 4.1 3B hold the persona without a teacher?
 
 M2's teacher screen rejected every candidate, so this probe trains the student
 base directly on the 946 M1 gold pairs plus ~500 public instruct replay rows
 and measures the result with the existing M0 sniff/blind harness.  If the
-canon-only adapter already beats stock Qwen, the synthetic corpus shrinks from
-load-bearing to augmentation; if not, it measures the gap a teacher must close.
+canon-only adapter already beats stock Granite, the synthetic corpus shrinks
+from load-bearing to augmentation; if not, it measures the gap a teacher must
+close.
 
 No canon text leaves the machine: training is local, and the replay rows are
 public data downloaded once from Hugging Face.
@@ -27,9 +28,9 @@ import m0
 
 TRAINER_ROOT = Path(__file__).resolve().parent
 DEFAULT_DATA = TRAINER_ROOT / "data" / "m2-probe"
-DEFAULT_OUT = TRAINER_ROOT / "out" / "m2-probe"
+DEFAULT_OUT = TRAINER_ROOT / "out" / "m2-granite-probe"
 GOLD_PAIRS = TRAINER_ROOT / "data" / "m1" / "gold-pairs.jsonl"
-BASE_MODEL = "Qwen/Qwen3-4B-Instruct-2507"
+BASE_MODEL = "ibm-granite/granite-4.1-3b"
 REPLAY_DATASET = "allenai/tulu-3-sft-mixture"
 SEED = 20260811
 
@@ -37,20 +38,14 @@ SEED = 20260811
 REPLAY_CHAR_BUDGET = 3200
 REPLAY_NON_ASCII_BUDGET = 800
 
-# Qwen3 chat-template turn markers, used for response masking.
-INSTRUCTION_PART = "<|im_start|>user\n"
-RESPONSE_PART = "<|im_start|>assistant\n"
-
-# The official Qwen3-4B-Instruct-2507 template, committed verbatim.  Unsloth's
-# mirror substitutes a thinking-style template that renders every assistant
-# turn as "<think>\n\n</think>\n\n<reply>" — training on that taught the model
-# to open replies with think/tool_call token salad.  Production serves the
-# official template, so training and sniffing must too.
-CHAT_TEMPLATE = TRAINER_ROOT / "qwen3-instruct-chat-template.jinja"
+# Granite's official chat-template turn markers, used for response masking.
+INSTRUCTION_PART = "<|start_of_role|>user<|end_of_role|>"
+RESPONSE_PART = "<|start_of_role|>assistant<|end_of_role|>"
 
 
 def enforce_template(tokenizer: Any) -> None:
-    tokenizer.chat_template = CHAT_TEMPLATE.read_text(encoding="utf-8")
+    if not tokenizer.chat_template:
+        raise RuntimeError("tokenizer has no chat template")
     rendered = tokenizer.apply_chat_template(
         [{"role": "user", "content": "hi"}], tokenize=False, add_generation_prompt=True
     )
@@ -423,7 +418,7 @@ def sniff(args: argparse.Namespace) -> int:
             )
             # One trailing eos is the normal stop; anything else must be seen
             # by the special-token check, so do not skip_special_tokens.
-            content = re.sub(r"\s*<\|im_end\|>\s*$", "", completion).strip()
+            content = re.sub(r"\s*<\|end_of_text\|>\s*$", "", completion).strip()
             handle.write(
                 json.dumps(
                     {
@@ -477,7 +472,7 @@ def parser() -> argparse.ArgumentParser:
     )
     sniff_parser.add_argument("--adapter", type=Path, default=DEFAULT_OUT / "adapter")
     sniff_parser.add_argument("--prompts", type=Path, default=m0.DEFAULT_PROMPTS)
-    sniff_parser.add_argument("--model", default="qwen3-4b-m2-probe")
+    sniff_parser.add_argument("--model", default="granite-4.1-3b-m2-probe")
     sniff_parser.add_argument(
         "--output", type=Path, default=DEFAULT_OUT / "probe.sniff.jsonl"
     )

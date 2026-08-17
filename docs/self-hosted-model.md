@@ -21,17 +21,27 @@ correction is what appears here.  Anything still unverified says so.
 | Training code home | `trainer/`, its own `uv` project, invisible to `cargo` |
 | Backend switch | `CHAT_URL` + `CHAT_MODEL`, Groq defaults preserved |
 | Publishing | Weights + synthetic corpus + recipe.  Canon-derived rows withheld. |
-| Base model | `Qwen/Qwen3-4B-Instruct-2507` (Apache-2.0) |
+| Model-origin policy | Default to non-Chinese families; require an explicit, benchmark-backed exception when credible alternatives trail by roughly 1–2 model generations |
+| Base and deployed model | `ibm-granite/granite-4.1-3b` (Apache-2.0) |
 | Teacher | None approved; hosted hunt queues Kimi K2.6 then DeepSeek-V4-Flash-0731, awaiting operator go; no rental |
 | A/B baseline | `llama-3.3-70b-versatile` — today's production behaviour |
-| Judge | `qwen/qwen3.6-27b` — distinct from teacher and baseline |
+| Judge | `openai/gpt-oss-120b` — distinct from teacher, student, and baseline |
 
-An Apache-2.0 teacher is a deliberate choice.  Llama 3.3's Community License
+A permissively licensed teacher is a deliberate choice.  Llama 3.3's Community License
 §1.b.i requires any *distributed* model distilled from Llama to be **named
 beginning with "Llama"**, with prominent "Built with Llama" attribution — even
-on an Apache-2.0 base.  Since we publish, an Apache-2.0 teacher removes the
-obligation outright.  Keeping teacher, baseline, and judge as three different
+on an Apache-2.0 base.  Since we publish, an Apache-2.0 or MIT teacher removes
+the obligation outright.  Keeping teacher, baseline, and judge as three different
 models also keeps self-preference bias out of the evaluation.
+
+The origin preference is a selection gate, not a historical purge or an
+unconditional blacklist.  A Chinese model is ineligible for an active student,
+teacher, judge, or deployment role unless no credible non-Chinese candidate is
+within roughly one or two release/architecture generations; the exception must
+name the alternatives, show the benchmark gap, and receive explicit approval.
+The queued Kimi/DeepSeek teacher screen is such a pending exception: every
+screened non-Chinese teacher missed the frozen quality gate, and no request is
+sent without approval.  Past Qwen measurements remain below for auditability.
 
 ## Constraints
 
@@ -90,18 +100,26 @@ available if the numbers come up short.
 
 ## Stack
 
-**Base: `Qwen/Qwen3-4B-Instruct-2507`.**  36 layers / 32 Q heads / 8 KV heads /
-head_dim 128, pure GQA, explicitly non-thinking.  Q5_K_M is 2.89 GB; KV is
-144 KiB/token, so 576 MiB at 4096 context.
+**Base: `ibm-granite/granite-4.1-3b`.**  40 layers / 40 Q heads / 8 KV heads /
+head_dim 64, dense GQA, text-only and non-thinking.  The first-party Q5_K_M is
+about 2.4 GB; FP16 KV is 80 KiB/token, or 320 MiB at 4096 context.  Production
+switched to this checkpoint on 2026-08-17 and the training probe now uses its
+official chat template and response markers.
 
-It beats the newer Qwen3.5-4B by dissolving four problems at once: no Gated
+**Superseded technical-only choice (historical):
+`Qwen/Qwen3-4B-Instruct-2507`.**  Before the model-origin policy, it was selected
+on technical fit alone: 36 layers / 32 Q heads / 8 KV heads / head_dim 128,
+pure GQA, explicitly non-thinking.  Q5_K_M is 2.89 GB; KV is 144 KiB/token, so
+576 MiB at 4096 context.
+
+It beat the newer Qwen3.5-4B by dissolving four problems at once: no Gated
 DeltaNet (llama.cpp #24712 open — GDN falls back to CPU even on an RTX 5060, and
 no Turing data point exists at all), no thinking mode to suppress (#20182 open,
 `enable_thinking:false` ignored), no vision tower, and no vendor warning against
 QLoRA.  Runner-up is `mistralai/Ministral-3-3B-Instruct-2512`, whose `-BF16` repo
 is the one to fine-tune since the default release is FP8.
 
-**Rescanned 2026-08-10** (three-agent web pass): the decision stands — no
+**Rescanned 2026-08-10** (three-agent web pass): at that time no
 released ≤5B model displaces Qwen3-4B-Instruct-2507 as a plain-GQA, text-only,
 non-thinking, Apache-2.0 base.  What changed underneath:
 
@@ -336,8 +354,8 @@ list at training time and diff it on every deploy via `llama-server`'s
 `chat_template.jinja` as a separate file, so reading only `tokenizer_config.json`
 makes this load-bearing check "fail" for reasons unrelated to the model.
 
-**Ship Q5_K_M at 4096 context**: 2.89 GB + 576 MiB KV + ~600 MB CUDA context
-lands near 3.81 GiB, leaving real slack.  llama.cpp's KLD ladder for Llama-3-8B
+**Ship Q5_K_M at 4096 context**: about 2.4 GB + 320 MiB KV + ~600 MB CUDA
+context lands near 3.3 GiB, leaving real slack.  llama.cpp's KLD ladder for Llama-3-8B
 puts q5_K_M at 0.010762 against q4_K_M's 0.028152 — about 2.6× closer to FP16.
 **Do not ship IQ4_XS**, which is *worse* than Q4_K_M (0.036334) for 0.44 GiB
 saved, plus extra decode compute on a card with no tensor cores.
@@ -395,7 +413,7 @@ made it dumber".  A >5pp drop is real; 0-3pp is noise.  Add a 20-prompt
 functional smoke (two-step instructions, arithmetic, 15-message coherence) to
 catch *"perfectly in character and completely incoherent"*.
 
-**Tier 3 — pairwise A/B** against the prompted 70B, judged by `qwen/qwen3.6-27b`
+**Tier 3 — pairwise A/B** against the prompted 70B, judged by `openai/gpt-oss-120b`
 at temperature 0 with forced JSON.  Run every pair twice with the order swapped
 and count a win only when both orderings agree; report judge consistency and
 treat anything under 70% as voiding the tier.
@@ -440,9 +458,9 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   1660 capacity gate looks unlikely but remains pending the uncontaminated
   24-hour window; a confirmed failure routes serving to the 4070.
 
-  **Decision (2026-08-11): serving moves to the RTX 4070 SUPER, base model
-  unchanged.**  The 1660 constrained quantization and serving flags, not the
-  model pick — the spec filter (plain GQA for QLoRA, non-thinking, text-only,
+  **Decision (2026-08-11, superseded for model choice): serving moves to the
+  RTX 4070 SUPER, base model unchanged.**  The 1660 constrained quantization
+  and serving flags, not the model pick — the spec filter (plain GQA for QLoRA, non-thinking, text-only,
   Apache-2.0) still has no better candidate with the ≤5B VRAM cap lifted.
   Qwen3.5-4B's Ampere-only chunked-prefill objection (#26001) vanishes on Ada,
   but its vision stack, hybrid fine-tune path, and empty RP record remain: it
@@ -453,6 +471,12 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   problem, which M1 fine-tuning targets on the base already wired through the
   whole pipeline.  Spend the 4070's headroom on quant fidelity, context, and
   prefill — see the Ada deltas under Deployment.
+
+  **Policy switch (2026-08-17): Granite 4.1 3B replaces Qwen for deployment and
+  future fine-tuning.**  The first-party Q5_K_M passed its pinned checksum,
+  loaded fully on the RTX 4070 SUPER, and completed an authenticated inference;
+  the lower stock persona score is accepted because M3/M4 exist to specialize
+  the student.  The Qwen/Granite M0 comparison stays historical evidence.
 
 - ✅ **M1 Extract and parse the script.**  *Deliverable:* `trainer/extract.py`,
   canon lines and gold pairs as JSONL.  *Measure:* **1,520 physical / 2,319
@@ -487,9 +511,11 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   wrapper): QLoRA on the 946 gold pairs plus 500 Tulu-3 replay rows with
   per-row system-prompt variants, the mandatory response-masking assertion,
   a `probe.json` sidecar, and a sniff that feeds the existing M0 blind
-  review.  The probe decides how much M3 must carry: if canon-only beats
-  stock Qwen in the blinded 20-prompt review, the synthetic corpus becomes
-  augmentation rather than foundation; if not, its margin is the bar a
+  review.  The active probe now uses Granite and writes to
+  `trainer/out/m2-granite-probe/`; the completed Qwen run below remains a
+  historical diagnostic.  The probe decides how much M3 must carry: if
+  canon-only beats stock Granite in the blinded 20-prompt review, the
+  synthetic corpus becomes augmentation rather than foundation; if not, its margin is the bar a
   future teacher must clear.
 
   The first probe run caught the silent-template-substitution bug class this
@@ -497,9 +523,11 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   mirror ships a thinking-style chat template that renders every assistant
   turn as `<think>\n\n</think>\n\n<reply>`, so the first adapter opened
   replies with think/tool_call token salad while the bare production header
-  never triggers it.  The official Instruct-2507 template is now committed
-  verbatim (`trainer/qwen3-instruct-chat-template.jinja`) and enforced at
-  train and sniff time, with a think-free rendering assertion.  Fallout fix:
+  never triggers it.  For that historical run, the official Instruct-2507
+  template was committed verbatim
+  (`trainer/qwen3-instruct-chat-template.jinja`) and enforced at train and
+  sniff time.  The active Granite probe instead validates the official
+  upstream template and its response markers.  Fallout fix:
   Tier 0's special-token regex never covered `<think>`/`<tool_call>` and
   flagged 0 of 18 contaminated replies; `m0.py` now matches them.
 
@@ -607,7 +635,8 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   Mistral-7B-generated prose-roleplay.  Useful as a pipeline sanity check only.
 - **Do not start from a base checkpoint** — on ~3,750 rows the result is
   Natsuki's voice attached to something that has forgotten how to converse.
-  There is no `Qwen3-4B-Base-2507` in any case.
+  The Granite base checkpoint exists, but this small corpus needs the instruct
+  model's conversational prior.
 - **Do not start from an existing roleplay fine-tune.**  They carry RPG
   character-card format — asterisk actions, second-person prose — that the LoRA
   budget would be spent undoing, and several are NSFW-tuned in ways that leak.

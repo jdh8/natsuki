@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Active model selection now defaults to non-Chinese model families. A Chinese
+  model requires an explicit, benchmark-backed exception showing that credible
+  alternatives trail by roughly one or two model generations. Granite 4.1 3B
+  replaces Qwen as the deployment and fine-tuning default; historical Qwen
+  results remain for auditability.
 - `deploy/setup` now picks the container engine by platform: Docker Compose
   (`deploy/compose.yaml`) on Ubuntu, where the system daemon starts the
   hardened containers at boot (lingering user managers proved unreliable
@@ -35,17 +40,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   manually reviewed, with 51 register/persona passes, 49 failures, zero AI
   disclosures or self-prefixes, and one sentence-count violation.
 - A canon-only fine-tune probe (`trainer/m2_probe.py`): with every teacher
-  candidate rejected, it QLoRA-trains Qwen3-4B directly on the 946 gold pairs
-  plus 500 public Tulu-3 replay rows and scores the adapter through the
+  candidate rejected, it QLoRA-trains Granite 4.1 3B directly on the 946 gold
+  pairs plus 500 public Tulu-3 replay rows and scores the adapter through the
   existing blinded 20-prompt review, deciding how much the future synthetic
   corpus must carry.  Training data stays local and gitignored; users are
   unaffected until a model ships.
-- The official Qwen3-4B-Instruct-2507 chat template, committed verbatim and
-  enforced during probe training and inference after unsloth's mirror
-  silently substituted a thinking-style template that taught the first
+- The official Qwen3-4B-Instruct-2507 chat template, committed verbatim for the
+  historical Qwen probe after unsloth's mirror silently substituted a
+  thinking-style template that taught the first
   adapter to open replies with `<think>`/`<tool_call>` token salad.  The
-  Tier-0 special-token check now also catches `<think>`, `<tool_call>`, and
-  `<tool_response>` leakage, which it previously missed entirely.
+  Tier-0 special-token check now also catches `<think>`, `<tool_call>`,
+  `<tool_response>`, and Granite role/end-marker leakage.
 - The completed probe verdict: canon-only training converges but loses the
   persona (flat replies, replay-taught assistant-isms) while stock Qwen with
   the production prompt fails register the opposite way, so the synthetic
@@ -64,7 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The deploy wizard now requires an explicit `prod` or `dev` argument and
   loads the matching `.env.prod` or `.env.dev` file.  Switching environments
   redeploys the same services with the selected credentials and configuration.
-- The deploy wizard now defaults to the cached stock Qwen3 GGUF when
+- The deploy wizard now defaults to the cached stock Granite 4.1 3B GGUF when
   `MODEL_PATH` is not set.
 - Deployment now uses one shared workflow with Fedora and Ubuntu platform
   adapters.  The entrypoint rejects versions below the supported minimum and

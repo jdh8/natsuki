@@ -22,9 +22,9 @@ Keep each environment's credentials and deployment overrides in its own file:
 MODEL_PATH=/absolute/path/to/natsuki.gguf
 ```
 
-If `MODEL_PATH` is missing, the wizard uses the stock Qwen3 GGUF in the current
-user's Hugging Face cache.  It also generates and saves a separate
-`CHAT_API_KEY` when the selected file does not have one.  The env file also
+If `MODEL_PATH` is missing, the wizard uses the stock Granite 4.1 3B Q5_K_M
+GGUF in the current user's Hugging Face cache.  It also generates and saves a
+separate `CHAT_API_KEY` when the selected file does not have one.  The env file also
 optionally supplies `GUILD` and `TOP_GG_TOKEN`; empty values count as unset.
 
 Both modes deploy the same service names.  Running setup for one environment

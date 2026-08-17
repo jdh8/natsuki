@@ -23,7 +23,7 @@ The production Podman/Quadlet deployment is documented in
 [`deploy/README.md`](deploy/README.md).
 
 The stock self-hosted deployment uses
-[Qwen3-4B-Instruct-2507](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507).
+[IBM Granite 4.1 3B](https://huggingface.co/ibm-granite/granite-4.1-3b).
 See the [model design notes](docs/self-hosted-model.md) for selection and
 evaluation details.
 

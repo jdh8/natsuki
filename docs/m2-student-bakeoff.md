@@ -1,6 +1,6 @@
 # M2 student bakeoff
 
-Research date: 2026-08-11. Sources are first-party model cards, repositories,
+Research date: 2026-08-11; policy update: 2026-08-17. Sources are first-party model cards, repositories,
 license text, and framework documentation.
 
 ## Decision
@@ -17,14 +17,13 @@ The exact three checkpoints are:
 
 | Checkpoint | Why it gets a slot |
 | --- | --- |
-| `Qwen/Qwen3-4B-Instruct-2507` | The control. It is a 4B, text-only, fixed non-thinking instruct model under Apache-2.0, and the current QLoRA probe proves that this exact checkpoint trains and serves on the 4070. Removing it would make the experiment unable to say whether switching helped. [Official model card](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507) |
-| `ibm-granite/granite-4.1-3b` | The low-risk independent-family challenger: a text-only 3B dense GQA instruct model under Apache-2.0. M0 did **not** settle its value as an adapter base: stock Granite won 11/20 blinded pairs with three ties, despite its lower 3.15/5 persona score and one refusal. The target fine-tune is specifically meant to change those stock behaviors. [Official model card](https://huggingface.co/ibm-granite/granite-4.1-3b), [official architecture repository](https://github.com/ibm-granite/granite-4.1-language-models) |
-| `mistralai/Ministral-3-3B-Instruct-2512-BF16` | The best unmeasured third family. It has a 3.4B language model plus a 0.4B vision encoder, is explicitly intended for chat, short content, fine-tuning, and edge use, and is Apache-2.0. Use the BF16 checkpoint as the QLoRA source and freeze the unused vision encoder/projector. Unsloth documents current fine-tuning support for the family; Mistral publishes its own GGUFs for the text serving pre-screen. [Official BF16 model card](https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512-BF16), [Unsloth Ministral 3 guide](https://unsloth.ai/docs/new/ministral-3), [official GGUF](https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512-GGUF) |
+| `ibm-granite/granite-4.1-3b` | The control and deployed model: a text-only 3B dense GQA instruct model under Apache-2.0. Stock Granite won 11/20 blinded pairs with three ties, scored 3.15/5 persona, and had one refusal; the target fine-tune is specifically meant to change those stock behaviors. [Official model card](https://huggingface.co/ibm-granite/granite-4.1-3b), [official architecture repository](https://github.com/ibm-granite/granite-4.1-language-models) |
+| `mistralai/Ministral-3-3B-Instruct-2512-BF16` | The second family. It has a 3.4B language model plus a 0.4B vision encoder, is explicitly intended for chat, short content, fine-tuning, and edge use, and is Apache-2.0. Use the BF16 checkpoint as the QLoRA source and freeze the unused vision encoder/projector. Unsloth documents current fine-tuning support for the family; Mistral publishes its own GGUFs for serving. [Official BF16 model card](https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512-BF16), [Unsloth Ministral 3 guide](https://unsloth.ai/docs/new/ministral-3), [official GGUF](https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512-GGUF) |
+| `microsoft/Phi-4-mini-instruct` | The independent, text-only third family: 3.8B dense GQA under MIT. Its reasoning-heavy post-training is not ideal for persona work, but it is technically eligible and avoids spending a race slot on a model excluded by the origin policy. [Official model card](https://huggingface.co/microsoft/Phi-4-mini-instruct) |
 
-All three checkpoint cards designate Apache-2.0. Apache grants modification and
-redistribution of derivatives subject to license, change-notice, attribution,
-and NOTICE preservation, so a published adapter or merged result can remain
-Apache-2.0-compatible if those materials ship with it. [Apache-2.0 §§2, 4](https://www.apache.org/licenses/LICENSE-2.0)
+Granite and Ministral designate Apache-2.0; Phi designates MIT. Both are
+permissive, but their notice and attribution materials must ship with a
+published adapter or merged result. [Apache-2.0 §§2, 4](https://www.apache.org/licenses/LICENSE-2.0)
 
 Mistral's card adds: “You must not use this model in a manner that infringes,
 misappropriates, or otherwise violates any third party's rights.” It still
@@ -41,11 +40,12 @@ before publishing. This is an engineering license screen, not legal advice.
 
 ## What to test now
 
-Only Ministral needs a stock M0 pre-screen. Qwen and Granite already completed
+Only Phi needs a stock M0 pre-screen. Granite and Ministral already completed
 the same 20-prompt hardware and quality run, so repeating them buys nothing.
-Serve Mistral's official `Q5_K_M` GGUF through `llama-server` with its embedded
-Jinja template and the unchanged Natsuki system prompt, then call the existing
-`m0.py sniff` command. No harness change is needed.
+Convert the pinned official Phi checkpoint, quantize it to `Q5_K_M`, serve it
+through `llama-server` with its embedded Jinja template and the unchanged
+Natsuki system prompt, then call the existing `m0.py sniff` command. No harness
+change is needed.
 
 That stock run answers only two cheap questions: does the exact text path fully
 offload and clear 30 tok/s, and does its template leak vendor/thinking/special
@@ -108,17 +108,10 @@ server for all three so the 12 GB constraint and batch behavior stay controlled.
 
 ## Why the newer names are out
 
-`Qwen/Qwen3.5-4B` remains interesting as a **stock** revisit on Ada: Qwen
-documents a text-only serving switch and materially stronger instruction scores.
-That is different from eligibility for this post-M3 adapter race. Qwen3.5 thinks
-by default, has a vision encoder and hybrid Gated DeltaNet language stack, and
-its current Unsloth guide explicitly advises against 4-bit QLoRA because of
-larger-than-normal quantization differences; the supported BF16 LoRA path is
-quoted at 10 GB before the desktop and resident server. Do not spend a stock
-sniff on a model that cannot enter the selected QLoRA protocol. Revisit it when
-the QLoRA warning is removed or a dedicated-card BF16 LoRA race is in scope.
-[Official model card](https://huggingface.co/Qwen/Qwen3.5-4B),
-[official Unsloth fine-tuning guide](https://unsloth.ai/docs/models/qwen3.5/fine-tune)
+Qwen checkpoints are excluded from the active race by the model-origin policy.
+They can return only through an explicitly approved exception backed by evidence
+that credible non-Chinese candidates trail by roughly one or two generations;
+the current Granite, Ministral, and Phi field makes that exception unavailable.
 
 `google/gemma-4-E4B-it` fixes Gemma 3's license problem, but “E4B” is 4.5B
 effective and 8B including embeddings; the BF16 checkpoint is 16 GB and also
@@ -127,9 +120,3 @@ towers and demonstrates BF16 training on an H100, not this 12 GB QLoRA shape.
 It adds capacity and tooling confounds without persona evidence, so it does not
 beat the three above for a cheap race. [Official checkpoint](https://huggingface.co/google/gemma-4-E4B-it),
 [Hugging Face Gemma 4 fine-tuning guide](https://huggingface.co/docs/google-cloud/en/examples/vertex-ai-notebooks-fine-tune-gemma-4)
-
-`microsoft/Phi-4-mini-instruct` is technically eligible (MIT, 3.8B, dense,
-text-only), but its first-party positioning and post-training target reasoning,
-logic, and safety rather than short expressive chat. With only three slots it
-offers less task-specific evidence than Ministral and less local evidence than
-Granite. [Official model card](https://huggingface.co/microsoft/Phi-4-mini-instruct)

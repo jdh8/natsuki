@@ -6,7 +6,7 @@ readonly SERVICE_HOME=/var/lib/natsuki
 readonly SUBID_COUNT=65536
 readonly DEFAULT_SUBID_MIN=100000
 readonly DEFAULT_SUBID_MAX=600100000
-readonly DEFAULT_MODEL_PATH="${HF_HUB_CACHE:-${HF_HOME:-$HOME/.cache/huggingface}/hub}/models--unsloth--Qwen3-4B-Instruct-2507-GGUF/snapshots/a06e946bb6b655725eafa393f4a9745d460374c9/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+readonly DEFAULT_MODEL_PATH="${HF_HUB_CACHE:-${HF_HOME:-$HOME/.cache/huggingface}/hub}/models--ibm-granite--granite-4.1-3b-GGUF/snapshots/ab4701481089b58a082ef63cc1cee738887293ff/granite-4.1-3b-Q5_K_M.gguf"
 readonly LLAMA_IMAGE='ghcr.io/ggml-org/llama.cpp@sha256:dd0c408a4c3285f7809323ac17f85e70ef756bf67a3a30d4eed6805a8c1df16b'
 readonly CURL_IMAGE='docker.io/curlimages/curl@sha256:4026b29997dc7c823b51c164b71e2b51e0fd95cce4601f78202c513d97da2922'
 
@@ -151,7 +151,7 @@ ensure_subid_range() {
     || die "failed to assign natsuki a subordinate ID range in $file"
 }
 
-# resolve_model_config — validate MODEL_PATH (defaulting to the cached Qwen3
+# resolve_model_config — validate MODEL_PATH (defaulting to the cached Granite
 # GGUF) and ensure CHAT_API_KEY exists, persisting both to the env file.
 resolve_model_config() {
   MODEL_PATH=$(_existing MODEL_PATH || true)

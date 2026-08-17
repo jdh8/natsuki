@@ -5,7 +5,11 @@ does not depend on it.  Run M0 commands through `./trainer/m0`; the wrapper
 places Python, Hugging Face, CUDA JIT, XDG, and temporary caches under
 `/srv/var/jdh8` so the production server's `/home` filesystem is not consumed.
 
-## M0 commands
+## Historical M0 commands
+
+These reproduce the completed Qwen-versus-Granite baseline and are not active
+model choices.  New serving and training work starts from Granite; rerun the
+Qwen side only when auditing the dated M0 result.
 
 ```sh
 ./trainer/m0-download-models
@@ -102,8 +106,8 @@ sentence-count violation. These diagnostic results remain local under
 The next Groq candidate, `qwen/qwen3.6-27b`, was rejected at row 2: row 1
 narrowly passed, but row 2 failed the required speaker/message shape through
 all seven retries and its inspected reply belittled a sincere success. The
-runner handles that model's non-thinking JSON Object Mode only to keep the
-failed screen reproducible.
+failed result remains historical; the active runner no longer carries its
+provider-specific request mode.
 
 The no-spend self-hosted Hermes 4.3 36B screen completed all 12 structurally
 valid rows on 2026-08-12, but strict review passed only 2/12. It belittled the
@@ -126,7 +130,10 @@ dl02 teacher hunt stops here and M3 remains blocked. See
 
 The hunt has moved to hosted APIs: Kimi K2.6 (OpenRouter, thinking disabled)
 and then DeepSeek-V4-Flash-0731 (DeepInfra) are queued, pending operator
-approval of the provider account and spend. Set `TEACHER_API_KEY` for such
+approval of the provider account, spend, and model-origin exception.  They are
+eligible for that exception only because every screened non-Chinese teacher
+missed the frozen gate and no peer candidate remains within the capability
+bar.  Set `TEACHER_API_KEY` for such
 endpoints; requests to `openrouter.ai` automatically carry
 `reasoning: {"enabled": false}`. Before a 12-row screen, run a one-row
 `--limit 1` probe in a throwaway output directory to confirm the endpoint
@@ -147,23 +154,21 @@ buys.  It runs on the dev box; the wrapper only redirects caches to
 ./trainer/m2-probe train                  # full two epochs
 ./trainer/m2-probe sniff
 ./trainer/m0 blind \
-  --left trainer/out/m0/qwen.sniff.jsonl \
-  --right trainer/out/m2-probe/probe.sniff.jsonl \
-  --output trainer/out/m2-probe/blind-review.md \
-  --key-output trainer/out/m2-probe/blind-key.json
+  --left trainer/out/m0/granite.sniff.jsonl \
+  --right trainer/out/m2-granite-probe/probe.sniff.jsonl \
+  --output trainer/out/m2-granite-probe/blind-review.md \
+  --key-output trainer/out/m2-granite-probe/blind-key.json
 ```
 
 Gold rows sample a system-prompt variant per row (roughly a quarter each of
 none / ultra-short / medium paraphrase / full production prompt); replay rows
-are verbatim and never carry the persona prompt.  Training pins the official
-Instruct-2507 chat template committed as
-`qwen3-instruct-chat-template.jinja` — unsloth's mirror silently substitutes
-a thinking-style template whose empty `<think>` blocks the adapter then
-parrots — refuses to start if response masking leaves any sample fully
+are verbatim and never carry the persona prompt.  Training uses Granite's
+official upstream chat template and verifies its role markers, refuses to
+start if response masking leaves any sample fully
 masked or any row renders a think block, and the adapter ships
 with a `probe.json` sidecar recording the base model, LoRA config, data
 hashes, system-prompt hash, tokenized chat-template fixture, and eval-loss
-curve.  Read the blinded review by hand: canon-only beating stock Qwen
+curve.  Read the blinded review by hand: canon-only beating stock Granite
 demotes the synthetic corpus from load-bearing to augmentation; losing
 measures the gap a future teacher must close.
 

@@ -132,16 +132,11 @@ class M2Tests(unittest.TestCase):
         self.assertIn("Treat this as a late-night group DM", instructions)
         self.assertIn('["user1:", "user2:"]', instructions)
 
-    def test_qwen_uses_its_supported_groq_modes(self):
-        with (
-            mock.patch.object(m2, "MODEL", "qwen/qwen3.6-27b"),
-            mock.patch.object(m2, "TEACHER_URL", m2.GROQ_URL),
-        ):
+    def test_groq_teacher_uses_standard_structured_output(self):
+        with mock.patch.object(m2, "TEACHER_URL", m2.GROQ_URL):
             payload = m2.request_payload(m2.schedule()[0], [], "voice")
-        self.assertEqual(payload["reasoning_effort"], "none")
-        self.assertEqual(payload["response_format"], {"type": "json_object"})
-        self.assertIn("JSON object", payload["messages"][1]["content"])
-        self.assertIn("exactly two string fields", payload["messages"][1]["content"])
+        self.assertEqual(payload["reasoning_effort"], "medium")
+        self.assertEqual(payload["response_format"]["type"], "json_schema")
 
     def test_local_teacher_omits_groq_reasoning_mode(self):
         with mock.patch.object(m2, "TEACHER_URL", "http://localhost/teacher"):

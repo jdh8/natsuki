@@ -104,10 +104,30 @@ class ReplayFilter(unittest.TestCase):
 
 
 class ChatTemplate(unittest.TestCase):
-    def test_committed_template_is_production_shaped(self):
-        template = m2_probe.CHAT_TEMPLATE.read_text(encoding="utf-8")
-        self.assertNotIn("<think>", template)
-        self.assertIn("{{- '<|im_start|>assistant\\n' }}", template)
+    def test_granite_is_the_active_training_default(self):
+        self.assertEqual(m2_probe.BASE_MODEL, "ibm-granite/granite-4.1-3b")
+        self.assertNotIn("qwen", m2_probe.BASE_MODEL.casefold())
+        self.assertEqual(
+            m2_probe.INSTRUCTION_PART,
+            "<|start_of_role|>user<|end_of_role|>",
+        )
+        self.assertEqual(
+            m2_probe.RESPONSE_PART,
+            "<|start_of_role|>assistant<|end_of_role|>",
+        )
+
+    def test_official_template_is_production_shaped(self):
+        class Tokenizer:
+            chat_template = "official Granite template"
+
+            @staticmethod
+            def apply_chat_template(*_args, **_kwargs):
+                return (
+                    "<|start_of_role|>user<|end_of_role|>hi<|end_of_text|>\n"
+                    "<|start_of_role|>assistant<|end_of_role|>"
+                )
+
+        m2_probe.enforce_template(Tokenizer())
 
 
 class Split(unittest.TestCase):

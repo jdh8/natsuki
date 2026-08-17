@@ -102,6 +102,11 @@ SCRIPT_DIR="$DEPLOY_DIR"
 # shellcheck source=deploy/lib/common.sh
 source "$DEPLOY_DIR/lib/common.sh"
 
+[[ "$DEFAULT_MODEL_PATH" == *models--ibm-granite--granite-4.1-3b-GGUF* ]] \
+  || fail "the default deployment model is not Granite 4.1 3B"
+[[ "${DEFAULT_MODEL_PATH,,}" != *qwen* ]] \
+  || fail "the default deployment model violates the model-origin policy"
+
 touch "$TEST_TMP/subids-empty"
 assert_subid_start "$TEST_TMP/subids-empty" 100000 600100000 600016544
 

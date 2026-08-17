@@ -56,7 +56,7 @@ REFUSAL = re.compile(
 )
 SELF_PREFIX = re.compile(r"^\s*(?:natsuki|assistant)\s*:", re.IGNORECASE)
 SPECIAL_TOKEN = re.compile(
-    r"<\|(?:im_start|im_end|endoftext|assistant|user|system)\|>|"
+    r"<\|(?:im_start|im_end|endoftext|end_of_text|start_of_role|end_of_role|assistant|user|system)\|>|"
     r"<\/?(?:s|bos|eos|think|tool_call|tool_response)>|\[/?INST\]",
     re.IGNORECASE,
 )

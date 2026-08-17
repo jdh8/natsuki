@@ -3,23 +3,31 @@
 Research updated: 2026-08-12. Sources below are first-party model cards,
 documentation, release notes, and license terms.
 
+**Policy update 2026-08-17:** non-Chinese families are the default for every
+active model role.  Kimi K2.6 and DeepSeek-V4-Flash-0731 remain only as a
+pending exception because all screened non-Chinese teachers missed the frozen
+gate and no peer candidate remains within the capability bar.  Running either
+still requires explicit approval backed by that comparison.  Qwen references
+below are historical and it is not an active candidate or judge.
+
 ## Decision
 
-**No teacher is approved or queued.** `allenai/Olmo-3.1-32B-Instruct` was
+**No teacher is approved and no hosted screen is authorized.**
+`allenai/Olmo-3.1-32B-Instruct` was
 rejected on 2026-08-12: both independent strict reviews passed only 2/12 frozen
 rows, rows 4 and 5 had mechanical sentence-count failures, row 5 gave
 technically backwards and underqualified baking advice, and row 7 belittled
 sincere effort. Do not run its fresh 30. The current dl02 teacher hunt stops
-here. The user dropped H200 rentals, so Mistral Large 3 and Qwen3-235B remain
-parked without a quality verdict; M3 remains blocked. The hunt has moved to
-hosted APIs — see the hosted-API hunt below; nothing is approved and no
+here. The user dropped H200 rentals, so Mistral Large 3 remains parked without
+a quality verdict; Qwen3-235B is excluded by the origin policy. M3 remains
+blocked. The hunt has moved to hosted APIs — see the hosted-API hunt below; nothing is approved and no
 request has been sent.
 
 This does not approve the teacher. The repository's acceptance bar remains
 10/12 frozen cases plus 27/30 fresh cases, with zero hard-rule or factual
 failures. `openai/gpt-oss-120b` and
 `mistralai/Mistral-Small-3.2-24B-Instruct-2506` have already been screened;
-`qwen/qwen3.6-27b` also failed and conflicts with the current judge. None is a
+`qwen/qwen3.6-27b` also failed. None is a
 candidate. The no-spend Hermes screen below also failed. As required by
 [`trainer/README.md`](../trainer/README.md),
 only the original voice card and synthetic attribute tuple may reach a teacher;
@@ -53,7 +61,7 @@ ceiling ≈ $1).
 | --- | --- |
 | Exact checkpoint | `moonshotai/Kimi-K2.6` at revision `7eb5002f6aadc958aed6a9177b7ed26bb94011bb`: 1T-total/32B-active MoE, 256K context. It is the newest Kimi whose thinking can be disabled server-side; Kimi K3 ("always has thinking enabled") and K2.7-Code (thinking always on) are disqualified, and K2.5/K2-Instruct are sunset or discontinued on the vendor platform. [Pinned tree](https://huggingface.co/moonshotai/Kimi-K2.6/tree/7eb5002f6aadc958aed6a9177b7ed26bb94011bb), [K3 card](https://huggingface.co/moonshotai/Kimi-K3) |
 | License / distillation | Modified MIT whose sole modification requires displaying "Kimi K2.6" only in products exceeding 100M monthly active users or US$20M monthly revenue — unreachable here. No anti-distillation or output-use term; standard MIT grant otherwise, so publishing the student and corpus is unencumbered. [Pinned LICENSE](https://huggingface.co/moonshotai/Kimi-K2.6/raw/7eb5002f6aadc958aed6a9177b7ed26bb94011bb/LICENSE) |
-| Family independence | Moonshot's own 1T MoE pretrain (15.5T tokens, MuonClip; K2.5/K2.6 continue Kimi-K2-Base). DeepSeek-style MLA/MoE architecture but an independent training run — separate from the Qwen judge and control, the Granite and Ministral students, and every rejected family. [K2-Instruct card](https://huggingface.co/moonshotai/Kimi-K2-Instruct), [Kimi-K2.5 card](https://huggingface.co/moonshotai/Kimi-K2.5) |
+| Family independence | Moonshot's own 1T MoE pretrain (15.5T tokens, MuonClip; K2.5/K2.6 continue Kimi-K2-Base). DeepSeek-style MLA/MoE architecture but an independent training run — separate from the gpt-oss judge, the Granite/Ministral/Phi students, the Llama baseline, and every rejected family. [K2-Instruct card](https://huggingface.co/moonshotai/Kimi-K2-Instruct), [Kimi-K2.5 card](https://huggingface.co/moonshotai/Kimi-K2.5) |
 | Endpoint | OpenRouter `https://openrouter.ai/api/v1/chat/completions`, model `moonshotai/kimi-k2.6` — about 21 interchangeable providers with structured outputs (DeepInfra fp4, Crusoe bf16, Fireworks, Together, …). Pin providers or enable OpenRouter's train-opt-out and ZDR data-policy filtering in the account. Groq hosts no Kimi today (`kimi-k2-instruct-0905` shut down 2026-04-15), and Moonshot's first-party platform is rejected as a venue: its ToS uses Customer Content "to provide, maintain, develop, support, and improve the Services" by default and prohibits building "models that have potential competitive possibilities with the Services". [Endpoint list](https://openrouter.ai/api/v1/models/moonshotai/kimi-k2.6/endpoints), [Groq deprecations](https://console.groq.com/docs/deprecations), [Moonshot model-use terms](https://platform.kimi.ai/docs/agreement/modeluse.md) |
 | Provider contract | OpenRouter: "Where possible, OpenRouter has opted out of model training with the Models it uses"; prompt logging is opt-in and providers are filterable by data policy. DeepInfra (a pinnable underlying host): "We do not use data you submit to our APIs for training models"; inputs/outputs are not stored beyond the request. [OpenRouter privacy docs](https://openrouter.ai/docs/features/privacy-and-logging), [DeepInfra data privacy](https://docs.deepinfra.com/account/data-privacy) |
 | Mode / transport | Thinking is on by default and disabled per request; through OpenRouter the normalized `reasoning: {"enabled": false}` field is documented for this model. Vendor caveat on structured output: "`kimi-k2.6` occasionally behaves unstably with complex schemas" — M2's single flat object plus the seven-retry budget matches the vendor's own "prefer simple schemas and add a second validation layer" guidance, and the first structural failure still rejects. [Thinking-model guide](https://platform.kimi.ai/docs/guide/use-thinking-models.md), [response_format guide](https://platform.kimi.ai/docs/guide/response_format.md), [OpenRouter reasoning docs](https://openrouter.ai/docs/use-cases/reasoning-tokens) |
