@@ -337,7 +337,7 @@ pub async fn smash(
                 || format!("{author} smashed!"),
                 |u| format!("{author} smashed {}!", u.mention()),
             ))
-            .image("https://raw.githubusercontent.com/jdh8/natsuki/master/assets/smash.png")],
+            .image("https://raw.githubusercontent.com/jdh8/natsuki/main/assets/smash.png")],
         ..Default::default()
     })
     .await?;
