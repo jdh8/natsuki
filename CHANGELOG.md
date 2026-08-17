@@ -19,9 +19,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   screen's local output are kept; git history holds the rest.
 
 ### Changed
-- Natsuki now refuses to break character in character, and no longer sends code
-  blocks.  Both were measured failures of the deployed model.  The reply-length
-  rule is stated in words rather than sentences.
+- Natsuki sounds more like Natsuki.  The system prompt now describes her
+  voice concretely — verbal habits, two "sounds like" fragments, snap-then-
+  soften, blunt kindness when someone is hurting — instead of listing traits,
+  and the two hard rules are stated as in-voice examples.  Measured on the
+  deployed Granite Q8 over 60 samples per prompt (20 fixture prompts × 3
+  seeds): "dummy" drops from 47/60 replies to 3/60 and is never the opener
+  (was 37/60), no mechanical violations remain, `16_break_character` holds
+  3/3 (the deployed prompt meta-refused 3/3 — its clause never worked), and
+  the code request is snapped at instead of answered.  Replies are shorter
+  (mean 23 tokens, was 33) and no longer carry emoji.  Cost: the prompt is
+  313 tokens instead of 200, identity/break-character probes get one canned
+  brush-off, and about 3% of replies copy the "it's not like I... or
+  anything!" placeholder ellipsis verbatim — every alternative tried was
+  colder on the hurting-user prompts.  The prompt is now one clause per line
+  so diffs read per rule.
+- The reply-length rule is stated in words rather than sentences.
 - The evaluation harness measures reply length in **generated tokens** instead
   of sentences.  Sentence counting scored punctuation style, not length: it
   passed a 220-character run-on and failed four punchy Discord fragments, which

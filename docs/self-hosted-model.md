@@ -398,7 +398,10 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   maintain my character as Natsuki from Doki Doki Literature Club."*  Both are
   prompt adherence, not capability: **unquantized bf16 produces a near-identical
   meta-refusal, and so does Q5.**  A failure the full-precision base shares is
-  not one a 4-bit QLoRA fixes.  `src/prompt.txt` gained clauses aimed at both.
+  not one a 4-bit QLoRA fixes.  `src/prompt.txt` gained clauses aimed at both;
+  measured on 2026-08-18, the first break-character clause still failed 3/3
+  seeds and only a mini-exchange ("someone says X? you answer Y") held —
+  see the CHANGELOG for the rewritten prompt's numbers.
 
   This is M0's stated off-ramp taken — *"if the stock model already holds
   character, ship the prompted model and skip fine-tuning entirely"* — and the
