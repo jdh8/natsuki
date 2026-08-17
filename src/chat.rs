@@ -15,16 +15,7 @@ const MAX_HISTORY: usize = 20;
 /// Evicting in chunks keeps that prefix stable for three exchanges.
 const EVICT_CHUNK: usize = 6;
 
-const SYSTEM_PROMPT: &str = "You are Natsuki from Doki Doki Literature Club, \
-chatting on Discord.  You are tsundere: blunt, easily flustered, secretly kind.  \
-You love baking (especially cupcakes) and manga (Parfait Girls is the best, \
-fight me).  You are defensive about your height and about manga being real \
-literature.  You call people 'dummy' when embarrassed and hide vulnerability \
-behind snark, but you genuinely care about your friends.  \
-User messages are prefixed with the speaker's name like 'name: text'; do NOT \
-prefix your own replies with a name.  Keep replies short, 1-3 sentences, \
-casual Discord tone.  Stay in character.  Never mention being an AI or a \
-language model.";
+const SYSTEM_PROMPT: &str = include_str!("prompt.txt");
 
 pub type ChatHistory = std::sync::Mutex<HashMap<serenity::ChannelId, VecDeque<ChatMessage>>>;
 
@@ -42,7 +33,8 @@ async fn complete(
 ) -> anyhow::Result<String> {
     let user_content = format!("{author}: {input}");
 
-    let mut messages = vec![serde_json::json!({ "role": "system", "content": SYSTEM_PROMPT })];
+    let mut messages =
+        vec![serde_json::json!({ "role": "system", "content": SYSTEM_PROMPT.trim() })];
     {
         let history = data.chat_history.lock().unwrap();
         if let Some(deque) = history.get(&channel) {
@@ -94,8 +86,9 @@ async fn complete(
         .await?;
     let reply = json["choices"][0]["message"]["content"]
         .as_str()
-        .ok_or_else(|| anyhow::anyhow!("Unexpected chat response: {json}"))?;
-    let reply = clean_reply(reply, author);
+        .ok_or_else(|| anyhow::anyhow!("Unexpected chat response: {json}"))?
+        .trim()
+        .to_owned();
 
     // Discord caps messages at 2000 chars
     let reply = if reply.chars().count() > 2000 {
@@ -111,15 +104,6 @@ async fn complete(
         reply.clone(),
     );
     Ok(reply)
-}
-
-fn clean_reply(reply: &str, author: &str) -> String {
-    let reply = reply.trim();
-    reply
-        .strip_prefix(&format!("{author}:"))
-        .unwrap_or(reply)
-        .trim_start()
-        .to_owned()
 }
 
 /// Append one exchange, evicting a whole chunk once the window overflows.
@@ -202,14 +186,5 @@ mod tests {
                 assert_eq!(msg.role, expected, "turn {n} after exchange {i}");
             }
         }
-    }
-
-    #[test]
-    fn removes_echoed_user_prefix() {
-        assert_eq!(clean_reply("jdh8: Fine, dummy.", "jdh8"), "Fine, dummy.");
-        assert_eq!(
-            clean_reply("monika: Fine, dummy.", "jdh8"),
-            "monika: Fine, dummy."
-        );
     }
 }

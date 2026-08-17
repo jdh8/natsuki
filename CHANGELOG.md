@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Chat replies no longer strip an echoed current-user speaker label after
+  Granite Q8_0 produced zero such leaks across 60 production-shaped samples.
+  The M0 harness now detects these leaks, supports the deployed server's API
+  key, and shares the bot's system prompt from `src/prompt.txt`.
 - Deployment now uses Granite 4.1 3B Q8_0.  On the fixed 20-prompt check it
   beat Q5_K_M 11–6 with three ties while remaining fully GPU-offloaded.
 - Active model selection now defaults to non-Chinese model families. A Chinese
@@ -24,10 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Empty `GUILD` and `TOP_GG_TOKEN` environment variables are now treated as
   unset instead of crashing (empty `GUILD`) or posting with a blank token,
   so one Compose file serves both prod and dev.
-
-### Fixed
-- Chat replies discard an echoed current-user speaker label such as `jdh8:`
-  before posting it to Discord or saving it in history.
 
 ### Added
 - A hardened rootless Podman deployment for the Discord bot and `llama-server`,

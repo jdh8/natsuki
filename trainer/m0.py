@@ -14,6 +14,7 @@ import csv
 import hashlib
 import json
 import math
+import os
 import re
 import shutil
 import signal
@@ -33,18 +34,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 TRAINER_ROOT = REPO_ROOT / "trainer"
 DEFAULT_OUT = TRAINER_ROOT / "out" / "m0"
 DEFAULT_PROMPTS = TRAINER_ROOT / "m0-prompts.jsonl"
-SYSTEM_PROMPT = (
-    "You are Natsuki from Doki Doki Literature Club, chatting on Discord.  "
-    "You are tsundere: blunt, easily flustered, secretly kind.  "
-    "You love baking (especially cupcakes) and manga (Parfait Girls is the best, "
-    "fight me).  You are defensive about your height and about manga being real "
-    "literature.  You call people 'dummy' when embarrassed and hide vulnerability "
-    "behind snark, but you genuinely care about your friends.  "
-    "User messages are prefixed with the speaker's name like 'name: text'; do NOT "
-    "prefix your own replies with a name.  Keep replies short, 1-3 sentences, "
-    "casual Discord tone.  Stay in character.  Never mention being an AI or a "
-    "language model."
-)
+SYSTEM_PROMPT = (REPO_ROOT / "src" / "prompt.txt").read_text(encoding="utf-8").strip()
 
 AI_DISCLOSURE = re.compile(
     r"(?i)\b(?:as an? (?:ai|assistant|language model)|i(?:'m| am) (?:an? )?"
@@ -295,10 +285,13 @@ def request_completion(
         "temperature": 0.8,
         "seed": prompt["seed"],
     }
+    headers = {"Content-Type": "application/json", "User-Agent": "natsuki-m0/0.1"}
+    if api_key := os.environ.get("CHAT_API_KEY"):
+        headers["Authorization"] = f"Bearer {api_key}"
     request = urllib.request.Request(
         endpoint,
         data=json.dumps(payload).encode(),
-        headers={"Content-Type": "application/json", "User-Agent": "natsuki-m0/0.1"},
+        headers=headers,
         method="POST",
     )
     started = time.monotonic()
@@ -313,6 +306,9 @@ def request_completion(
     content = ""
     if status < 400:
         content = body["choices"][0]["message"]["content"].strip()
+    found = violations(content) if content else ["empty_response"]
+    if content and re.match(rf"^\s*{re.escape(prompt['author'])}\s*:", content, re.I):
+        found.append("user_prefix")
     return {
         "timestamp_utc": utc_now(),
         "prompt_id": prompt["id"],
@@ -323,7 +319,7 @@ def request_completion(
         "http_status": status,
         "elapsed_seconds": round(elapsed, 6),
         "response": content,
-        "violations": violations(content) if content else ["empty_response"],
+        "violations": found,
         "usage": body.get("usage"),
         "timings": body.get("timings"),
         "error": body.get("error"),
@@ -447,7 +443,10 @@ def evaluation_summary(
         if len(model_names) != 1:
             raise ValueError(f"{path}: expected one model, got {sorted(model_names)}")
         model = model_names.pop()
-        rescored = [violations(row["response"]) for row in rows]
+        rescored = [
+            list(dict.fromkeys([*violations(row["response"]), *row.get("violations", [])]))
+            for row in rows
+        ]
         counts: dict[str, int] = {}
         for row_violations in rescored:
             for name in row_violations:

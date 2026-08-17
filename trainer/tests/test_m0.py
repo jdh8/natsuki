@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from unittest import mock
 
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "m0.py"
@@ -38,6 +39,25 @@ class PromptTests(unittest.TestCase):
             M0.violations("Why be mean? I'll show you who's annoying... uh, my cupcakes! 😒"),
             [],
         )
+
+    def test_request_flags_author_prefix(self):
+        response = mock.MagicMock(status=200)
+        response.read.return_value = b'{"choices":[{"message":{"content":"Amy: Fine."}}]}'
+        response.__enter__.return_value = response
+        prompt = {
+            "id": "greeting",
+            "category": "ordinary",
+            "seed": 1,
+            "author": "amy",
+            "input": "hey",
+        }
+        with (
+            mock.patch.dict(M0.os.environ, {"CHAT_API_KEY": "secret"}),
+            mock.patch.object(M0.urllib.request, "urlopen", return_value=response) as urlopen,
+        ):
+            result = M0.request_completion("http://example.test", "model", prompt, 1)
+        self.assertIn("user_prefix", result["violations"])
+        self.assertEqual(urlopen.call_args.args[0].get_header("Authorization"), "Bearer secret")
 
 
 class VramTests(unittest.TestCase):
