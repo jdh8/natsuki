@@ -6,7 +6,7 @@ readonly SERVICE_HOME=/var/lib/natsuki
 readonly SUBID_COUNT=65536
 readonly DEFAULT_SUBID_MIN=100000
 readonly DEFAULT_SUBID_MAX=600100000
-readonly DEFAULT_MODEL_PATH="${HF_HUB_CACHE:-${HF_HOME:-$HOME/.cache/huggingface}/hub}/models--ibm-granite--granite-4.1-3b-GGUF/snapshots/ab4701481089b58a082ef63cc1cee738887293ff/granite-4.1-3b-Q5_K_M.gguf"
+readonly DEFAULT_MODEL_PATH="${HF_HUB_CACHE:-${HF_HOME:-$HOME/.cache/huggingface}/hub}/models--ibm-granite--granite-4.1-3b-GGUF/snapshots/ab4701481089b58a082ef63cc1cee738887293ff/granite-4.1-3b-Q8_0.gguf"
 readonly LLAMA_IMAGE='ghcr.io/ggml-org/llama.cpp@sha256:dd0c408a4c3285f7809323ac17f85e70ef756bf67a3a30d4eed6805a8c1df16b'
 readonly CURL_IMAGE='docker.io/curlimages/curl@sha256:4026b29997dc7c823b51c164b71e2b51e0fd95cce4601f78202c513d97da2922'
 

@@ -101,9 +101,9 @@ available if the numbers come up short.
 ## Stack
 
 **Base: `ibm-granite/granite-4.1-3b`.**  40 layers / 40 Q heads / 8 KV heads /
-head_dim 64, dense GQA, text-only and non-thinking.  The first-party Q5_K_M is
-about 2.4 GB; FP16 KV is 80 KiB/token, or 320 MiB at 4096 context.  Production
-switched to this checkpoint on 2026-08-17 and the training probe now uses its
+head_dim 64, dense GQA, text-only and non-thinking.  Deployment selects the
+first-party Q8_0 (3.37 GiB) at 4096 context; FP16 KV is 80 KiB/token, or 320
+MiB at that context.  The training probe uses the BF16 checkpoint with the
 official chat template and response markers.
 
 **Superseded technical-only choice (historical):
@@ -354,8 +354,10 @@ list at training time and diff it on every deploy via `llama-server`'s
 `chat_template.jinja` as a separate file, so reading only `tokenizer_config.json`
 makes this load-bearing check "fail" for reasons unrelated to the model.
 
-**Ship Q5_K_M at 4096 context**: about 2.4 GB + 320 MiB KV + ~600 MB CUDA
-context lands near 3.3 GiB, leaving real slack.  llama.cpp's KLD ladder for Llama-3-8B
+**Ship Q8_0 at 4096 context**: the 3.37-GiB artifact plus KV and CUDA runtime
+measured 4,000 MiB fully offloaded on the RTX 4070 SUPER.  It beat Q5_K_M 11–6
+with three ties on the fixed 20-prompt check, with five automatic violations
+against Q5's seven.  llama.cpp's KLD ladder for Llama-3-8B
 puts q5_K_M at 0.010762 against q4_K_M's 0.028152 — about 2.6× closer to FP16.
 **Do not ship IQ4_XS**, which is *worse* than Q4_K_M (0.036334) for 0.44 GiB
 saved, plus extra decode compute on a card with no tensor cores.
@@ -382,11 +384,11 @@ build ships PTX only, so expect a JIT compile on first load.
 by the 1660; on Ada: `-ub` can return to the default 512 (128 was a VRAM
 concession), flash attention is settled-on, and the `GGML_CUDA_FORCE_MMQ` /
 Turing-build questions stay M0-only artifacts.  Context 8192 becomes affordable
-(KV 1.15 GiB) and the ship quant can move Q5_K_M → Q6_K or Q8_0 — decide both
-at M5 via the KLD procedure above, not now.  The constraint that replaces VRAM
-scarcity is sharing: serving, the desktop session, and QLoRA runs coexist on
-~12 GB, and the 4B footprint (~3.8–5.5 GiB depending on quant and context) is
-what keeps that workable.
+(KV 1.15 GiB); the 2026-08-17 stock-model benchmark selected Q8_0, while M5
+still measures the merged fine-tune's KLD before release.  The constraint that
+replaces VRAM scarcity is sharing: serving, the desktop session, and QLoRA runs
+coexist on ~12 GB, and the 4B footprint (~3.8–5.5 GiB depending on quant and
+context) is what keeps that workable.
 
 ## Evaluation
 
@@ -476,7 +478,9 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   future fine-tuning.**  The first-party Q5_K_M passed its pinned checksum,
   loaded fully on the RTX 4070 SUPER, and completed an authenticated inference;
   the lower stock persona score is accepted because M3/M4 exist to specialize
-  the student.  The Qwen/Granite M0 comparison stays historical evidence.
+  the student.  A same-day precision benchmark then selected Q8_0 for serving:
+  it beat Q5_K_M 11–6 with three ties and Qwen3 4B Q5_K_M 12–8.  The earlier
+  Qwen/Granite M0 comparison stays historical evidence.
 
 - ✅ **M1 Extract and parse the script.**  *Deliverable:* `trainer/extract.py`,
   canon lines and gold pairs as JSONL.  *Measure:* **1,520 physical / 2,319
@@ -654,10 +658,9 @@ Each names a **deliverable**, a **measure**, and its **deps**.
 
 1. ✅ Does the prod box actually leave 4.5 GB free?  Likely not (47.6% of
    preflight samples) — mooted by the 2026-08-11 decision to serve on the 4070.
-2. ⬜ Would a 3B at Q8_0 beat a 4B at Q5_K_M?  Never evaluated.  Llama-3.2-3B
-   Q8_0 lands near 4.5 GB total with far better KLD, but 3B is below the size
-   where the never-admit-being-an-AI rule reliably holds.  Resolve by measurement
-   in M6, not by argument.
+2. ✅ Would a 3B at Q8_0 beat a 4B at Q5_K_M?  Granite 4.1 3B Q8_0 beat
+   Qwen3 4B Q5_K_M 12–8 on the fixed blinded check, with five automatic
+   violations against Qwen's sixteen, and was selected for deployment.
 3. ⬜ How much does 4B buy on instruction adherence?  Less than hoped — published
    per-task data shows 4B still failing ~19% on the hardest task, and 9B scoring
    *worse* than 4B on two of nine.  The honest reading is that no model in this

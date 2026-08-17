@@ -104,6 +104,8 @@ source "$DEPLOY_DIR/lib/common.sh"
 
 [[ "$DEFAULT_MODEL_PATH" == *models--ibm-granite--granite-4.1-3b-GGUF* ]] \
   || fail "the default deployment model is not Granite 4.1 3B"
+[[ "$DEFAULT_MODEL_PATH" == *granite-4.1-3b-Q8_0.gguf ]] \
+  || fail "the default deployment quant is not Q8_0"
 [[ "${DEFAULT_MODEL_PATH,,}" != *qwen* ]] \
   || fail "the default deployment model violates the model-origin policy"
 

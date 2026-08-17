@@ -94,9 +94,8 @@ async fn complete(
         .await?;
     let reply = json["choices"][0]["message"]["content"]
         .as_str()
-        .ok_or_else(|| anyhow::anyhow!("Unexpected chat response: {json}"))?
-        .trim()
-        .to_owned();
+        .ok_or_else(|| anyhow::anyhow!("Unexpected chat response: {json}"))?;
+    let reply = clean_reply(reply, author);
 
     // Discord caps messages at 2000 chars
     let reply = if reply.chars().count() > 2000 {
@@ -112,6 +111,15 @@ async fn complete(
         reply.clone(),
     );
     Ok(reply)
+}
+
+fn clean_reply(reply: &str, author: &str) -> String {
+    let reply = reply.trim();
+    reply
+        .strip_prefix(&format!("{author}:"))
+        .unwrap_or(reply)
+        .trim_start()
+        .to_owned()
 }
 
 /// Append one exchange, evicting a whole chunk once the window overflows.
@@ -194,5 +202,14 @@ mod tests {
                 assert_eq!(msg.role, expected, "turn {n} after exchange {i}");
             }
         }
+    }
+
+    #[test]
+    fn removes_echoed_user_prefix() {
+        assert_eq!(clean_reply("jdh8: Fine, dummy.", "jdh8"), "Fine, dummy.");
+        assert_eq!(
+            clean_reply("monika: Fine, dummy.", "jdh8"),
+            "monika: Fine, dummy."
+        );
     }
 }
