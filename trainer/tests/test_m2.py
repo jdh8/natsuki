@@ -102,7 +102,6 @@ class M2Tests(unittest.TestCase):
     def test_prompt_scopes_content_attributes_to_the_right_turns(self):
         payload = m2.request_payload(m2.schedule()[0], [], "voice")
         instructions = payload["messages"][1]["content"]
-        self.assertEqual(payload["reasoning_effort"], "medium")
         with mock.patch.object(m2, "TEMPERATURE", 0.15):
             self.assertEqual(
                 m2.request_payload(m2.schedule()[0], [], "voice")["temperature"],

@@ -483,12 +483,9 @@ def original_route_candidates(
 
 
 def parse_plus(
-    plus_root: Path,
-    blocks: dict[str, dict[str, Any]] | None = None,
-    localization: dict[str, dict[int, str]] | None = None,
+    blocks: dict[str, dict[str, Any]],
+    localization: dict[str, dict[int, str]],
 ) -> tuple[list[CanonLine], list[Turn], int]:
-    blocks = blocks or load_plus_blocks(plus_root)
-    localization = localization or load_plus_localization(plus_root)
     canon: list[CanonLine] = []
     turns: list[Turn] = []
     unresolved = 0
@@ -701,7 +698,7 @@ def run(args: argparse.Namespace) -> int:
         ROUTE_QUOTAS,
         ROUTE_LINES,
     )
-    plus_lines, plus_turns, unresolved = parse_plus(plus_root, blocks, localization)
+    plus_lines, plus_turns, unresolved = parse_plus(blocks, localization)
     counts = validate_locked_counts(
         original_physical,
         original_turns,

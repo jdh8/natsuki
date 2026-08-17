@@ -528,10 +528,10 @@ Each names a **deliverable**, a **measure**, and its **deps**.
   turn as `<think>\n\n</think>\n\n<reply>`, so the first adapter opened
   replies with think/tool_call token salad while the bare production header
   never triggers it.  For that historical run, the official Instruct-2507
-  template was committed verbatim
-  (`trainer/qwen3-instruct-chat-template.jinja`) and enforced at train and
-  sniff time.  The active Granite probe instead validates the official
-  upstream template and its response markers.  Fallout fix:
+  template was pinned verbatim in the repo and enforced at train and sniff
+  time; the pinned copy was removed after the Granite switch (see git
+  history).  The active Granite probe instead validates the official upstream
+  template and its response markers.  Fallout fix:
   Tier 0's special-token regex never covered `<think>`/`<tool_call>` and
   flagged 0 of 18 contaminated replies; `m0.py` now matches them.
 

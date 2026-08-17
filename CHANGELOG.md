@@ -51,10 +51,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   existing blinded 20-prompt review, deciding how much the future synthetic
   corpus must carry.  Training data stays local and gitignored; users are
   unaffected until a model ships.
-- The official Qwen3-4B-Instruct-2507 chat template, committed verbatim for the
-  historical Qwen probe after unsloth's mirror silently substituted a
-  thinking-style template that taught the first
-  adapter to open replies with `<think>`/`<tool_call>` token salad.  The
+- The historical Qwen probe pinned the official Qwen3-4B-Instruct-2507 chat
+  template verbatim and enforced it at train and sniff time after unsloth's
+  mirror silently substituted a thinking-style template that taught the first
+  adapter to open replies with `<think>`/`<tool_call>` token salad.  The pinned
+  copy was removed after the Granite switch because the active probe validates
+  Granite's upstream template.  The
   Tier-0 special-token check now also catches `<think>`, `<tool_call>`,
   `<tool_response>`, and Granite role/end-marker leakage.
 - The completed probe verdict: canon-only training converges but loses the
@@ -91,6 +93,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   updated code and secrets actually deploy.
 
 ### Internal
+- Removed unused trainer code: the orphaned Qwen chat-template file,
+  trl/transformers shims dead against the pinned lock, a redundant username
+  regex, unused `parse_plus` fallbacks, and a stray test import/assertion. No
+  user-facing behavior changes.
 - Added the isolated Python 3.12 M0 harness, fixed 20-prompt stock-model sniff
   test, VRAM sampler, benchmark/evaluation runners, blinded comparison tooling,
   and self-finalizing compact reports.  Pinned native Turing and GTX-16 MMQ

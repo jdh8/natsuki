@@ -196,21 +196,6 @@ def build_data(args: argparse.Namespace) -> int:
     return 0
 
 
-def sft_config(SFTConfig: Any, wanted: dict[str, Any]) -> Any:
-    """Build an SFTConfig, dropping keys this trl version does not know."""
-    import dataclasses
-
-    names = {field.name for field in dataclasses.fields(SFTConfig)}
-    if "max_length" in wanted and "max_length" not in names:
-        wanted["max_seq_length"] = wanted.pop("max_length")
-    if "eval_strategy" in wanted and "eval_strategy" not in names:
-        wanted["evaluation_strategy"] = wanted.pop("eval_strategy")
-    dropped = sorted(set(wanted) - names)
-    if dropped:
-        print(f"SFTConfig does not accept {dropped}; dropping", file=sys.stderr)
-    return SFTConfig(**{key: value for key, value in wanted.items() if key in names})
-
-
 def git_head() -> str:
     return subprocess.run(
         ["git", "-C", str(TRAINER_ROOT), "rev-parse", "HEAD"],
@@ -272,48 +257,38 @@ def train(args: argparse.Namespace) -> int:
         name: Dataset.from_list(m0.load_jsonl(data_dir / f"{name}.jsonl")).map(to_text)
         for name in ("train", "eval")
     }
-    config = sft_config(
-        SFTConfig,
-        {
-            "output_dir": str(out / "checkpoints"),
-            "dataset_text_field": "text",
-            "max_length": 1024,
-            "per_device_train_batch_size": 2,
-            # Eval logits are batch x 1024 x 152k vocab; batch 8 alone OOMs
-            # the shared 12 GB card next to llama-server and the desktop.
-            "per_device_eval_batch_size": 2,
-            "gradient_accumulation_steps": 8,
-            "num_train_epochs": 2,
-            "max_steps": args.max_steps,
-            "learning_rate": 2e-4,
-            "lr_scheduler_type": "cosine",
-            "warmup_ratio": 0.05,
-            "optim": "adamw_8bit",
-            "logging_steps": 5,
-            "eval_strategy": "steps",
-            "eval_steps": 20,
-            "save_strategy": "steps",
-            "save_steps": 20,
-            "save_total_limit": 2,
-            "load_best_model_at_end": args.max_steps < 0,
-            "metric_for_best_model": "eval_loss",
-            "seed": args.seed,
-            "report_to": "none",
-        },
-    )
-    import inspect
-
-    tokenizer_kwarg = (
-        "processing_class"
-        if "processing_class" in inspect.signature(SFTTrainer.__init__).parameters
-        else "tokenizer"
+    config = SFTConfig(
+        output_dir=str(out / "checkpoints"),
+        dataset_text_field="text",
+        max_length=1024,
+        per_device_train_batch_size=2,
+        # Eval logits are batch x 1024 x 152k vocab; batch 8 alone OOMs
+        # the shared 12 GB card next to llama-server and the desktop.
+        per_device_eval_batch_size=2,
+        gradient_accumulation_steps=8,
+        num_train_epochs=2,
+        max_steps=args.max_steps,
+        learning_rate=2e-4,
+        lr_scheduler_type="cosine",
+        warmup_ratio=0.05,
+        optim="adamw_8bit",
+        logging_steps=5,
+        eval_strategy="steps",
+        eval_steps=20,
+        save_strategy="steps",
+        save_steps=20,
+        save_total_limit=2,
+        load_best_model_at_end=args.max_steps < 0,
+        metric_for_best_model="eval_loss",
+        seed=args.seed,
+        report_to="none",
     )
     trainer = SFTTrainer(
         model=model,
         train_dataset=splits["train"],
         eval_dataset=splits["eval"],
         args=config,
-        **{tokenizer_kwarg: tokenizer},
+        processing_class=tokenizer,
     )
     trainer = train_on_responses_only(
         trainer, instruction_part=INSTRUCTION_PART, response_part=RESPONSE_PART

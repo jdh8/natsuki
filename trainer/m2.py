@@ -28,7 +28,6 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 TEACHER_URL = os.environ.get("TEACHER_URL", GROQ_URL)
 MODEL = os.environ.get("TEACHER_MODEL", "openai/gpt-oss-120b")
 TEMPERATURE = float(os.environ.get("TEACHER_TEMPERATURE", "0.7"))
-USERNAME = re.compile(r"[a-z0-9][a-z0-9_.]{0,30}[a-z0-9]")
 USER_LINE = re.compile(r"^([a-z0-9][a-z0-9_.]{0,30}[a-z0-9]):\s+\S", re.DOTALL)
 
 
@@ -211,7 +210,7 @@ def validate_conversation(
             raise ValueError(f"message {index} is not a non-empty {role} message")
         if role == "user":
             match = USER_LINE.match(message["content"])
-            if not match or not USERNAME.fullmatch(match.group(1)):
+            if not match:
                 raise ValueError(
                     f"message {index} has an invalid production username prefix"
                 )
