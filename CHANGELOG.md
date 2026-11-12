@@ -132,6 +132,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   warns when a newer release is not in the explicitly targeted version matrix.
 
 ### Fixed
+- Chat no longer dies after an NVIDIA driver upgrade on Fedora.  The CDI spec
+  lists driver libraries by full version, so after an upgrade the model
+  container could not be created at the next restart and every reply became
+  "my brain just froze".  NVIDIA's own refresh unit never ran because its
+  condition does not match Fedora's compressed kernel modules; the deploy
+  wizard now installs a drop-in so the spec is regenerated at boot and after
+  module rebuilds.
 - The deploy wizard now sets the `container_use_devices` SELinux boolean;
   without it the model container is denied `/dev/nvidiactl` and `llama-server`
   silently falls back to the CPU.  The wizard also fails loudly when the

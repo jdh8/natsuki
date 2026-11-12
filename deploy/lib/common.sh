@@ -276,6 +276,18 @@ deploy_main() {
   platform_prepare_gpu "$uid"
   sudo install -d -m 0755 /etc/cdi
   sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+  # The spec lists driver libraries by full version, so a driver upgrade leaves
+  # it pointing at files that no longer exist and the model container cannot
+  # be created.  NVIDIA ships a unit to regenerate it, but its ExecCondition
+  # greps modules.dep for "nvidia.ko:" and never matches Fedora's compressed
+  # "nvidia.ko.xz:", so it is always skipped.  Drop the condition and aim the
+  # unit at the spec above; it then runs at boot and after module rebuilds.
+  sudo install -d -m 0755 /etc/systemd/system/nvidia-cdi-refresh.service.d
+  printf '%s\n' '[Service]' 'ExecCondition=' \
+    'Environment=NVIDIA_CTK_CDI_OUTPUT_FILE_PATH=/etc/cdi/nvidia.yaml' \
+    | sudo tee /etc/systemd/system/nvidia-cdi-refresh.service.d/natsuki.conf >/dev/null
+  sudo systemctl daemon-reload
+  sudo systemctl enable --now nvidia-cdi-refresh.path nvidia-cdi-refresh.service
   nvidia-ctk cdi list | grep -Fx 'nvidia.com/gpu=0' >/dev/null || die "CDI did not expose GPU 0"
   as_natsuki podman info >/dev/null
   if ! as_natsuki podman run --rm \
